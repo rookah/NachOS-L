@@ -10,7 +10,7 @@
  *	be careful to allocate a big enough stack to hold the automatics!
  */
 
-#include "syscall.h"
+#include "../userprog/syscall.h"
 
 int
 main ()
