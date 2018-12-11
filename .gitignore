@@ -4,3 +4,4 @@ code/bin/*.o
 code/bin/.*.d
 *.swp
 tags
+list
