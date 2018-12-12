@@ -35,7 +35,8 @@
 #define	SC_GetString 14
 #define SC_GetInt	15
 #define SC_PutInt 16
-
+#define SC_UserThreadCreate 17
+#define SC_UserThreadExit 18
 #ifdef IN_USER_MODE
 
 // LB: This part is read only on compiling the test/*.c files.
@@ -146,6 +147,7 @@ void GetInt(int *n);
 
 void PutInt(int n);
 
+int UserThreadCreate(void f(void *arg), void *arg);
 
 #endif // IN_USER_MODE
 

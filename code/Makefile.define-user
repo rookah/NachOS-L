@@ -58,15 +58,15 @@ USERPROG_LIBS=start.S
 ###########################################################################
 # The Makefile.define-origin defines the following flavors
 ######### threads
-$(eval $(call define-flavor,threads,thread-test synchconsole.cc))
+$(eval $(call define-flavor,threads,thread-test synchconsole.cc userthread.cc))
 ######### userprog
-$(eval $(call define-flavor,userprog,userprog filesys-stub,synchconsole.cc))
+$(eval $(call define-flavor,userprog,userprog filesys-stub,synchconsole.cc userthread.cc))
 ######### filesys
-$(eval $(call define-flavor,filesys,userprog filesys,synchconsole.cc))
+$(eval $(call define-flavor,filesys,userprog filesys,synchconsole.cc userthread.cc))
 ######### network
-$(eval $(call define-flavor,network,thread-test userprog filesys network,synchconsole.cc))
+$(eval $(call define-flavor,network,thread-test userprog filesys network,synchconsole.cc userthread.cc))
 ######### vm
-$(eval $(call define-flavor,vm,userprog filesys-stub,synchconsole.cc vm))
+$(eval $(call define-flavor,vm,userprog filesys-stub,synchconsole.cc userthread.cc vm))
 ###########################################################################
 
 ###########################################################################
@@ -81,7 +81,7 @@ USER_FLAVORS=filesys network userprog threads step2
 # to the personal flavors
 # USER_FLAVORS=step2 step5 mynetwork final
 
-$(eval $(call define-flavor,step2,userprog filesys-stub,synchconsole.cc))
+$(eval $(call define-flavor,step2,userprog filesys-stub,synchconsole.cc userthread.cc))
 # $(eval $(call define-flavor,step5,userprog filesys,\
 #     synchconsole.cc userthread.cc))
 # $(eval $(call define-flavor,mynetwork,userprog filesys-stub network, \
