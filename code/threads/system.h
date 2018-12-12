@@ -16,6 +16,9 @@
 #include "stats.h"
 #include "timer.h"
 
+
+#define MAX_STRING_SIZE 256
+
 class SynchConsole;
 
 // Initialization and cleanup routines

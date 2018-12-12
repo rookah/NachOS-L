@@ -63,12 +63,13 @@ UpdatePC ()
 //      "which" is the kind of exception.  The list of possible exceptions 
 //      are in machine.h.
 //----------------------------------------------------------------------
+void copyStringFromMachine(int from,char *to,unsigned size);
 
 void
 ExceptionHandler (ExceptionType which)
 {
     int type = machine->ReadRegister (2);
-
+    char string[MAX_STRING_SIZE];
     if (which == SyscallException) {
       switch (type) {
       case SC_Halt: {
@@ -86,6 +87,26 @@ ExceptionHandler (ExceptionType which)
        // machine->WriteRegister(2 ,interrupt->GetChar());
        break;
       }
+      case SC_PutString:
+        copyStringFromMachine((machine->ReadRegister (4)),string,MAX_STRING_SIZE);
+        synchconsole->SynchPutString(string);
+        break;
+      case SC_GetString:{
+        char *fromptr=(char*)(machine->ReadRegister (4) + machine->mainMemory);
+        synchconsole->SynchGetString(fromptr,machine->ReadRegister (5));
+        break;  
+      }
+      case SC_PutInt:
+        synchconsole->SynchPutInt(machine->ReadRegister (4));
+        break;
+
+      case SC_GetInt:
+        {
+          int *n=(int*)(machine->ReadRegister (4) + machine->mainMemory);
+          synchconsole->SynchGetInt(n);
+          break;  
+      }
+
       default: {
         printf("Unexpected user mode exception %d %d\n", which, type);
         ASSERT(FALSE);
@@ -96,4 +117,17 @@ ExceptionHandler (ExceptionType which)
   }
 
     // End of addition
+}
+
+
+void copyStringFromMachine(int from,char *to,unsigned size){
+
+  char *fromptr=(char*)(from + machine->mainMemory);
+  while(*fromptr!='\0' && size>1){
+    *to=*fromptr;
+    fromptr++;
+    to++;
+    size--;
+  }
+  *to='\0';
 }

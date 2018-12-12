@@ -8,7 +8,6 @@
 
 #include "copyright.h"
 #include "utility.h"
-
 // this seems to be dependent on how the compiler is configured.
 // if you have problems with va_start, try both of these alternatives
 #if defined(HOST_SNAKE) || defined(HOST_SPARC) || defined(HOST_i386)
@@ -70,3 +69,5 @@ DEBUG (char flag, const char *format, ...)
 	  fflush (stdout);
       }
 }
+
+

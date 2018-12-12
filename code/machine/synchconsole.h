@@ -14,8 +14,10 @@ void SynchPutChar(const char ch);
 char SynchGetChar();
 // Unix putchar(3S)
 // Unix getchar(3S)
-void SynchPutString(const char *s); // Unix puts(3S)
+void SynchPutString( char *s); // Unix puts(3S)
 void SynchGetString(char *s, int n);
+void SynchPutInt(int n);
+void SynchGetInt(int *n);
 // Unix fgets(3S)
 private:
 Console *console;

@@ -18,5 +18,5 @@ int	main()
 	// c=GetChar();
 	print('a',4);
 
-	Halt();
+	Halt();	
 }

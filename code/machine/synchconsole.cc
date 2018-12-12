@@ -2,7 +2,7 @@
 #include "synchconsole.h"
 #include "synch.h"	
 #include "copyright.h"
-
+#include "utility.h"
 
 static Semaphore *readAvail;
 static Semaphore *writeDone;
@@ -10,6 +10,8 @@ static void ReadAvail(int arg) {
 	readAvail->V();
 	
  }
+void copyStringFromMachine(int from,char *to,unsigned size);
+
 static void WriteDone(int arg) { writeDone->V(); }
 
 SynchConsole::SynchConsole(char *readFile, char *writeFile)
@@ -38,11 +40,42 @@ char SynchConsole::SynchGetChar()
 	return console->GetChar ();
 		
 }
-void SynchConsole::SynchPutString(const char s[])
+void SynchConsole::SynchPutString(char *s)
 {
-
+	
+	int i=0;
+	while(s[i]!='\0'){
+		SynchPutChar(s[i]);
+		i++;
+	}
+	
 }
+
+
 void SynchConsole::SynchGetString(char *s, int n)
-{
+{	
+	while(n>1 && ( *s=SynchGetChar())!=EOF  ){
+		n--;
+		if(*s=='\n')
+			n=0;
+		s++;
+	}
+	*s='\0';
 
 }
+
+void SynchConsole::SynchPutInt(int n)
+{
+	char string[12];
+	snprintf(string,12,"%d",n);
+	SynchPutString(string);
+		
+	}
+
+void SynchConsole::SynchGetInt(int *n)
+{	char string[13];
+
+	SynchGetString(string,13);
+	sscanf(string,"%d",n);
+	
+	}
