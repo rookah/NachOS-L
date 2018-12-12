@@ -93,6 +93,10 @@ class Interrupt {
 
     void Halt(); 			// quit and print out stats
     
+    // void PutChar(char c);
+    
+    // char GetChar();
+
     void YieldOnReturn();		// cause a context switch on return 
 					// from an interrupt handler
 
