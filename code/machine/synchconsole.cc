@@ -6,6 +6,8 @@
 
 static Semaphore *readAvail;
 static Semaphore *writeDone;
+
+
 static void ReadAvail(int arg) { 
 	readAvail->V();
 	
@@ -18,6 +20,7 @@ SynchConsole::SynchConsole(char *readFile, char *writeFile)
 {
 readAvail = new Semaphore("read avail", 0);
 writeDone = new Semaphore("write done", 0);
+mutex= new Lock("lock");
 console = new Console (readFile, writeFile, ReadAvail, WriteDone, 0);
 }
 
@@ -26,18 +29,24 @@ SynchConsole::~SynchConsole()
 delete console;
 delete writeDone;
 delete readAvail;
+delete mutex;
 }
 
 void SynchConsole::SynchPutChar(const char ch)
-{
+{	
+	mutex->Acquire();
 	console->PutChar(ch);
 	writeDone->P ();// wait for write to finish
+	mutex->Release();
 }
 
 char SynchConsole::SynchGetChar()
-{
+{	
+	mutex->Acquire();
 	readAvail->P ();	// wait for character to arrive
-	return console->GetChar ();
+	char c=console->GetChar ();
+	mutex->Release();
+	return c;
 		
 }
 void SynchConsole::SynchPutString(char *s)

@@ -112,7 +112,7 @@ class Thread
     {
 	printf ("%s, ", name);
     }
-
+    int id;
   private:
     // some of the private data for this class is listed above
 

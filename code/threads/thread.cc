@@ -19,7 +19,8 @@
 #include "switch.h"
 #include "synch.h"
 #include "system.h"
-
+static int tid=1 ;
+static Lock mutex("mtx");
 #define STACK_FENCEPOST 0xdeadbeef	// this is put at the top of the
 					// execution stack, for detecting 
 					// stack overflows
@@ -38,6 +39,9 @@ Thread::Thread (const char *threadName)
     stackTop = NULL;
     stack = NULL;
     status = JUST_CREATED;
+    mutex.Acquire();
+    id=tid++;
+    mutex.Release();
 #ifdef USER_PROGRAM
     space = NULL;
     // FBT: Need to initialize special registers of simulator to 0

@@ -15,6 +15,10 @@
 
 #include "copyright.h"
 #include "filesys.h"
+class Lock;
+class Semaphore;
+
+#define MaxThreadNum    1024
 
 #define UserStackSize		1024	// increase this as necessary!
 
@@ -31,11 +35,17 @@ class AddrSpace
 
     void SaveState ();		// Save/restore address space-specific
     void RestoreState ();	// info on a context switch 
+    int ThreadCount();
+    void SignalThread(int t);
+    void JoinThread(int t);
 
   private:
       TranslationEntry * pageTable;	// Assume linear page table translation
     // for now!
     unsigned int numPages;	// Number of pages in the virtual 
+    int  numThreads;
+    Lock *mtx;
+    Semaphore* tid[MaxThreadNum];
     // address space
 };
 

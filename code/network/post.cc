@@ -18,7 +18,6 @@
 
 #include "copyright.h"
 #include "post.h"
-
 #include <strings.h> /* for bzero */
 
 //----------------------------------------------------------------------
