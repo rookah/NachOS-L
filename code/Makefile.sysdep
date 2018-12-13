@@ -30,7 +30,7 @@ GCCDIR ?= $(firstword $(wildcard /usr/mipsel-linux-gnu/bin \
 	/opt/NACHOS/nachos_gcc/cross/decstation-ultrix/bin))
 MIPS_CC=$(firstword $(wildcard \
 	$(GCCDIR)/gcc \
-	mipsel-unknown-linux-gnu-gcc \
+	/usr/bin/mipsel-unknown-linux-gnu-gcc \
 	/usr/bin/mipsel-linux-gnu-gcc \
 	/opt/NACHOS/nachos_gcc/cross/decstation-ultrix/bin))
 ###############################################
