@@ -22,11 +22,8 @@
 #include "system.h"
 #include <strings.h> /* for bzero */
 
-<<<<<<< HEAD
 static int process_count = 0; // TODO Protect me with mutex
-=======
-//static void ReadAtVirtual(OpenFile *executable, int virtualaddr, int numBytes, int position);
->>>>>>> step 4 start
+static void ReadAtVirtual(OpenFile *executable, int virtualaddr, int numBytes, int position);
 
 //----------------------------------------------------------------------
 // SwapHeader
@@ -109,15 +106,14 @@ AddrSpace::AddrSpace(OpenFile *executable) : mtx(new Lock("thread countlock")) {
   if (noffH.code.size > 0) {
     DEBUG('a', "Initializing code segment, at 0x%x, size %d\n",
           noffH.code.virtualAddr, noffH.code.size);
-    executable->ReadAt(&(machine->mainMemory[noffH.code.virtualAddr]), noffH.code.size, noffH.code.inFileAddr);
-    //ReadAtVirtual(executable, noffH.code.virtualAddr, noffH.code.size, noffH.code.inFileAddr);
+    //executable->ReadAt(&(machine->mainMemory[noffH.code.virtualAddr]), noffH.code.size, noffH.code.inFileAddr);
+    ReadAtVirtual(executable, noffH.code.virtualAddr, noffH.code.size, noffH.code.inFileAddr);
   }
   if (noffH.initData.size > 0) {
     DEBUG('a', "Initializing data segment, at 0x%x, size %d\n",
           noffH.initData.virtualAddr, noffH.initData.size);
-    executable->ReadAt(&(machine->mainMemory[noffH.initData.virtualAddr]),
-                       noffH.initData.size, noffH.initData.inFileAddr);
-    //ReadAtVirtual(executable, noffH.initData.virtualAddr, noffH.initData.size, noffH.initData.inFileAddr);
+    //executable->ReadAt(&(machine->mainMemory[noffH.initData.virtualAddr]), noffH.initData.size, noffH.initData.inFileAddr);
+    ReadAtVirtual(executable, noffH.initData.virtualAddr, noffH.initData.size, noffH.initData.inFileAddr);
   }
   numThreads = 0;
   for (i = 0; i < MaxThreadNum; i++) {
@@ -125,13 +121,13 @@ AddrSpace::AddrSpace(OpenFile *executable) : mtx(new Lock("thread countlock")) {
   }
 }
 
-//static void ReadAtVirtual(OpenFile *executable, int virtualaddr, int numBytes, int position) {
-//  char buff[numBytes];
-//  numBytes = executable->ReadAt(buff, numBytes, position);
-//  for (int i = 0; i < numBytes; i++) {
-//    machine->WriteMem(virtualaddr + i, 1, buff[i]);
-//  }
-//}
+static void ReadAtVirtual(OpenFile *executable, int virtualaddr, int numBytes, int position) {
+  char buff[numBytes];
+  numBytes = executable->ReadAt(buff, numBytes, position);
+  for (int i = 0; i < numBytes; i++) {
+    machine->WriteMem(virtualaddr + i, 1, buff[i]);
+  }
+}
 
 //----------------------------------------------------------------------
 // AddrSpace::~AddrSpace
