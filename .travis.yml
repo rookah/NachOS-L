@@ -7,9 +7,12 @@ sudo: required
 
 addons:
   apt:
+    sources:
+      - sourceline: 'ppa:duggan/bats'
     packages:
       - git
       - gcc-mipsel-linux-gnu
+      - bats # Unit testing in Bash
 
 before_install:
   - sudo bash README.Debian
@@ -17,3 +20,5 @@ before_install:
 script:
   - cd code
   - make
+  - cd build
+  - bats -p ../test/test_all.bats
