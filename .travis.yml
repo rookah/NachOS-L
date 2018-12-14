@@ -1,0 +1,17 @@
+language: cpp
+compiler: gcc
+
+os: linux
+sudo: required
+
+addons:
+  apt:
+    packages:
+      - gcc-mipsel-linux-gnu
+
+before_install:
+  - sudo bash README.Debian
+
+script:
+  - cd code
+  - make
