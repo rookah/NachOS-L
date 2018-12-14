@@ -69,7 +69,7 @@ Semaphore::P ()
     while (value == 0)
       {				// semaphore not available
 	  queue->Append ((void *) currentThread);	// so go to sleep
-	  currentThread->Sleep ();
+	  currentThread->Sleep (); 
       }
     value--;			// semaphore available, 
     // consume its value
@@ -87,7 +87,7 @@ Semaphore::P ()
 
 void
 Semaphore::V ()
-{
+{   
     Thread *thread;
     IntStatus oldLevel = interrupt->SetLevel (IntOff);
 
@@ -101,20 +101,22 @@ Semaphore::V ()
 // Dummy functions -- so we can compile our later assignments 
 // Note -- without a correct implementation of Condition::Wait(), 
 // the test case in the network assignment won't work!
-Lock::Lock (const char *debugName)
-{
-}
+Lock::Lock (const char *debugName) : sem(debugName,1)
+{   
+}   
 
 Lock::~Lock ()
 {
 }
 void
 Lock::Acquire ()
-{
+{  
+   sem.P(); 
 }
 void
 Lock::Release ()
-{
+{   
+    sem.V();
 }
 
 Condition::Condition (const char *debugName)

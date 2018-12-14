@@ -21,7 +21,7 @@ void thread(void *d){
 	
 	// int i=0;
 	// PutInt(8);
-	for(int i=0;i<5;i++){
+	for(int i=0;i<100;i++){
 	// while(1){
 		PutChar('g');	
 		// PutChar('a');
@@ -30,7 +30,7 @@ void thread(void *d){
 	// PutChar('g');
 }	
 void thread2(void *d){
-	UserThreadCreate(thread3,(void *)0);
+	int id3=UserThreadCreate(thread3,(void *)0);
 	
 	// int i=0;
 	// PutInt(8);
@@ -39,6 +39,7 @@ void thread2(void *d){
 		PutChar('t');	
 		// PutChar('a');
 	}
+	UserThreadJoin(id3);
 	UserThreadExit();
 	// PutChar('g');
 }	
@@ -47,16 +48,12 @@ void thread2(void *d){
 
 int main(){
 
-	UserThreadCreate(thread2,(void *)0);	
-	UserThreadCreate(thread,(void *)0);
-	PutChar('s');
-	for(int j=0;j<1000;j++){
-	// int i =0;
-	// while(1){
-		// PutChar('b');
-		// i++;
-	}
+	int id1=UserThreadCreate(thread2,(void *)0);	
+	int id2=UserThreadCreate(thread,(void *)0);
+	UserThreadJoin(id1);
+	UserThreadJoin(id2);
+
 	
-	// Halt();	
+	Halt();	
 	return 0;
 }	

@@ -19,7 +19,7 @@
 #include "system.h"
 #include "addrspace.h"
 #include "noff.h"
-
+#include "synch.h"
 #include <strings.h>		/* for bzero */
 
 //----------------------------------------------------------------------
@@ -60,7 +60,7 @@ SwapHeader (NoffHeader * noffH)
 //      "executable" is the file containing the object code to load into memory
 //----------------------------------------------------------------------
 
-AddrSpace::AddrSpace (OpenFile * executable)
+AddrSpace::AddrSpace (OpenFile * executable):mtx(new Lock("thread countlock"))
 {
     NoffHeader noffH;
     unsigned int i, size;
@@ -119,7 +119,10 @@ AddrSpace::AddrSpace (OpenFile * executable)
 			       [noffH.initData.virtualAddr]),
 			      noffH.initData.size, noffH.initData.inFileAddr);
       }
-
+      numThreads=0;
+      for(i=0;i<MaxThreadNum;i++){
+        tid[i]=new Semaphore("sem",0);
+      }
 }
 
 //----------------------------------------------------------------------
@@ -194,4 +197,24 @@ AddrSpace::RestoreState ()
 {
     machine->pageTable = pageTable;
     machine->pageTableSize = numPages;
+}
+
+int AddrSpace::ThreadCount(){
+    
+    mtx->Acquire();
+    int a=++numThreads;
+    mtx->Release();
+    return a;
+}
+
+void AddrSpace::JoinThread(int t){
+    ASSERT(t<MaxThreadNum);
+    tid[t]->P();
+
+}
+
+void AddrSpace::SignalThread(int t){
+    ASSERT(t<MaxThreadNum);
+    tid[t]->V();
+
 }

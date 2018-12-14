@@ -87,6 +87,7 @@ class Lock
 
   private:
     const char *name;		// for debugging
+    Semaphore sem;
     // plus some other stuff you'll need to define
 };
 

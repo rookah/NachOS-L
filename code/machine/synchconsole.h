@@ -4,6 +4,9 @@
 #include "copyright.h"
 #include "utility.h"
 #include "console.h"
+#include "synch.h"
+
+
 class SynchConsole {
 public:
 SynchConsole(char *readFile, char *writeFile);
@@ -21,6 +24,7 @@ void SynchGetInt(int *n);
 // Unix fgets(3S)
 private:
 Console *console;
+Lock *mutex;
 };
 #endif // SYNCHCONSOLE_H
 #endif // CHANGED
