@@ -20,5 +20,5 @@ before_install:
 script:
   - cd code
   - make
-  - cd ../build
+  - cd build
   - bats ../test/test_all.bats
