@@ -38,6 +38,8 @@ USERPROG_LIBS=start.S
 # sources and will always be linked only with start.S (USERPROG_LIBS
 # and ..._EXTRA_SOURCES are ignored for them)
 
+EXTRA_SOURCES=synchconsole.cc userthread.cc semaphore.cc
+
 ###########################################################################
 #                        NACHOS KERNELS                                   #
 ###########################################################################
@@ -58,15 +60,15 @@ USERPROG_LIBS=start.S
 ###########################################################################
 # The Makefile.define-origin defines the following flavors
 ######### threads
-$(eval $(call define-flavor,threads,thread-test synchconsole.cc userthread.cc))
+$(eval $(call define-flavor,threads,thread-test $(EXTRA_SOURCES)))
 ######### userprog
-$(eval $(call define-flavor,userprog,userprog filesys-stub,synchconsole.cc userthread.cc))
+$(eval $(call define-flavor,userprog,userprog filesys-stub,$(EXTRA_SOURCES)))
 ######### filesys
-$(eval $(call define-flavor,filesys,userprog filesys,synchconsole.cc userthread.cc))
+$(eval $(call define-flavor,filesys,userprog filesys,$(EXTRA_SOURCES)))
 ######### network
-$(eval $(call define-flavor,network,thread-test userprog filesys network,synchconsole.cc userthread.cc))
+$(eval $(call define-flavor,network,thread-test userprog filesys network,$(EXTRA_SOURCES)))
 ######### vm
-$(eval $(call define-flavor,vm,userprog filesys-stub,synchconsole.cc userthread.cc vm))
+$(eval $(call define-flavor,vm,userprog filesys-stub,$(EXTRA_SOURCES) vm))
 ###########################################################################
 
 ###########################################################################
@@ -81,11 +83,11 @@ USER_FLAVORS=filesys network userprog threads step2
 # to the personal flavors
 # USER_FLAVORS=step2 step5 mynetwork final
 
-$(eval $(call define-flavor,step2,userprog filesys-stub,synchconsole.cc userthread.cc))
+$(eval $(call define-flavor,step2,userprog filesys-stub,$(EXTRA_SOURCES)))
 # $(eval $(call define-flavor,step5,userprog filesys,\
-#     synchconsole.cc userthread.cc))
+#     $(EXTRA_SOURCES)))
 # $(eval $(call define-flavor,mynetwork,userprog filesys-stub network, \
-#     synchconsole.cc userthread.cc))
+#     $(EXTRA_SOURCES)))
 # $(eval $(call define-flavor,final,userprog filesys network,\
-#     synchconsole.cc userthread.cc))
+#     $(EXTRA_SOURCES)))
 

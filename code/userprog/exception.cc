@@ -22,6 +22,7 @@
 // of liability and disclaimer of warranty provisions.
 
 #include "copyright.h"
+#include "semaphore.h"
 #include "syscall.h"
 #include "system.h"
 #include "userthread.h"
@@ -86,6 +87,7 @@ void ExceptionHandler(ExceptionType which)
 			copyStringFromMachine((machine->ReadRegister(4)), string, MAX_STRING_SIZE);
 			synchconsole->SynchPutString(string);
 			break;
+
 		case SC_GetString: {
 			char *fromptr = (char *)(machine->ReadRegister(4) + machine->mainMemory);
 			synchconsole->SynchGetString(fromptr, machine->ReadRegister(5));
@@ -108,11 +110,22 @@ void ExceptionHandler(ExceptionType which)
 
 		case SC_UserThreadExit:
 			do_UserThreadExit();
-
 			break;
+
 		case SC_UserThreadJoin:
 			do_UserThreadJoin(machine->ReadRegister(4));
+			break;
 
+		case SC_SemInit:
+			machine->WriteRegister(2, do_SemInit(machine->ReadRegister(4)));
+			break;
+
+		case SC_SemWait:
+			do_SemWait(machine->ReadRegister(4));
+			break;
+
+		case SC_SemPost:
+			do_SemPost(machine->ReadRegister(4));
 			break;
 
 		default: {
