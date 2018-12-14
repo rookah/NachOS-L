@@ -38,7 +38,13 @@
 #define SC_UserThreadCreate 17
 #define SC_UserThreadExit 18
 #define SC_UserThreadJoin 19
+#define SC_SemInit 20
+#define SC_SemWait 21
+#define SC_SemPost 22
+
 #ifdef IN_USER_MODE
+
+typedef int sem_t;
 
 // LB: This part is read only on compiling the test/*.c files.
 // It is *not* read on compiling test/start.S
@@ -148,6 +154,12 @@ int UserThreadCreate(void f(void *arg), void *arg);
 void UserThreadExit();
 
 void UserThreadJoin(int tid);
+
+sem_t SemInit(int value);
+
+void SemWait(sem_t sem);
+
+void SemPost(sem_t sem);
 #endif // IN_USER_MODE
 
 #endif /* SYSCALL_H */
