@@ -1,11 +1,10 @@
 #include "syscall.h"
 
+int main() {
+  int n;
 
-int	main()
-{	int n;
+  GetInt(&n);
+  PutInt(n);
 
-	GetInt(&n);
-	PutInt(n);
-
-	Halt();	
+  Halt();
 }
