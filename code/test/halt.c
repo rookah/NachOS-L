@@ -12,9 +12,10 @@
 
 #include "../userprog/syscall.h"
 
-int main() {
-  Halt();
+int main()
+{
+	Halt();
 
-  /* not reached */
-  return 0;
+	/* not reached */
+	return 0;
 }

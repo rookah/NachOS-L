@@ -19,35 +19,36 @@
 //
 // The fields in this class are public to make it easier to update.
 
-class Statistics {
-public:
-  // LB: type of ticks promoted from 32 bit int to 64 bit long long
-  // to cope with long runs
-  // int totalTicks;      	// Total time running Nachos
-  // int idleTicks;       	// Time spent idle (no threads to run)
-  // int systemTicks;	 	// Time spent executing system code
-  // int userTicks;       	// Time spent executing user code
-  // (this is also equal to # of
-  // user instructions executed)
-  long long totalTicks;  // Total time running Nachos
-  long long idleTicks;   // Time spent idle (no threads to run)
-  long long systemTicks; // Time spent executing system code
-  long long userTicks;   // Time spent executing user code
-                       // (this is also equal to # of
-                       // user instructions executed)
-  // End of correction
+class Statistics
+{
+  public:
+	// LB: type of ticks promoted from 32 bit int to 64 bit long long
+	// to cope with long runs
+	// int totalTicks;      	// Total time running Nachos
+	// int idleTicks;       	// Time spent idle (no threads to run)
+	// int systemTicks;	 	// Time spent executing system code
+	// int userTicks;       	// Time spent executing user code
+	// (this is also equal to # of
+	// user instructions executed)
+	long long totalTicks;  // Total time running Nachos
+	long long idleTicks;   // Time spent idle (no threads to run)
+	long long systemTicks; // Time spent executing system code
+	long long userTicks;   // Time spent executing user code
+	                       // (this is also equal to # of
+	                       // user instructions executed)
+	// End of correction
 
-  int numDiskReads;           // number of disk read requests
-  int numDiskWrites;          // number of disk write requests
-  int numConsoleCharsRead;    // number of characters read from the keyboard
-  int numConsoleCharsWritten; // number of characters written to the display
-  int numPageFaults;          // number of virtual memory page faults
-  int numPacketsSent;         // number of packets sent over the network
-  int numPacketsRecvd;        // number of packets received over the network
+	int numDiskReads;           // number of disk read requests
+	int numDiskWrites;          // number of disk write requests
+	int numConsoleCharsRead;    // number of characters read from the keyboard
+	int numConsoleCharsWritten; // number of characters written to the display
+	int numPageFaults;          // number of virtual memory page faults
+	int numPacketsSent;         // number of packets sent over the network
+	int numPacketsRecvd;        // number of packets received over the network
 
-  Statistics(); // initialize everything to zero
+	Statistics(); // initialize everything to zero
 
-  void Print(); // print collected statistics
+	void Print(); // print collected statistics
 };
 
 // Constants used to reflect the relative time an operation would

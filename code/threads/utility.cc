@@ -16,8 +16,7 @@
 #include "/usr/include/stdarg.h"
 #endif
 
-static const char *enableFlags =
-    NULL; // controls which DEBUG messages are printed
+static const char *enableFlags = NULL; // controls which DEBUG messages are printed
 
 //----------------------------------------------------------------------
 // DebugInit
@@ -30,18 +29,22 @@ static const char *enableFlags =
 //              to be enabled.
 //----------------------------------------------------------------------
 
-void DebugInit(const char *flagList) { enableFlags = flagList; }
+void DebugInit(const char *flagList)
+{
+	enableFlags = flagList;
+}
 
 //----------------------------------------------------------------------
 // DebugIsEnabled
 //      Return TRUE if DEBUG messages with "flag" are to be printed.
 //----------------------------------------------------------------------
 
-bool DebugIsEnabled(char flag) {
-  if (enableFlags != NULL)
-    return (strchr(enableFlags, flag) != 0) || (strchr(enableFlags, '+') != 0);
-  else
-    return FALSE;
+bool DebugIsEnabled(char flag)
+{
+	if (enableFlags != NULL)
+		return (strchr(enableFlags, flag) != 0) || (strchr(enableFlags, '+') != 0);
+	else
+		return FALSE;
 }
 
 //----------------------------------------------------------------------
@@ -50,13 +53,14 @@ bool DebugIsEnabled(char flag) {
 //      only with an extra argument on the front.
 //----------------------------------------------------------------------
 
-void DEBUG(char flag, const char *format, ...) {
-  if (DebugIsEnabled(flag)) {
-    va_list ap;
-    // You will get an unused variable message here -- ignore it.
-    va_start(ap, format);
-    vfprintf(stdout, format, ap);
-    va_end(ap);
-    fflush(stdout);
-  }
+void DEBUG(char flag, const char *format, ...)
+{
+	if (DebugIsEnabled(flag)) {
+		va_list ap;
+		// You will get an unused variable message here -- ignore it.
+		va_start(ap, format);
+		vfprintf(stdout, format, ap);
+		va_end(ap);
+		fflush(stdout);
+	}
 }

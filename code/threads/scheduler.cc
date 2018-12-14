@@ -27,14 +27,20 @@
 //      Initialize the list of ready but not running threads to empty.
 //----------------------------------------------------------------------
 
-Scheduler::Scheduler() { readyList = new List; }
+Scheduler::Scheduler()
+{
+	readyList = new List;
+}
 
 //----------------------------------------------------------------------
 // Scheduler::~Scheduler
 //      De-allocate the list of ready threads.
 //----------------------------------------------------------------------
 
-Scheduler::~Scheduler() { delete readyList; }
+Scheduler::~Scheduler()
+{
+	delete readyList;
+}
 
 //----------------------------------------------------------------------
 // Scheduler::ReadyToRun
@@ -44,11 +50,12 @@ Scheduler::~Scheduler() { delete readyList; }
 //      "thread" is the thread to be put on the ready list.
 //----------------------------------------------------------------------
 
-void Scheduler::ReadyToRun(Thread *thread) {
-  DEBUG('t', "Putting thread %s on ready list.\n", thread->getName());
+void Scheduler::ReadyToRun(Thread *thread)
+{
+	DEBUG('t', "Putting thread %s on ready list.\n", thread->getName());
 
-  thread->setStatus(READY);
-  readyList->Append((void *)thread);
+	thread->setStatus(READY);
+	readyList->Append((void *)thread);
 }
 
 //----------------------------------------------------------------------
@@ -59,7 +66,10 @@ void Scheduler::ReadyToRun(Thread *thread) {
 //      Thread is removed from the ready list.
 //----------------------------------------------------------------------
 
-Thread *Scheduler::FindNextToRun() { return (Thread *)readyList->Remove(); }
+Thread *Scheduler::FindNextToRun()
+{
+	return (Thread *)readyList->Remove();
+}
 
 //----------------------------------------------------------------------
 // Scheduler::Run
@@ -75,52 +85,52 @@ Thread *Scheduler::FindNextToRun() { return (Thread *)readyList->Remove(); }
 //      "nextThread" is the thread to be put into the CPU.
 //----------------------------------------------------------------------
 
-void Scheduler::Run(Thread *nextThread) {
-  Thread *oldThread = currentThread;
+void Scheduler::Run(Thread *nextThread)
+{
+	Thread *oldThread = currentThread;
 
-  // LB: For safety...
-  ASSERT(interrupt->getLevel() == IntOff);
-  // End of addition
+	// LB: For safety...
+	ASSERT(interrupt->getLevel() == IntOff);
+// End of addition
 
-#ifdef USER_PROGRAM                   // ignore until running user programs
-  if (currentThread->space != NULL) { // if this thread is a user program,
-    currentThread->SaveUserState();   // save the user's CPU registers
-    currentThread->space->SaveState();
-  }
+#ifdef USER_PROGRAM                     // ignore until running user programs
+	if (currentThread->space != NULL) { // if this thread is a user program,
+		currentThread->SaveUserState(); // save the user's CPU registers
+		currentThread->space->SaveState();
+	}
 #endif
 
-  oldThread->CheckOverflow(); // check if the old thread
-  // had an undetected stack overflow
+	oldThread->CheckOverflow(); // check if the old thread
+	// had an undetected stack overflow
 
-  currentThread = nextThread;        // switch to the next thread
-  currentThread->setStatus(RUNNING); // nextThread is now running
+	currentThread = nextThread;        // switch to the next thread
+	currentThread->setStatus(RUNNING); // nextThread is now running
 
-  DEBUG('t', "Switching from thread \"%s\" to thread \"%s\"\n",
-        oldThread->getName(), nextThread->getName());
+	DEBUG('t', "Switching from thread \"%s\" to thread \"%s\"\n", oldThread->getName(), nextThread->getName());
 
-  // This is a machine-dependent assembly language routine defined
-  // in switch.s.  You may have to think
-  // a bit to figure out what happens after this, both from the point
-  // of view of the thread and from the perspective of the "outside world".
+	// This is a machine-dependent assembly language routine defined
+	// in switch.s.  You may have to think
+	// a bit to figure out what happens after this, both from the point
+	// of view of the thread and from the perspective of the "outside world".
 
-  SWITCH(oldThread, nextThread);
+	SWITCH(oldThread, nextThread);
 
-  DEBUG('t', "Now in thread \"%s\"\n", currentThread->getName());
+	DEBUG('t', "Now in thread \"%s\"\n", currentThread->getName());
 
-  // If the old thread gave up the processor because it was finishing,
-  // we need to delete its carcass.  Note we cannot delete the thread
-  // before now (for example, in Thread::Finish()), because up to this
-  // point, we were still running on the old thread's stack!
-  if (threadToBeDestroyed != NULL) {
-    delete threadToBeDestroyed;
-    threadToBeDestroyed = NULL;
-  }
+	// If the old thread gave up the processor because it was finishing,
+	// we need to delete its carcass.  Note we cannot delete the thread
+	// before now (for example, in Thread::Finish()), because up to this
+	// point, we were still running on the old thread's stack!
+	if (threadToBeDestroyed != NULL) {
+		delete threadToBeDestroyed;
+		threadToBeDestroyed = NULL;
+	}
 
 #ifdef USER_PROGRAM
-  if (currentThread->space != NULL) {  // if there is an address space
-    currentThread->RestoreUserState(); // to restore, do it.
-    currentThread->space->RestoreState();
-  }
+	if (currentThread->space != NULL) {    // if there is an address space
+		currentThread->RestoreUserState(); // to restore, do it.
+		currentThread->space->RestoreState();
+	}
 #endif
 }
 
@@ -129,7 +139,8 @@ void Scheduler::Run(Thread *nextThread) {
 //      Print the scheduler state -- in other words, the contents of
 //      the ready list.  For debugging.
 //----------------------------------------------------------------------
-void Scheduler::Print() {
-  printf("Ready list contents:\n");
-  readyList->Mapcar((VoidFunctionPtr)ThreadPrint);
+void Scheduler::Print()
+{
+	printf("Ready list contents:\n");
+	readyList->Mapcar((VoidFunctionPtr)ThreadPrint);
 }

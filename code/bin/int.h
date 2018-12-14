@@ -17,12 +17,10 @@
 #define ifetch(addr) (*(int *)(int)(&(mem - memoffset)[imark(addr)]))
 #define fetch(addr) (*(int *)(int)(&(mem - memoffset)[amark(addr)]))
 #define sfetch(addr) (*(short *)(int)(&(mem - memoffset)[amark(addr)]))
-#define usfetch(addr)                                                          \
-  (*(unsigned short *)(int)(&(mem - memoffset)[amark(addr)]))
+#define usfetch(addr) (*(unsigned short *)(int)(&(mem - memoffset)[amark(addr)]))
 #define cfetch(addr) (*(char *)(int)(&(mem - memoffset)[amark(addr)]))
 #define ucfetch(addr) (*(unsigned char *)(int)(&(mem - memoffset)[amark(addr)]))
 
 #define store(addr, i) ((*(int *)(int)(&(mem - memoffset)[amark(addr)]) = (i)))
-#define sstore(addr, i)                                                        \
-  ((*(short *)(int)(&(mem - memoffset)[amark(addr)]) = (i)))
+#define sstore(addr, i) ((*(short *)(int)(&(mem - memoffset)[amark(addr)]) = (i)))
 #define cstore(addr, i) (((mem - memoffset)[amark(addr)] = (i)))

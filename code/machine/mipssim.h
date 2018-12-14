@@ -110,50 +110,38 @@
 #define RFMT 3
 
 struct OpInfo {
-  int opCode; /* Translated op code. */
-  int format; /* Format type (IFMT or JFMT or RFMT) */
+	int opCode; /* Translated op code. */
+	int format; /* Format type (IFMT or JFMT or RFMT) */
 };
 
 static OpInfo opTable[] = {
-    {SPECIAL, RFMT},  {BCOND, IFMT},    {OP_J, JFMT},     {OP_JAL, JFMT},
-    {OP_BEQ, IFMT},   {OP_BNE, IFMT},   {OP_BLEZ, IFMT},  {OP_BGTZ, IFMT},
-    {OP_ADDI, IFMT},  {OP_ADDIU, IFMT}, {OP_SLTI, IFMT},  {OP_SLTIU, IFMT},
-    {OP_ANDI, IFMT},  {OP_ORI, IFMT},   {OP_XORI, IFMT},  {OP_LUI, IFMT},
-    {OP_UNIMP, IFMT}, {OP_UNIMP, IFMT}, {OP_UNIMP, IFMT}, {OP_UNIMP, IFMT},
-    {OP_RES, IFMT},   {OP_RES, IFMT},   {OP_RES, IFMT},   {OP_RES, IFMT},
-    {OP_RES, IFMT},   {OP_RES, IFMT},   {OP_RES, IFMT},   {OP_RES, IFMT},
-    {OP_RES, IFMT},   {OP_RES, IFMT},   {OP_RES, IFMT},   {OP_RES, IFMT},
-    {OP_LB, IFMT},    {OP_LH, IFMT},    {OP_LWL, IFMT},   {OP_LW, IFMT},
-    {OP_LBU, IFMT},   {OP_LHU, IFMT},   {OP_LWR, IFMT},   {OP_RES, IFMT},
-    {OP_SB, IFMT},    {OP_SH, IFMT},    {OP_SWL, IFMT},   {OP_SW, IFMT},
-    {OP_RES, IFMT},   {OP_RES, IFMT},   {OP_SWR, IFMT},   {OP_RES, IFMT},
-    {OP_UNIMP, IFMT}, {OP_UNIMP, IFMT}, {OP_UNIMP, IFMT}, {OP_UNIMP, IFMT},
-    {OP_RES, IFMT},   {OP_RES, IFMT},   {OP_RES, IFMT},   {OP_RES, IFMT},
-    {OP_UNIMP, IFMT}, {OP_UNIMP, IFMT}, {OP_UNIMP, IFMT}, {OP_UNIMP, IFMT},
-    {OP_RES, IFMT},   {OP_RES, IFMT},   {OP_RES, IFMT},   {OP_RES, IFMT}};
+    {SPECIAL, RFMT},  {BCOND, IFMT},    {OP_J, JFMT},     {OP_JAL, JFMT},   {OP_BEQ, IFMT},  {OP_BNE, IFMT}, {OP_BLEZ, IFMT}, {OP_BGTZ, IFMT},
+    {OP_ADDI, IFMT},  {OP_ADDIU, IFMT}, {OP_SLTI, IFMT},  {OP_SLTIU, IFMT}, {OP_ANDI, IFMT}, {OP_ORI, IFMT}, {OP_XORI, IFMT}, {OP_LUI, IFMT},
+    {OP_UNIMP, IFMT}, {OP_UNIMP, IFMT}, {OP_UNIMP, IFMT}, {OP_UNIMP, IFMT}, {OP_RES, IFMT},  {OP_RES, IFMT}, {OP_RES, IFMT},  {OP_RES, IFMT},
+    {OP_RES, IFMT},   {OP_RES, IFMT},   {OP_RES, IFMT},   {OP_RES, IFMT},   {OP_RES, IFMT},  {OP_RES, IFMT}, {OP_RES, IFMT},  {OP_RES, IFMT},
+    {OP_LB, IFMT},    {OP_LH, IFMT},    {OP_LWL, IFMT},   {OP_LW, IFMT},    {OP_LBU, IFMT},  {OP_LHU, IFMT}, {OP_LWR, IFMT},  {OP_RES, IFMT},
+    {OP_SB, IFMT},    {OP_SH, IFMT},    {OP_SWL, IFMT},   {OP_SW, IFMT},    {OP_RES, IFMT},  {OP_RES, IFMT}, {OP_SWR, IFMT},  {OP_RES, IFMT},
+    {OP_UNIMP, IFMT}, {OP_UNIMP, IFMT}, {OP_UNIMP, IFMT}, {OP_UNIMP, IFMT}, {OP_RES, IFMT},  {OP_RES, IFMT}, {OP_RES, IFMT},  {OP_RES, IFMT},
+    {OP_UNIMP, IFMT}, {OP_UNIMP, IFMT}, {OP_UNIMP, IFMT}, {OP_UNIMP, IFMT}, {OP_RES, IFMT},  {OP_RES, IFMT}, {OP_RES, IFMT},  {OP_RES, IFMT}};
 
 /*
  * The table below is used to convert the "funct" field of SPECIAL
  * instructions into the "opCode" field of a MemWord.
  */
 
-static int specialTable[] = {
-    OP_SLL,  OP_RES,   OP_SRL,  OP_SRA,  OP_SLLV,    OP_RES,   OP_SRLV, OP_SRAV,
-    OP_JR,   OP_JALR,  OP_RES,  OP_RES,  OP_SYSCALL, OP_UNIMP, OP_RES,  OP_RES,
-    OP_MFHI, OP_MTHI,  OP_MFLO, OP_MTLO, OP_RES,     OP_RES,   OP_RES,  OP_RES,
-    OP_MULT, OP_MULTU, OP_DIV,  OP_DIVU, OP_RES,     OP_RES,   OP_RES,  OP_RES,
-    OP_ADD,  OP_ADDU,  OP_SUB,  OP_SUBU, OP_AND,     OP_OR,    OP_XOR,  OP_NOR,
-    OP_RES,  OP_RES,   OP_SLT,  OP_SLTU, OP_RES,     OP_RES,   OP_RES,  OP_RES,
-    OP_RES,  OP_RES,   OP_RES,  OP_RES,  OP_RES,     OP_RES,   OP_RES,  OP_RES,
-    OP_RES,  OP_RES,   OP_RES,  OP_RES,  OP_RES,     OP_RES,   OP_RES,  OP_RES};
+static int specialTable[] = {OP_SLL,   OP_RES,  OP_SRL, OP_SRA,  OP_SLLV, OP_RES,  OP_SRLV, OP_SRAV, OP_JR,  OP_JALR, OP_RES, OP_RES,  OP_SYSCALL,
+                             OP_UNIMP, OP_RES,  OP_RES, OP_MFHI, OP_MTHI, OP_MFLO, OP_MTLO, OP_RES,  OP_RES, OP_RES,  OP_RES, OP_MULT, OP_MULTU,
+                             OP_DIV,   OP_DIVU, OP_RES, OP_RES,  OP_RES,  OP_RES,  OP_ADD,  OP_ADDU, OP_SUB, OP_SUBU, OP_AND, OP_OR,   OP_XOR,
+                             OP_NOR,   OP_RES,  OP_RES, OP_SLT,  OP_SLTU, OP_RES,  OP_RES,  OP_RES,  OP_RES, OP_RES,  OP_RES, OP_RES,  OP_RES,
+                             OP_RES,   OP_RES,  OP_RES, OP_RES,  OP_RES,  OP_RES,  OP_RES,  OP_RES,  OP_RES, OP_RES,  OP_RES, OP_RES};
 
 // Stuff to help print out each instruction, for debugging
 
 enum RegType { NONE, RS, RT, RD, EXTRA };
 
 struct OpString {
-  const char *string; // Printed version of instruction
-  RegType args[3];
+	const char *string; // Printed version of instruction
+	RegType args[3];
 };
 
 static struct OpString opStrings[] = {{"Shouldn't happen", {NONE, NONE, NONE}},

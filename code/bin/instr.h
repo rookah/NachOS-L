@@ -18,5 +18,4 @@
 #define top4(i) (((i) & (~((1 << 28) - 1))))
 #define off16(i) (immed(i) << 2)
 
-#define extend(i, hibitmask)                                                   \
-  (((i) & (hibitmask)) ? ((i) | (-(hibitmask))) : (i))
+#define extend(i, hibitmask) (((i) & (hibitmask)) ? ((i) | (-(hibitmask))) : (i))

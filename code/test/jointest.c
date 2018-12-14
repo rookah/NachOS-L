@@ -1,44 +1,44 @@
 #include "syscall.h"
 
-void thread3(void *d) {
+void thread3(void *d)
+{
+	for (int i = 0; i < 5; i++) {
+		PutChar('3');
+	}
 
-  for (int i = 0; i < 5; i++) {
-    PutChar('3');
-  }
-
-  UserThreadExit();
+	UserThreadExit();
 }
 
-void thread1(void *d) {
+void thread1(void *d)
+{
+	for (int i = 0; i < 5; i++) {
+		PutChar('1');
+	}
 
-  for (int i = 0; i < 5; i++) {
-    PutChar('1');
-  }
-
-  UserThreadExit();
+	UserThreadExit();
 }
-void thread2(void *d) {
+void thread2(void *d)
+{
+	int id3 = UserThreadCreate(thread3, (void *)0);
 
-  int id3 = UserThreadCreate(thread3, (void *)0);
+	for (int i = 0; i < 5; i++) {
+		PutChar('2');
+	}
 
-  for (int i = 0; i < 5; i++) {
-    PutChar('2');
-  }
-
-  UserThreadJoin(id3);
-  UserThreadExit();
+	UserThreadJoin(id3);
+	UserThreadExit();
 }
 
-int main() {
+int main()
+{
+	int id1 = UserThreadCreate(thread1, (void *)0);
+	int id2 = UserThreadCreate(thread2, (void *)0);
 
-  int id1 = UserThreadCreate(thread1, (void *)0);
-  int id2 = UserThreadCreate(thread2, (void *)0);
+	UserThreadJoin(id1);
+	UserThreadJoin(id2);
 
-  UserThreadJoin(id1);
-  UserThreadJoin(id2);
+	PutChar('\n');
 
-  PutChar('\n');
-
-  Halt();
-  return 0;
+	Halt();
+	return 0;
 }

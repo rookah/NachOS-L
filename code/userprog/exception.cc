@@ -29,13 +29,14 @@
 // UpdatePC : Increments the Program Counter register in order to resume
 // the user program immediately after the "syscall" instruction.
 //----------------------------------------------------------------------
-static void UpdatePC() {
-  int pc = machine->ReadRegister(PCReg);
-  machine->WriteRegister(PrevPCReg, pc);
-  pc = machine->ReadRegister(NextPCReg);
-  machine->WriteRegister(PCReg, pc);
-  pc += 4;
-  machine->WriteRegister(NextPCReg, pc);
+static void UpdatePC()
+{
+	int pc = machine->ReadRegister(PCReg);
+	machine->WriteRegister(PrevPCReg, pc);
+	pc = machine->ReadRegister(NextPCReg);
+	machine->WriteRegister(PCReg, pc);
+	pc += 4;
+	machine->WriteRegister(NextPCReg, pc);
 }
 
 //----------------------------------------------------------------------
@@ -62,80 +63,80 @@ static void UpdatePC() {
 //----------------------------------------------------------------------
 void copyStringFromMachine(int from, char *to, unsigned size);
 
-void ExceptionHandler(ExceptionType which) {
-  int type = machine->ReadRegister(2);
-  char string[MAX_STRING_SIZE];
-  if (which == SyscallException) {
-    switch (type) {
-    case SC_Halt: {
-      DEBUG('a', "Shutdown, initiated by user program.\n");
-      interrupt->Halt();
-      break;
-    }
-    case SC_PutChar: {
-      synchconsole->SynchPutChar((char)(machine->ReadRegister(4)));
-      // interrupt->PutChar((char)(machine->ReadRegister (4)));
-      break;
-    }
-    case SC_GetChar: {
-      machine->WriteRegister(2, (int)(synchconsole->SynchGetChar()));
-      // machine->WriteRegister(2 ,interrupt->GetChar());
-      break;
-    }
-    case SC_PutString:
-      copyStringFromMachine((machine->ReadRegister(4)), string,
-                            MAX_STRING_SIZE);
-      synchconsole->SynchPutString(string);
-      break;
-    case SC_GetString: {
-      char *fromptr = (char *)(machine->ReadRegister(4) + machine->mainMemory);
-      synchconsole->SynchGetString(fromptr, machine->ReadRegister(5));
-      break;
-    }
-    case SC_PutInt:
-      synchconsole->SynchPutInt(machine->ReadRegister(4));
-      break;
+void ExceptionHandler(ExceptionType which)
+{
+	int type = machine->ReadRegister(2);
+	char string[MAX_STRING_SIZE];
+	if (which == SyscallException) {
+		switch (type) {
+		case SC_Halt: {
+			DEBUG('a', "Shutdown, initiated by user program.\n");
+			interrupt->Halt();
+			break;
+		}
+		case SC_PutChar: {
+			synchconsole->SynchPutChar((char)(machine->ReadRegister(4)));
+			// interrupt->PutChar((char)(machine->ReadRegister (4)));
+			break;
+		}
+		case SC_GetChar: {
+			machine->WriteRegister(2, (int)(synchconsole->SynchGetChar()));
+			// machine->WriteRegister(2 ,interrupt->GetChar());
+			break;
+		}
+		case SC_PutString:
+			copyStringFromMachine((machine->ReadRegister(4)), string, MAX_STRING_SIZE);
+			synchconsole->SynchPutString(string);
+			break;
+		case SC_GetString: {
+			char *fromptr = (char *)(machine->ReadRegister(4) + machine->mainMemory);
+			synchconsole->SynchGetString(fromptr, machine->ReadRegister(5));
+			break;
+		}
+		case SC_PutInt:
+			synchconsole->SynchPutInt(machine->ReadRegister(4));
+			break;
 
-    case SC_GetInt: {
-      int *n = (int *)(machine->ReadRegister(4) + machine->mainMemory);
-      synchconsole->SynchGetInt(n);
-      break;
-    }
+		case SC_GetInt: {
+			int *n = (int *)(machine->ReadRegister(4) + machine->mainMemory);
+			synchconsole->SynchGetInt(n);
+			break;
+		}
 
-    case SC_UserThreadCreate:
-      machine->WriteRegister(2, do_UserThreadCreate(machine->ReadRegister(4),
-                                                    machine->ReadRegister(5)));
+		case SC_UserThreadCreate:
+			machine->WriteRegister(2, do_UserThreadCreate(machine->ReadRegister(4), machine->ReadRegister(5)));
 
-      break;
+			break;
 
-    case SC_UserThreadExit:
-      do_UserThreadExit();
+		case SC_UserThreadExit:
+			do_UserThreadExit();
 
-      break;
-    case SC_UserThreadJoin:
-      do_UserThreadJoin(machine->ReadRegister(4));
+			break;
+		case SC_UserThreadJoin:
+			do_UserThreadJoin(machine->ReadRegister(4));
 
-      break;
+			break;
 
-    default: {
-      printf("Unexpected user mode exception %d %d\n", which, type);
-      ASSERT(FALSE);
-    }
-    }
-    UpdatePC();
-  }
+		default: {
+			printf("Unexpected user mode exception %d %d\n", which, type);
+			ASSERT(FALSE);
+		}
+		}
+		UpdatePC();
+	}
 
-  // End of addition
+	// End of addition
 }
 
-void copyStringFromMachine(int from, char *to, unsigned size) {
+void copyStringFromMachine(int from, char *to, unsigned size)
+{
 
-  char *fromptr = (char *)(from + machine->mainMemory);
-  while (*fromptr != '\0' && size > 1) {
-    *to = *fromptr;
-    fromptr++;
-    to++;
-    size--;
-  }
-  *to = '\0';
+	char *fromptr = (char *)(from + machine->mainMemory);
+	while (*fromptr != '\0' && size > 1) {
+		*to = *fromptr;
+		fromptr++;
+		to++;
+		size--;
+	}
+	*to = '\0';
 }

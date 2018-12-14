@@ -36,8 +36,7 @@ extern void AssignNameToSocket(const char *socketName, int sockID);
 extern void DeAssignNameToSocket(const char *socketName);
 extern bool PollSocket(int sockID);
 extern void ReadFromSocket(int sockID, char *buffer, int packetSize);
-extern void SendToSocket(int sockID, const char *buffer, int packetSize,
-                         const char *toName);
+extern void SendToSocket(int sockID, const char *buffer, int packetSize, const char *toName);
 
 // Process control: abort, exit, and sleep
 extern void Abort();

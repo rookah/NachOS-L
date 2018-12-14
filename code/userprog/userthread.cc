@@ -3,48 +3,52 @@
 
 typedef struct bundle {
 
-  int f;
-  int arg;
-  int stackreg;
+	int f;
+	int arg;
+	int stackreg;
 } bundle_t;
 
 static void StartUserThread(int f);
 
-int do_UserThreadCreate(int f, int arg) {
-  bundle_t *b = new bundle_t;
-  b->f = f;
-  b->arg = arg;
-  b->stackreg = machine->ReadRegister(StackReg);
-  Thread *t = new Thread("newThread");
-  t->Fork(StartUserThread, (int)b);
-  return t->id;
+int do_UserThreadCreate(int f, int arg)
+{
+	bundle_t *b = new bundle_t;
+	b->f = f;
+	b->arg = arg;
+	b->stackreg = machine->ReadRegister(StackReg);
+	Thread *t = new Thread("newThread");
+	t->Fork(StartUserThread, (int)b);
+	return t->id;
 }
 
-void do_UserThreadJoin(int tid) { currentThread->space->JoinThread(tid); }
-
-void do_UserThreadExit() {
-
-  currentThread->space->SignalThread(currentThread->id);
-  currentThread->Finish();
+void do_UserThreadJoin(int tid)
+{
+	currentThread->space->JoinThread(tid);
 }
 
-static void StartUserThread(int f) {
+void do_UserThreadExit()
+{
 
-  bundle_t *b = (bundle_t *)f;
+	currentThread->space->SignalThread(currentThread->id);
+	currentThread->Finish();
+}
 
-  machine->WriteRegister(PCReg, b->f);
+static void StartUserThread(int f)
+{
 
-  machine->WriteRegister(NextPCReg, b->f + 4);
+	bundle_t *b = (bundle_t *)f;
 
-  // printf("%d\n",  b->stackreg);
-  machine->WriteRegister(
-      StackReg, b->stackreg - PageSize * 2 * currentThread->id); // machine->ReadRegister(StackReg)machine->pageTableSize
-                                                                 // * PageSize
-  DEBUG('a', "Initializing stack register to %d\n",
-        machine->ReadRegister(StackReg));
+	machine->WriteRegister(PCReg, b->f);
 
-  currentThread->space->RestoreState();
+	machine->WriteRegister(NextPCReg, b->f + 4);
 
-  machine->Run();
-  ASSERT(FALSE);
+	// printf("%d\n",  b->stackreg);
+	machine->WriteRegister(StackReg, b->stackreg - PageSize * 2 * currentThread->id); // machine->ReadRegister(StackReg)machine->pageTableSize
+	                                                                                  // * PageSize
+	DEBUG('a', "Initializing stack register to %d\n", machine->ReadRegister(StackReg));
+
+	currentThread->space->RestoreState();
+
+	machine->Run();
+	ASSERT(FALSE);
 }

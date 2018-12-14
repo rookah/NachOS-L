@@ -18,13 +18,15 @@
 #include "system.h"
 
 // Dummy functions because C++ is weird about pointers to member functions
-static void ConsoleReadPoll(int c) {
-  Console *console = (Console *)c;
-  console->CheckCharAvail();
+static void ConsoleReadPoll(int c)
+{
+	Console *console = (Console *)c;
+	console->CheckCharAvail();
 }
-static void ConsoleWriteDone(int c) {
-  Console *console = (Console *)c;
-  console->WriteDone();
+static void ConsoleWriteDone(int c)
+{
+	Console *console = (Console *)c;
+	console->WriteDone();
 }
 
 //----------------------------------------------------------------------
@@ -40,26 +42,26 @@ static void ConsoleWriteDone(int c) {
 //		output
 //----------------------------------------------------------------------
 
-Console::Console(char *readFile, char *writeFile, VoidFunctionPtr readAvail,
-                 VoidFunctionPtr writeDone, int callArg) {
-  if (readFile == NULL)
-    readFileNo = 0; // keyboard = stdin
-  else
-    readFileNo = OpenForReadWrite(readFile, TRUE); // should be read-only
-  if (writeFile == NULL)
-    writeFileNo = 1; // display = stdout
-  else
-    writeFileNo = OpenForWrite(writeFile);
+Console::Console(char *readFile, char *writeFile, VoidFunctionPtr readAvail, VoidFunctionPtr writeDone, int callArg)
+{
+	if (readFile == NULL)
+		readFileNo = 0; // keyboard = stdin
+	else
+		readFileNo = OpenForReadWrite(readFile, TRUE); // should be read-only
+	if (writeFile == NULL)
+		writeFileNo = 1; // display = stdout
+	else
+		writeFileNo = OpenForWrite(writeFile);
 
-  // set up the stuff to emulate asynchronous interrupts
-  writeHandler = writeDone;
-  readHandler = readAvail;
-  handlerArg = callArg;
-  putBusy = FALSE;
-  incoming = EOF;
+	// set up the stuff to emulate asynchronous interrupts
+	writeHandler = writeDone;
+	readHandler = readAvail;
+	handlerArg = callArg;
+	putBusy = FALSE;
+	incoming = EOF;
 
-  // start polling for incoming packets
-  interrupt->Schedule(ConsoleReadPoll, (int)this, ConsoleTime, ConsoleReadInt);
+	// start polling for incoming packets
+	interrupt->Schedule(ConsoleReadPoll, (int)this, ConsoleTime, ConsoleReadInt);
 }
 
 //----------------------------------------------------------------------
@@ -67,11 +69,12 @@ Console::Console(char *readFile, char *writeFile, VoidFunctionPtr readAvail,
 // 	Clean up console emulation
 //----------------------------------------------------------------------
 
-Console::~Console() {
-  if (readFileNo != 0)
-    Close(readFileNo);
-  if (writeFileNo != 1)
-    Close(writeFileNo);
+Console::~Console()
+{
+	if (readFileNo != 0)
+		Close(readFileNo);
+	if (writeFileNo != 1)
+		Close(writeFileNo);
 }
 
 //----------------------------------------------------------------------
@@ -85,22 +88,23 @@ Console::~Console() {
 //	put into the buffer.
 //----------------------------------------------------------------------
 
-void Console::CheckCharAvail() {
-  char c;
-  int n;
+void Console::CheckCharAvail()
+{
+	char c;
+	int n;
 
-  // schedule the next time to poll for a packet
-  interrupt->Schedule(ConsoleReadPoll, (int)this, ConsoleTime, ConsoleReadInt);
+	// schedule the next time to poll for a packet
+	interrupt->Schedule(ConsoleReadPoll, (int)this, ConsoleTime, ConsoleReadInt);
 
-  // do nothing if character is already buffered, or none to be read
-  if ((incoming != EOF) || !PollFile(readFileNo))
-    return;
+	// do nothing if character is already buffered, or none to be read
+	if ((incoming != EOF) || !PollFile(readFileNo))
+		return;
 
-  // otherwise, read character and tell user about it
-  n = ReadPartial(readFileNo, &c, sizeof(char));
-  incoming = (n == 1 ? c : EOF);
-  stats->numConsoleCharsRead++;
-  (*readHandler)(handlerArg);
+	// otherwise, read character and tell user about it
+	n = ReadPartial(readFileNo, &c, sizeof(char));
+	incoming = (n == 1 ? c : EOF);
+	stats->numConsoleCharsRead++;
+	(*readHandler)(handlerArg);
 }
 
 //----------------------------------------------------------------------
@@ -110,10 +114,11 @@ void Console::CheckCharAvail() {
 //	completed.
 //----------------------------------------------------------------------
 
-void Console::WriteDone() {
-  putBusy = FALSE;
-  stats->numConsoleCharsWritten++;
-  (*writeHandler)(handlerArg);
+void Console::WriteDone()
+{
+	putBusy = FALSE;
+	stats->numConsoleCharsWritten++;
+	(*writeHandler)(handlerArg);
 }
 
 //----------------------------------------------------------------------
@@ -122,11 +127,12 @@ void Console::WriteDone() {
 //	Either return the character, or EOF if none buffered.
 //----------------------------------------------------------------------
 
-char Console::GetChar() {
-  char ch = incoming;
+char Console::GetChar()
+{
+	char ch = incoming;
 
-  incoming = EOF;
-  return ch;
+	incoming = EOF;
+	return ch;
 }
 
 //----------------------------------------------------------------------
@@ -135,10 +141,10 @@ char Console::GetChar() {
 //	to occur in the future, and return.
 //----------------------------------------------------------------------
 
-void Console::PutChar(char ch) {
-  ASSERT(putBusy == FALSE);
-  WriteFile(writeFileNo, &ch, sizeof(char));
-  putBusy = TRUE;
-  interrupt->Schedule(ConsoleWriteDone, (int)this, ConsoleTime,
-                      ConsoleWriteInt);
+void Console::PutChar(char ch)
+{
+	ASSERT(putBusy == FALSE);
+	WriteFile(writeFileNo, &ch, sizeof(char));
+	putBusy = TRUE;
+	interrupt->Schedule(ConsoleWriteDone, (int)this, ConsoleTime, ConsoleWriteInt);
 }
