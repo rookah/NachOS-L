@@ -36,15 +36,15 @@ void do_UserThreadExit()
 static void StartUserThread(int f)
 {
 
+	//arguments retrieval
 	bundle_t *b = (bundle_t *)f;
 
+	//PC update
 	machine->WriteRegister(PCReg, b->f);
-
 	machine->WriteRegister(NextPCReg, b->f + 4);
 
-	// printf("%d\n",  b->stackreg);
-	machine->WriteRegister(StackReg, b->stackreg - PageSize * 2 * currentThread->id); // machine->ReadRegister(StackReg)machine->pageTableSize
-	                                                                                  // * PageSize
+	//stack pointer assignation
+	machine->WriteRegister(StackReg, b->stackreg - PageSize * 2 * currentThread->id);
 	DEBUG('a', "Initializing stack register to %d\n", machine->ReadRegister(StackReg));
 
 	currentThread->space->RestoreState();

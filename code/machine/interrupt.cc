@@ -357,15 +357,3 @@ void Interrupt::DumpState()
 	printf("End of pending interrupts\n");
 	fflush(stdout);
 }
-
-// void
-// Interrupt::PutChar(char c)
-// {
-//     synchconsole->SynchPutChar(c);
-// }
-
-// char
-// Interrupt::GetChar()
-// {
-//     return synchconsole->SynchGetChar();
-// }

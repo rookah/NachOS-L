@@ -112,8 +112,7 @@ void Thread::Fork(VoidFunctionPtr func, int arg)
 #endif // USER_PROGRAM
 
 	IntStatus oldLevel = interrupt->SetLevel(IntOff);
-	scheduler->ReadyToRun(this); // ReadyToRun assumes that interrupts
-	// are disabled!
+	scheduler->ReadyToRun(this); // ReadyToRun assumes that interrupts are disabled!
 	(void)interrupt->SetLevel(oldLevel);
 }
 
