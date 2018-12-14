@@ -21,4 +21,4 @@ script:
   - cd code
   - make
   - cd build
-  - bats ../test/test_all.bats
+  - bats -p ../test/test_all.bats
