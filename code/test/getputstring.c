@@ -2,8 +2,8 @@
 
 int main()
 {
-	char string[200];
-	GetString(string, 200);
+	char string[32];
+	GetString(string, 32);
 	PutString(string);
 
 	Halt();

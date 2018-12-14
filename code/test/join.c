@@ -17,6 +17,7 @@ void thread1(void *d)
 
 	UserThreadExit();
 }
+
 void thread2(void *d)
 {
 	int id3 = UserThreadCreate(thread3, (void *)0);
