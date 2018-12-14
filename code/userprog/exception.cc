@@ -76,12 +76,10 @@ void ExceptionHandler(ExceptionType which)
 		}
 		case SC_PutChar: {
 			synchconsole->SynchPutChar((char)(machine->ReadRegister(4)));
-			// interrupt->PutChar((char)(machine->ReadRegister (4)));
 			break;
 		}
 		case SC_GetChar: {
-			machine->WriteRegister(2, (int)(synchconsole->SynchGetChar()));
-			// machine->WriteRegister(2 ,interrupt->GetChar());
+			machine->WriteRegister(2, synchconsole->SynchGetChar());
 			break;
 		}
 		case SC_PutString:

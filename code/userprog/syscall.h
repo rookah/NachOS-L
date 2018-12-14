@@ -133,7 +133,7 @@ void Yield();
 
 void PutChar(char c);
 
-char GetChar();
+int GetChar();
 
 void PutString(char *string);
 

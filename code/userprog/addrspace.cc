@@ -184,7 +184,6 @@ void AddrSpace::RestoreState()
 
 int AddrSpace::ThreadCount()
 {
-
 	mtx->Acquire();
 	int a = ++numThreads;
 	mtx->Release();
