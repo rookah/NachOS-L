@@ -89,7 +89,7 @@ AddrSpace::AddrSpace(OpenFile *executable) : mtx(new Lock("thread countlock")) {
   pageTable = new TranslationEntry[numPages];
   for (i = 0; i < numPages; i++) {
     pageTable[i].virtualPage = i; // for now, virtual page # = phys page #
-    pageTable[i].physicalPage = i;
+    pageTable[i].physicalPage = i + 1;
     pageTable[i].valid = TRUE;
     pageTable[i].use = FALSE;
     pageTable[i].dirty = FALSE;
@@ -97,6 +97,8 @@ AddrSpace::AddrSpace(OpenFile *executable) : mtx(new Lock("thread countlock")) {
                                    // a separate page, we could set its
                                    // pages to be read-only
   }
+
+  RestoreState();
 
   // zero out the entire address space, to zero the unitialized data segment
   // and the stack segment
