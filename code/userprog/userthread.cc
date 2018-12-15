@@ -43,7 +43,7 @@ static void StartUserThread(int f)
 	machine->WriteRegister(PCReg, b->f);
 	machine->WriteRegister(NextPCReg, b->f + 4);
 	//stack pointer assignation
-	machine->WriteRegister(StackReg, machine->pageTableSize * PageSize - 16 - StackSize/PageSize/sizeof(int) * currentThread->id);
+	machine->WriteRegister(StackReg, machine->pageTableSize * PageSize - 16 - (UserStackSize / sizeof(int)) * currentThread->id);
 	DEBUG('a', "Initializing stack register to %d\n", machine->ReadRegister(StackReg));
 
 	machine->Run();
