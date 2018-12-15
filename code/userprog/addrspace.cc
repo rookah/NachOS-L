@@ -193,11 +193,13 @@ int AddrSpace::ThreadCount()
 void AddrSpace::JoinThread(int t)
 {
 	ASSERT(t < MaxThreadNum);
+	printf("Now joining thread %d...\n", t);
 	tid[t]->P();
 }
 
 void AddrSpace::SignalThread(int t)
 {
 	ASSERT(t < MaxThreadNum);
+	printf("Thread %d joined !\n", t);
 	tid[t]->V();
 }
