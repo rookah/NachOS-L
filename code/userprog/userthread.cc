@@ -34,18 +34,18 @@ void do_UserThreadExit()
 static void StartUserThread(int f)
 {
 
-	//arguments retrieval
+	// arguments retrieval
 	bundle_t *b = (bundle_t *)f;
 
-	//page table load
+	// page table load
 	currentThread->space->RestoreState();
 
-	//PC update
+	// PC update
 	machine->WriteRegister(PCReg, b->f);
 	machine->WriteRegister(NextPCReg, b->f + 4);
 	machine->WriteRegister(31, b->userThreadExitAddr);
 
-	//stack pointer assignation
+	// stack pointer assignation
 	machine->WriteRegister(StackReg, machine->pageTableSize * PageSize - (UserStackSize / MaxThreadNum) * currentThread->id);
 	DEBUG('a', "Initializing stack register to %d\n", machine->ReadRegister(StackReg));
 

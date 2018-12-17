@@ -141,7 +141,7 @@ void PutChar(char c);
 
 int GetChar();
 
-void PutString(char *string);
+void PutString(const char *string);
 
 void GetString(char *s, int n);
 

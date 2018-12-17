@@ -56,7 +56,7 @@ NACHOS_MIPS_FLAGS += -G 0
 ###############################################
 
 # do not use standard include paths when cross-compiling nachos user programs
-MIPS_CPPFLAGS += -nostdinc
+MIPS_CPPFLAGS += 
 MIPS_CFLAGS += $(NACHOS_MIPS_FLAGS)
 MIPS_ASFLAGS += $(NACHOS_MIPS_FLAGS)
 # do not link with standard libraries (libc) when creating nachos user programs

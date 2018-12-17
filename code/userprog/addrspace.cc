@@ -112,7 +112,7 @@ AddrSpace::AddrSpace(OpenFile *executable) : mtx(new Lock("thread countlock"))
 	for (i = 0; i < MaxThreadNum; i++) {
 		tid[i] = new Semaphore("sem", 0);
 	}
-	
+
 	process_count++;
 }
 
@@ -209,7 +209,7 @@ void AddrSpace::SignalThread(int t)
 void AddrSpace::Exit()
 {
 	process_count--;
-	
+
 	if (process_count == 0)
 		interrupt->Halt();
 }

@@ -73,7 +73,7 @@ void ExceptionHandler(ExceptionType which)
 		case SC_Exit:
 			currentThread->space->Exit();
 			break;
-		
+
 		case SC_Halt: {
 			DEBUG('a', "Shutdown, initiated by user program.\n");
 			interrupt->Halt();
