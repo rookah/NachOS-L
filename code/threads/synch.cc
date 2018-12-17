@@ -114,7 +114,7 @@ void Lock::Release()
 	sem.Post();
 }
 
-Condition::Condition(const char *debugName)
+Condition::Condition(const char *debugName) : name(debugName)
 {
 }
 
@@ -123,12 +123,48 @@ Condition::~Condition()
 }
 void Condition::Wait(Lock *conditionLock)
 {
-	ASSERT(FALSE);
+	lock.Acquire();
+	++queue_size;
+	lock.Release();
+
+	if(conditionLock)
+		conditionLock->Release();
+
+	sem_empty.Wait();
+	sem_full.Post();
+
+	if(conditionLock)
+		conditionLock->Acquire();
 }
 
 void Condition::Signal(Lock *conditionLock)
 {
+	lock.Acquire();
+	if (queue_size > 0) {
+		if (conditionLock)
+			conditionLock->Acquire();
+
+	    --queue_size;
+		sem_empty.Post();
+		sem_full.Wait();
+	}
+	lock.Release();
 }
 void Condition::Broadcast(Lock *conditionLock)
 {
+	lock.Acquire();
+
+	for (int i=0; i < queue_size; i++) {
+		sem_empty.Post();
+	}
+
+	while(queue_size > 0) {
+		--queue_size;
+		if (conditionLock)
+			conditionLock->Acquire();
+
+		sem_full.Wait();
+	}
+
+	lock.Release();
 }

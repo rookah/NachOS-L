@@ -22,6 +22,10 @@
 // of liability and disclaimer of warranty provisions.
 
 #include "copyright.h"
+
+#include "semaphore.h"
+#include "condition.h"
+
 #include "syscall.h"
 #include "system.h"
 #include "usersemaphore.h"
@@ -133,6 +137,22 @@ void ExceptionHandler(ExceptionType which)
 
 		case SC_SemPost:
 			do_SemPost(machine->ReadRegister(4));
+			break;
+
+		case SC_CondInit:
+			machine->WriteRegister(2, do_CondInit());
+			break;
+
+		case SC_CondWait:
+			do_CondWait(machine->ReadRegister(4), machine->ReadRegister(5));
+			break;
+
+		case SC_CondSignal:
+			do_CondSignal(machine->ReadRegister(4), machine->ReadRegister(5));
+			break;
+
+		case SC_CondBroadcast:
+			do_CondBroadcast(machine->ReadRegister(4), machine->ReadRegister(5));
 			break;
 
 		default: {

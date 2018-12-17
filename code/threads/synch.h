@@ -21,6 +21,9 @@
 #include "list.h"
 #include "thread.h"
 
+// FIXME Redefined in addrspace.h
+#define MaxThreadNum 8
+
 // The following class defines a "semaphore" whose value is a non-negative
 // integer.  The semaphore has only two operations Wait() and Post():
 //
@@ -144,6 +147,10 @@ class Condition
 
   private:
 	const char *name;
-	// plus some other stuff you'll need to define
+	Lock lock{"condition_lock"};
+    Semaphore sem_empty{"sem_empty", MaxThreadNum};
+    Semaphore sem_full{"sem_full", 0};
+
+	int queue_size = 0;
 };
 #endif // SYNCH_H

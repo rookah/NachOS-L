@@ -238,8 +238,33 @@ SemPost:
 
 	.end SemPost
 
+	.globl CondInit
+	.ent CondInit
+CondInit:
+	addiu $2,$0,SC_CondInit
+	syscall
+	j	$31
 
-	
+	.end CondInit
+
+	.globl CondWait
+	.ent CondWait
+CondWait:
+	addiu $2,$0,SC_CondWait
+	syscall
+	j	$31
+
+	.end CondWait
+
+	.globl CondSignal
+	.ent Condsignal
+CondSignal:
+	addiu $2,$0,SC_CondSignal
+	syscall
+	j	$31
+
+	.end CondSignal
+
 /* dummy function to keep gcc happy */
         .globl  __main
         .ent    __main
