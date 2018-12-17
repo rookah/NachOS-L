@@ -1,6 +1,6 @@
+#include <pthread.h>
 #include <semaphore.h>
 #include <stdio.h>
-#include <pthread.h>
 
 #define BUFFER_SIZE 10
 #define DATA_SIZE 100
@@ -12,7 +12,7 @@ int buffer[BUFFER_SIZE];
 int in;
 int out;
 
-void* producer(void *d)
+void *producer(void *d)
 {
 	for (int i = 0; i < DATA_SIZE; i++) {
 		sem_wait(&sem_empty);
@@ -26,12 +26,12 @@ void* producer(void *d)
 	return NULL;
 }
 
-void* consumer(void *d)
+void *consumer(void *d)
 {
 	for (int i = 0; i < DATA_SIZE; ++i) {
 		sem_wait(&sem_full);
 
-		//putchar(buffer[out]); FIXME Display number
+		// putchar(buffer[out]); FIXME Display number
 		putchar('-');
 
 		out = (out + 1) % BUFFER_SIZE;

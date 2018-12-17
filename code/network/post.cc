@@ -283,7 +283,7 @@ void PostOffice::Send(PacketHeader pktHdr, MailHeader mailHdr, const char *data)
 	                     // to the network at any one time
 	network->Send(pktHdr, buffer);
 	messageSent->Wait(); // wait for interrupt to tell us
-	                  // ok to send the next message
+	                     // ok to send the next message
 	sendLock->Release();
 
 	delete[] buffer; // we've sent the message, so

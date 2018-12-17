@@ -197,7 +197,7 @@ int AddrSpace::ThreadCount()
 void AddrSpace::JoinThread(int t)
 {
 	ASSERT(t < MaxThreadNum);
-    tid[t]->Wait();
+	tid[t]->Wait();
 }
 
 void AddrSpace::SignalThread(int t)

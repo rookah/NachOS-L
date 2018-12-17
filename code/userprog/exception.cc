@@ -22,9 +22,9 @@
 // of liability and disclaimer of warranty provisions.
 
 #include "copyright.h"
-#include "usersemaphore.h"
 #include "syscall.h"
 #include "system.h"
+#include "usersemaphore.h"
 #include "userthread.h"
 //----------------------------------------------------------------------
 // UpdatePC : Increments the Program Counter register in order to resume

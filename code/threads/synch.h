@@ -71,7 +71,7 @@ class Lock
 {
   public:
 	explicit Lock(const char *debugName); // initialize lock to be FREE
-	~Lock();                     // deallocate lock
+	~Lock();                              // deallocate lock
 	const char *getName()
 	{
 		return name;
@@ -127,8 +127,8 @@ class Condition
 {
   public:
 	explicit Condition(const char *debugName); // initialize condition to
-	                                  // "no one waiting"
-	~Condition();                     // deallocate the condition
+	                                           // "no one waiting"
+	~Condition();                              // deallocate the condition
 	const char *getName()
 	{
 		return (name);

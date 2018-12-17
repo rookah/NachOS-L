@@ -80,17 +80,17 @@ void ConsoleTest(char *in, char *out)
 	writeDone = new Semaphore("write done", 0);
 
 	for (;;) {
-        readAvail->Wait(); // wait for character to arrive
+		readAvail->Wait(); // wait for character to arrive
 		ch = console->GetChar();
 		// echo it!
 		console->PutChar('<');
-        writeDone->Wait(); // wait for write to finish
+		writeDone->Wait(); // wait for write to finish
 
 		console->PutChar(ch);
-        writeDone->Wait();
+		writeDone->Wait();
 
 		console->PutChar('>');
-        writeDone->Wait();
+		writeDone->Wait();
 
 		if (ch == 'q' || ch == EOF)
 			return; // if q, quit
