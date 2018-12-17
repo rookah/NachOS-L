@@ -41,6 +41,8 @@ class AddrSpace
 	void SignalThread(int t);
 	void JoinThread(int t);
 
+	void Exit();
+
   private:
 	TranslationEntry *pageTable; // Assume linear page table translation
 	// for now!

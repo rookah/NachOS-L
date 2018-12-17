@@ -22,6 +22,8 @@
 #include "system.h"
 #include <strings.h> /* for bzero */
 
+static int process_count = 0; // TODO Protect me with mutex
+
 //----------------------------------------------------------------------
 // SwapHeader
 //      Do little endian to big endian conversion on the bytes in the
@@ -110,6 +112,8 @@ AddrSpace::AddrSpace(OpenFile *executable) : mtx(new Lock("thread countlock"))
 	for (i = 0; i < MaxThreadNum; i++) {
 		tid[i] = new Semaphore("sem", 0);
 	}
+
+	process_count++;
 }
 
 //----------------------------------------------------------------------
@@ -200,4 +204,12 @@ void AddrSpace::SignalThread(int t)
 {
 	ASSERT(t < MaxThreadNum);
 	tid[t]->Post();
+}
+
+void AddrSpace::Exit()
+{
+	process_count--;
+
+	if (process_count == 0)
+		interrupt->Halt();
 }

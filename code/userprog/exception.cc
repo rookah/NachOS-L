@@ -70,6 +70,10 @@ void ExceptionHandler(ExceptionType which)
 	char string[MAX_STRING_SIZE];
 	if (which == SyscallException) {
 		switch (type) {
+		case SC_Exit:
+			currentThread->space->Exit();
+			break;
+
 		case SC_Halt: {
 			DEBUG('a', "Shutdown, initiated by user program.\n");
 			interrupt->Halt();
