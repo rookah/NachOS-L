@@ -83,7 +83,6 @@ void SynchConsole::SynchPutInt(int n)
 void SynchConsole::SynchGetInt(int *n)
 {
 	char string[13];
-
 	SynchGetString(string, 13);
 	sscanf(string, "%d", n);
 }

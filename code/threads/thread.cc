@@ -19,8 +19,8 @@
 #include "switch.h"
 #include "synch.h"
 #include "system.h"
-static int tid = 1;
-static Lock mutex("mtx");
+static int tid = 0;
+static Lock thread_mutex("thread mutex");
 #define STACK_FENCEPOST 0xdeadbeef // this is put at the top of the
                                    // execution stack, for detecting
                                    // stack overflows
@@ -39,9 +39,9 @@ Thread::Thread(const char *threadName)
 	stackTop = NULL;
 	stack = NULL;
 	status = JUST_CREATED;
-	mutex.Acquire();
+	thread_mutex.Acquire();
 	id = tid++;
-	mutex.Release();
+	thread_mutex.Release();
 #ifdef USER_PROGRAM
 	space = NULL;
 	// FBT: Need to initialize special registers of simulator to 0
@@ -112,8 +112,7 @@ void Thread::Fork(VoidFunctionPtr func, int arg)
 #endif // USER_PROGRAM
 
 	IntStatus oldLevel = interrupt->SetLevel(IntOff);
-	scheduler->ReadyToRun(this); // ReadyToRun assumes that interrupts
-	// are disabled!
+	scheduler->ReadyToRun(this); // ReadyToRun assumes that interrupts are disabled!
 	(void)interrupt->SetLevel(oldLevel);
 }
 

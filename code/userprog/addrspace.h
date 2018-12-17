@@ -20,7 +20,7 @@
 class Lock;
 class Semaphore;
 
-#define MaxThreadNum 1024
+#define MaxThreadNum 8
 
 #define UserStackSize 1024 // increase this as necessary!
 

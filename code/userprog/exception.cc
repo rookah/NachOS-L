@@ -75,14 +75,17 @@ void ExceptionHandler(ExceptionType which)
 			interrupt->Halt();
 			break;
 		}
+
 		case SC_PutChar: {
 			synchconsole->SynchPutChar((char)(machine->ReadRegister(4)));
 			break;
 		}
+
 		case SC_GetChar: {
 			machine->WriteRegister(2, synchconsole->SynchGetChar());
 			break;
 		}
+
 		case SC_PutString:
 			copyStringFromMachine((machine->ReadRegister(4)), string, MAX_STRING_SIZE);
 			synchconsole->SynchPutString(string);
@@ -93,6 +96,7 @@ void ExceptionHandler(ExceptionType which)
 			synchconsole->SynchGetString(fromptr, machine->ReadRegister(5));
 			break;
 		}
+
 		case SC_PutInt:
 			synchconsole->SynchPutInt(machine->ReadRegister(4));
 			break;
@@ -105,7 +109,6 @@ void ExceptionHandler(ExceptionType which)
 
 		case SC_UserThreadCreate:
 			machine->WriteRegister(2, do_UserThreadCreate(machine->ReadRegister(4), machine->ReadRegister(5), machine->ReadRegister(6)));
-
 			break;
 
 		case SC_UserThreadExit:
@@ -135,8 +138,6 @@ void ExceptionHandler(ExceptionType which)
 		}
 		UpdatePC();
 	}
-
-	// End of addition
 }
 
 void copyStringFromMachine(int from, char *to, unsigned size)
