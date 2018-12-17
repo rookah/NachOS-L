@@ -18,7 +18,9 @@ before_install:
   - sudo bash README.Debian
 
 script:
+  - echo travis_fold:start:Compilation
   - cd code
   - make
+  - echo travis_fold:end:Compilation
   - cd build
   - bats -p ../test/test_all.bats
