@@ -72,7 +72,7 @@ void SynchDisk::ReadSector(int sectorNumber, char *data)
 {
 	lock->Acquire(); // only one disk I/O at a time
 	disk->ReadRequest(sectorNumber, data);
-	semaphore->P(); // wait for interrupt
+	semaphore->Wait(); // wait for interrupt
 	lock->Release();
 }
 
@@ -89,7 +89,7 @@ void SynchDisk::WriteSector(int sectorNumber, char *data)
 {
 	lock->Acquire(); // only one disk I/O at a time
 	disk->WriteRequest(sectorNumber, data);
-	semaphore->P(); // wait for interrupt
+	semaphore->Wait(); // wait for interrupt
 	lock->Release();
 }
 
@@ -101,5 +101,5 @@ void SynchDisk::WriteSector(int sectorNumber, char *data)
 
 void SynchDisk::RequestDone()
 {
-	semaphore->V();
+	semaphore->Post();
 }

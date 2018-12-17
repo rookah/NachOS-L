@@ -135,8 +135,8 @@ class PostOffice
 	NetworkAddress netAddr;      // Network address of this machine
 	MailBox *boxes;              // Table of mail boxes to hold incoming mail
 	int numBoxes;                // Number of mail boxes
-	Semaphore *messageAvailable; // V'ed when message has arrived from network
-	Semaphore *messageSent;      // V'ed when next message can be sent to network
+	Semaphore *messageAvailable; // Post'ed when message has arrived from network
+	Semaphore *messageSent;      // Post'ed when next message can be sent to network
 	Lock *sendLock;              // Only one outgoing message at a time
 };
 
