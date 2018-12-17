@@ -20,10 +20,12 @@
 #include "noff.h"
 #include "synch.h"
 #include "system.h"
+#include "frameprovider.h"
 #include <strings.h> /* for bzero */
 
 static int process_count = 0; // TODO Protect me with mutex
 static void ReadAtVirtual(OpenFile *executable, int virtualaddr, int numBytes, int position);
+static FrameProvider fp(NumPhysPages);
 
 //----------------------------------------------------------------------
 // SwapHeader
@@ -83,7 +85,7 @@ AddrSpace::AddrSpace(OpenFile *executable) : mtx(new Lock("thread countlock")) {
 	pageTable = new TranslationEntry[numPages];
 	for (i = 0; i < numPages; i++) {
 		pageTable[i].virtualPage = i;
-		pageTable[i].physicalPage = i + 1;
+		pageTable[i].physicalPage = fp.GetEmptyFrame();
 		pageTable[i].valid = TRUE;
 		pageTable[i].use = FALSE;
 		pageTable[i].dirty = FALSE;
@@ -134,6 +136,9 @@ AddrSpace::~AddrSpace()
 {
 	// LB: Missing [] for delete
 	// delete pageTable;
+	for (unsigned i = 0; i < numPages; i++) {
+		fp.ReleaseFrame(pageTable[i].physicalPage);
+	}
 	delete[] pageTable;
 	// End of modification
 }

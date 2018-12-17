@@ -8,6 +8,8 @@
 
 #include "bitmap.h"
 #include "copyright.h"
+#include <set>
+#include <algorithm>
 
 //----------------------------------------------------------------------
 // BitMap::BitMap
@@ -98,6 +100,23 @@ int BitMap::Find()
 			Mark(i);
 			return i;
 		}
+	return -1;
+}
+
+int BitMap::FindRandom()
+{
+	std::set<int> s;
+	for (int i = 0; i < numBits; i++)
+		s.insert(i);
+	std::set<int>::const_iterator it(s.begin());
+
+	for (int i = 0; i < numBits; i++) {
+		advance(it, 1);
+		if (!Test(*it)) {
+			Mark(*it);
+			return (*it);
+		}
+	}
 	return -1;
 }
 
