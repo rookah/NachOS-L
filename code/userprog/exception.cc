@@ -22,7 +22,7 @@
 // of liability and disclaimer of warranty provisions.
 
 #include "copyright.h"
-#include "semaphore.h"
+#include "usersemaphore.h"
 #include "syscall.h"
 #include "system.h"
 #include "userthread.h"

@@ -3,8 +3,8 @@
 #define BUFFER_SIZE 10
 #define DATA_SIZE 100
 
-sem_t sem_empty;
-sem_t sem_full;
+int sem_empty;
+int sem_full;
 
 int buffer[BUFFER_SIZE];
 int in;

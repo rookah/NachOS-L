@@ -44,8 +44,6 @@
 
 #ifdef IN_USER_MODE
 
-typedef int sem_t;
-
 // LB: This part is read only on compiling the test/*.c files.
 // It is *not* read on compiling test/start.S
 
@@ -151,15 +149,15 @@ void PutInt(int n);
 
 int UserThreadCreate(void f(void *arg), void *arg);
 
-void UserThreadExit();
+void UserThreadExit() __attribute__((noreturn));
 
 void UserThreadJoin(int tid);
 
-sem_t SemInit(int value);
+int SemInit(int value);
 
-void SemWait(sem_t sem);
+void SemWait(int sem);
 
-void SemPost(sem_t sem);
+void SemPost(int sem);
 #endif // IN_USER_MODE
 
 #endif /* SYSCALL_H */

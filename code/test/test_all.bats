@@ -1,5 +1,10 @@
 #!/usr/bin/env bats
 
+@test "semaphore" {
+  result="$(./nachos-step2 -rs 1 -x semaphore | head -n 1)"
+  [[ "$result" == "----------------------------------------------------------------------------------------------------" ]]
+}
+
 @test "nohalt" {
   result="$(./nachos-step2 -rs 1 -x nohalt | head -n 1)"
   [[ "$result" == "This main function does not halt!" ]]
