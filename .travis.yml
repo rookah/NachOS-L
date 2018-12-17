@@ -18,7 +18,7 @@ before_install:
   - sudo bash README.Debian
 
 script:
-  - echo 'Compiling...' && echo -en 'travis_fold:start:compilation\\r'
+  - echo '[0K[33;1mCompilation[0m' && echo -en 'travis_fold:start:compilation\\r'
   - cd code
   - make
   - echo -en 'travis_fold:end:compilation\\r'
