@@ -41,6 +41,7 @@
 #define SC_SemInit 20
 #define SC_SemWait 21
 #define SC_SemPost 22
+#define	SC_ForkExec 23
 
 #ifdef IN_USER_MODE
 
@@ -158,6 +159,8 @@ int SemInit(int value);
 void SemWait(int sem);
 
 void SemPost(int sem);
+
+int ForkExec(char *s);
 
 #endif // IN_USER_MODE
 

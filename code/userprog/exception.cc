@@ -138,6 +138,10 @@ void ExceptionHandler(ExceptionType which)
 			do_SemPost(machine->ReadRegister(4));
 			break;
 
+		case SC_ForkExec:
+			do_ForkExec(machine->ReadRegister(4));
+			break;
+
 		default: {
 			printf("Unexpected user mode exception %d %d\n", which, type);
 			ASSERT(FALSE);
