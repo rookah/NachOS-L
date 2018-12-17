@@ -183,15 +183,6 @@ GetInt:
 
 	.end GetInt
 
-	.globl UserThreadCreate
-	.ent UserThreadCreate
-UserThreadCreate:
-	addiu $2,$0,SC_UserThreadCreate
-	syscall
-	j	$31
-
-	.end UserThreadCreate
-
 	.globl UserThreadExit
 	.ent UserThreadExit
 UserThreadExit:
@@ -200,6 +191,16 @@ UserThreadExit:
 	j	$31
 
 	.end UserThreadExit
+
+	.globl UserThreadCreate
+	.ent UserThreadCreate
+UserThreadCreate:
+	addiu $2,$0,SC_UserThreadCreate
+	addiu $6,$0,UserThreadExit
+	syscall
+	j	$31
+
+	.end UserThreadCreate
 
 	.globl UserThreadJoin
 	.ent UserThreadJoin

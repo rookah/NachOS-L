@@ -104,7 +104,7 @@ void ExceptionHandler(ExceptionType which)
 		}
 
 		case SC_UserThreadCreate:
-			machine->WriteRegister(2, do_UserThreadCreate(machine->ReadRegister(4), machine->ReadRegister(5)));
+			machine->WriteRegister(2, do_UserThreadCreate(machine->ReadRegister(4), machine->ReadRegister(5), machine->ReadRegister(6)));
 
 			break;
 
@@ -141,7 +141,6 @@ void ExceptionHandler(ExceptionType which)
 
 void copyStringFromMachine(int from, char *to, unsigned size)
 {
-
 	char *fromptr = (char *)(from + machine->mainMemory);
 	while (*fromptr != '\0' && size > 1) {
 		*to = *fromptr;
