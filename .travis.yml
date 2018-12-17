@@ -23,4 +23,4 @@ script:
   - make
   - echo travis_fold:end:Compilation
   - cd build
-  - bats -p ../test/test_all.bats
+  - bats ../test/test_all.bats
