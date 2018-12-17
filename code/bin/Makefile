@@ -22,6 +22,11 @@ CPPFLAGS += -DHOST_IS_BIG_ENDIAN
 endif
 CPPFLAGS += $(addprefix -I$(topsrc_dir)/,$(INCDIRS))
 
+# Miam
+ifneq (,$(findstring arch,$(shell uname -r)))
+CPPFLAGS += -isystem /usr/include
+endif
+
 all: coff2noff
 
 $(foreach f,$(wildcard *.c),\

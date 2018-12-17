@@ -12,7 +12,7 @@
 // to hold the CPU throughout, until interrupts are reenabled.
 //
 // Because some of these routines might be called with interrupts
-// already disabled (Semaphore::V for one), instead of turning
+// already disabled (Semaphore::Post for one), instead of turning
 // on interrupts at the end of the atomic operation, we always simply
 // re-set the interrupt state back to its original value (whether
 // that be disabled or enabled).
@@ -52,7 +52,7 @@ Semaphore::~Semaphore()
 }
 
 //----------------------------------------------------------------------
-// Semaphore::P
+// Semaphore::Wait
 //      Wait until semaphore value > 0, then decrement.  Checking the
 //      value and decrementing must be done atomically, so we
 //      need to disable interrupts before checking the value.
@@ -61,7 +61,7 @@ Semaphore::~Semaphore()
 //      when it is called.
 //----------------------------------------------------------------------
 
-void Semaphore::P()
+void Semaphore::Wait()
 {
 	IntStatus oldLevel = interrupt->SetLevel(IntOff); // disable interrupts
 
@@ -76,20 +76,20 @@ void Semaphore::P()
 }
 
 //----------------------------------------------------------------------
-// Semaphore::V
+// Semaphore::Post
 //      Increment semaphore value, waking up a waiter if necessary.
-//      As with P(), this operation must be atomic, so we need to disable
+//      As with Wait(), this operation must be atomic, so we need to disable
 //      interrupts.  Scheduler::ReadyToRun() assumes that threads
 //      are disabled when it is called.
 //----------------------------------------------------------------------
 
-void Semaphore::V()
+void Semaphore::Post()
 {
 	Thread *thread;
 	IntStatus oldLevel = interrupt->SetLevel(IntOff);
 
 	thread = (Thread *)queue->Remove();
-	if (thread != NULL) // make thread ready, consuming the V immediately
+	if (thread != NULL) // make thread ready, consuming the Post immediately
 		scheduler->ReadyToRun(thread);
 	value++;
 	(void)interrupt->SetLevel(oldLevel);
@@ -107,11 +107,11 @@ Lock::~Lock()
 }
 void Lock::Acquire()
 {
-	sem.P();
+	sem.Wait();
 }
 void Lock::Release()
 {
-	sem.V();
+	sem.Post();
 }
 
 Condition::Condition(const char *debugName)

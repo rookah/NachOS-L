@@ -228,7 +228,7 @@ void PostOffice::PostalDelivery()
 
 	for (;;) {
 		// first, wait for a message
-		messageAvailable->P();
+		messageAvailable->Wait();
 		pktHdr = network->Receive(buffer);
 
 		mailHdr = *(MailHeader *)buffer;
@@ -282,7 +282,7 @@ void PostOffice::Send(PacketHeader pktHdr, MailHeader mailHdr, const char *data)
 	sendLock->Acquire(); // only one message can be sent
 	                     // to the network at any one time
 	network->Send(pktHdr, buffer);
-	messageSent->P(); // wait for interrupt to tell us
+	messageSent->Wait(); // wait for interrupt to tell us
 	                  // ok to send the next message
 	sendLock->Release();
 
@@ -322,7 +322,7 @@ void PostOffice::Receive(int box, PacketHeader *pktHdr, MailHeader *mailHdr, cha
 
 void PostOffice::IncomingPacket()
 {
-	messageAvailable->V();
+	messageAvailable->Post();
 }
 
 //----------------------------------------------------------------------
@@ -337,5 +337,5 @@ void PostOffice::IncomingPacket()
 
 void PostOffice::PacketSent()
 {
-	messageSent->V();
+	messageSent->Post();
 }

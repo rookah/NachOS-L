@@ -58,11 +58,11 @@ static Semaphore *writeDone;
 
 static void ReadAvail(int arg)
 {
-	readAvail->V();
+	readAvail->Post();
 }
 static void WriteDone(int arg)
 {
-	writeDone->V();
+	writeDone->Post();
 }
 
 //----------------------------------------------------------------------
@@ -80,17 +80,17 @@ void ConsoleTest(char *in, char *out)
 	writeDone = new Semaphore("write done", 0);
 
 	for (;;) {
-		readAvail->P(); // wait for character to arrive
+        readAvail->Wait(); // wait for character to arrive
 		ch = console->GetChar();
 		// echo it!
 		console->PutChar('<');
-		writeDone->P(); // wait for write to finish
+        writeDone->Wait(); // wait for write to finish
 
 		console->PutChar(ch);
-		writeDone->P();
+        writeDone->Wait();
 
 		console->PutChar('>');
-		writeDone->P();
+        writeDone->Wait();
 
 		if (ch == 'q' || ch == EOF)
 			return; // if q, quit

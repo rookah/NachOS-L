@@ -22,18 +22,18 @@
 #include "thread.h"
 
 // The following class defines a "semaphore" whose value is a non-negative
-// integer.  The semaphore has only two operations P() and V():
+// integer.  The semaphore has only two operations Wait() and Post():
 //
-//      P() -- waits until value > 0, then decrement
+//      Wait() -- waits until value > 0, then decrement
 //
-//      V() -- increment, waking up a thread waiting in P() if necessary
+//      Post() -- increment, waking up a thread waiting in Wait() if necessary
 //
 // Note that the interface does *not* allow a thread to read the value of
 // the semaphore directly -- even if you did read the value, the
 // only thing you would know is what the value used to be.  You don't
 // know what the value is now, because by the time you get the value
 // into a register, a context switch might have occurred,
-// and some other thread might have called P or V, so the true value might
+// and some other thread might have called Wait or Post, so the true value might
 // now be different.
 
 class Semaphore
@@ -46,13 +46,13 @@ class Semaphore
 		return name;
 	} // debugging assist
 
-	void P(); // these are the only operations on a semaphore
-	void V(); // they are both *atomic*
+	void Wait(); // these are the only operations on a semaphore
+	void Post(); // they are both *atomic*
 
   private:
 	const char *name; // useful for debugging
 	int value;        // semaphore value, always >= 0
-	List *queue;      // threads waiting in P() for the value to be > 0
+	List *queue;      // threads waiting in Wait() for the value to be > 0
 };
 
 // The following class defines a "lock".  A lock can be BUSY or FREE.
@@ -70,7 +70,7 @@ class Semaphore
 class Lock
 {
   public:
-	Lock(const char *debugName); // initialize lock to be FREE
+	explicit Lock(const char *debugName); // initialize lock to be FREE
 	~Lock();                     // deallocate lock
 	const char *getName()
 	{
@@ -126,7 +126,7 @@ class Lock
 class Condition
 {
   public:
-	Condition(const char *debugName); // initialize condition to
+	explicit Condition(const char *debugName); // initialize condition to
 	                                  // "no one waiting"
 	~Condition();                     // deallocate the condition
 	const char *getName()

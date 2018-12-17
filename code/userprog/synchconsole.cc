@@ -11,12 +11,12 @@ static Semaphore *writeDone;
 
 static void ReadAvail(int arg)
 {
-	readAvail->V();
+	readAvail->Post();
 }
 
 static void WriteDone(int arg)
 {
-	writeDone->V();
+	writeDone->Post();
 }
 
 SynchConsole::SynchConsole(char *readFile, char *writeFile)
@@ -39,14 +39,14 @@ void SynchConsole::SynchPutChar(const char ch)
 {
 	mutex->Acquire();
 	console->PutChar(ch);
-	writeDone->P(); // wait for write to finish
+	writeDone->Wait(); // wait for write to finish
 	mutex->Release();
 }
 
 int SynchConsole::SynchGetChar()
 {
 	mutex->Acquire();
-	readAvail->P(); // wait for character to arrive
+	readAvail->Wait(); // wait for character to arrive
 	int c = console->GetChar();
 	mutex->Release();
 	return c;

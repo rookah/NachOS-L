@@ -27,7 +27,7 @@ void do_SemWait(int sid)
 	mtx.Release();
 
 	if (sem) {
-		sem->P();
+		sem->Wait();
 	}
 }
 
@@ -41,6 +41,6 @@ void do_SemPost(int sid)
 	mtx.Release();
 
 	if (sem) {
-		sem->V();
+		sem->Post();
 	}
 }
