@@ -29,6 +29,7 @@
 #include "system.h"
 #include "usersemaphore.h"
 #include "userthread.h"
+#include "forkexec.h"
 //----------------------------------------------------------------------
 // UpdatePC : Increments the Program Counter register in order to resume
 // the user program immediately after the "syscall" instruction.
@@ -139,7 +140,7 @@ void ExceptionHandler(ExceptionType which)
 			break;
 
 		case SC_ForkExec:
-			do_ForkExec(machine->ReadRegister(4));
+			do_ForkExec((char *)machine->ReadRegister(4));
 			break;
 
 		default: {
