@@ -13,6 +13,12 @@
 ###########################################################################
 #                      USERSPACE PROGRAMS                                 #
 ###########################################################################
+
+# Miam
+ifneq (,$(findstring arch,$(shell uname -r)))
+CPPFLAGS += -isystem /usr/include
+endif
+
 # List of C files that are not userspace programs (in test/ subdirectory)
 # => add here C files that are user-space libraries
 # all other C files will be compiled as a userspace nachos program
