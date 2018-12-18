@@ -117,6 +117,10 @@ AddrSpace::AddrSpace(OpenFile *executable) : mtx(new Lock("thread countlock")) {
 	for (i = 0; i < MaxThreadNum; i++) {
 		tid[i] = new Semaphore("sem", 0);
 	}
+
+	mtx->Acquire();
+	process_count++;
+	mtx->Release();
 }
 
 static void ReadAtVirtual(OpenFile *executable, int virtualaddr, int numBytes, int position) {
@@ -222,8 +226,9 @@ void AddrSpace::SignalThread(int t)
 
 void AddrSpace::Exit()
 {
+	mtx->Acquire();
 	process_count--;
-
 	if (process_count == 0)
 		interrupt->Halt();
+	mtx->Release();
 }

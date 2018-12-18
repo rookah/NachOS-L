@@ -76,6 +76,7 @@ void ExceptionHandler(ExceptionType which)
 		switch (type) {
 		case SC_Exit:
 			currentThread->space->Exit();
+			currentThread->Finish();
 			break;
 
 		case SC_Halt: {
@@ -140,7 +141,8 @@ void ExceptionHandler(ExceptionType which)
 			break;
 
 		case SC_ForkExec:
-			do_ForkExec((char *)machine->ReadRegister(4));
+			copyStringFromMachine((machine->ReadRegister(4)), string, MAX_STRING_SIZE);
+			do_ForkExec(string);
 			break;
 
 		default: {
@@ -154,12 +156,16 @@ void ExceptionHandler(ExceptionType which)
 
 void copyStringFromMachine(int from, char *to, unsigned size)
 {
-	char *fromptr = (char *)(from + machine->mainMemory);
+	char* fromptr;
+	machine->Translate(from, (int *) &fromptr, 1, false);
+	fromptr += (int) machine->mainMemory;
 	while (*fromptr != '\0' && size > 1) {
 		*to = *fromptr;
-		fromptr++;
+		from++;
 		to++;
 		size--;
+		machine->Translate(from, (int *) &fromptr, 1, false);
+		fromptr += (int) machine->mainMemory;
 	}
 	*to = '\0';
 }

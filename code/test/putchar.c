@@ -14,6 +14,4 @@ int main()
 	print('a', 4);
 
 	PutChar('\n');
-
-	Halt();
 }

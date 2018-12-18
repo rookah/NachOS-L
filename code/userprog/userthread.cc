@@ -16,7 +16,7 @@ int do_UserThreadCreate(int f, int arg, int userThreadExitAddr)
 	b->arg = arg;
 	b->userThreadExitAddr = userThreadExitAddr;
 	Thread *t = new Thread("newThread");
-	t->Fork(StartUserThread, (int)b);
+	t->Fork(StartUserThread, (int) b);
 	return t->id;
 }
 

@@ -12,7 +12,7 @@ FrameProvider::~FrameProvider()
 
 int FrameProvider::GetEmptyFrame()
 {
-	return this->frame_bitmap->FindRandom();
+	return this->frame_bitmap->Find();
 }
 
 void FrameProvider::ReleaseFrame(int frame)
