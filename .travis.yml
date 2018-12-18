@@ -20,7 +20,9 @@ before_install:
 script:
   - echo "Compilation" && echo -en 'travis_fold:start:compilation\\r'
   - cd code
+  - set -e
   - make
+  - set +e
   - echo -en 'travis_fold:end:compilation\\r'
   - cd build
   - bats ../test/test_all.bats
