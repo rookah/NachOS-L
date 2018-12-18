@@ -151,6 +151,6 @@ class Condition
     Semaphore sem_empty;
     Semaphore sem_full;
 
-	int queue_size = 0;
+	int queue_size;
 };
 #endif // SYNCH_H

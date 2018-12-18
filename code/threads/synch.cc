@@ -115,7 +115,7 @@ void Lock::Release()
 }
 
 Condition::Condition(const char *debugName)
-: name(debugName), lock("condition_lock"), sem_empty("sem_empty", MaxThreadNum), sem_full("sem_full", 0)
+: name(debugName), lock("condition_lock"), sem_empty("sem_empty", MaxThreadNum), sem_full("sem_full", 0), queue_size(0)
 {
 }
 
@@ -160,7 +160,7 @@ void Condition::Broadcast(Lock *conditionLock)
 
 	for (int i=0; i < queue_size; i++) {
 		sem_empty.Post();
-	}
+	};
 
 	while(queue_size > 0) {
 		--queue_size;
