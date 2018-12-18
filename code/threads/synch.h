@@ -147,9 +147,9 @@ class Condition
 
   private:
 	const char *name;
-	Lock lock{"condition_lock"};
-    Semaphore sem_empty{"sem_empty", MaxThreadNum};
-    Semaphore sem_full{"sem_full", 0};
+	Lock lock;
+    Semaphore sem_empty;
+    Semaphore sem_full;
 
 	int queue_size = 0;
 };

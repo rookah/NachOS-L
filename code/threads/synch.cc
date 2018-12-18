@@ -114,7 +114,8 @@ void Lock::Release()
 	sem.Post();
 }
 
-Condition::Condition(const char *debugName) : name(debugName)
+Condition::Condition(const char *debugName)
+: name(debugName), lock("condition_lock"), sem_empty("sem_empty", MaxThreadNum), sem_full("sem_full", 0)
 {
 }
 
