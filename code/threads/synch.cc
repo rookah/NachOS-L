@@ -123,26 +123,27 @@ Condition::~Condition()
 }
 void Condition::Wait(Lock *conditionLock)
 {
+	ASSERT(conditionLock != nullptr);
+
 	lock.Acquire();
 	++queue_size;
 	lock.Release();
 
-	if(conditionLock)
-		conditionLock->Release();
+	conditionLock->Release();
 
 	sem_empty.Wait();
 	sem_full.Post();
 
-	if(conditionLock)
-		conditionLock->Acquire();
+	conditionLock->Acquire();
 }
 
 void Condition::Signal(Lock *conditionLock)
 {
+	ASSERT(conditionLock != nullptr);
+
 	lock.Acquire();
 	if (queue_size > 0) {
-		if (conditionLock)
-			conditionLock->Acquire();
+		conditionLock->Acquire();
 
 	    --queue_size;
 		sem_empty.Post();
@@ -152,6 +153,8 @@ void Condition::Signal(Lock *conditionLock)
 }
 void Condition::Broadcast(Lock *conditionLock)
 {
+	ASSERT(conditionLock != nullptr);
+
 	lock.Acquire();
 
 	for (int i=0; i < queue_size; i++) {
@@ -160,8 +163,7 @@ void Condition::Broadcast(Lock *conditionLock)
 
 	while(queue_size > 0) {
 		--queue_size;
-		if (conditionLock)
-			conditionLock->Acquire();
+		conditionLock->Acquire();
 
 		sem_full.Wait();
 	}
