@@ -50,8 +50,8 @@ int pthread_mutex_unlock(pthread_mutex_t *mutex) {
 int pthread_cond_init (pthread_cond_t *__restrict __cond, const pthread_condattr_t *__restrict __cond_attr) {
     pthread_mutex_init(&__cond->mutex, NULL); // mutex
     __cond->queue_size = 0; // queue_size
-    sem_init(&__cond->sem_empty, 0, MaxThreadNum); // sem_empty
-    sem_init(&__cond->sem_full, 0, 0); // sem_full
+    sem_init(&__cond->sem_full, 0, MaxThreadNum); // sem_empty
+    sem_init(&__cond->sem_empty, 0, 0); // sem_full
 
     return 0; // FIXME return negative value on error
 }
@@ -92,9 +92,7 @@ int pthread_cond_broadcast (pthread_cond_t *__cond) {
 }
 
 int pthread_cond_wait (pthread_cond_t *__restrict __cond, pthread_mutex_t *__restrict __mutex) {
-    PutChar('d');
     pthread_mutex_lock(&__cond->mutex); // mutex
-    PutChar('e');
     ++(__cond->queue_size);
     pthread_mutex_unlock(&__cond->mutex); // mutex
 

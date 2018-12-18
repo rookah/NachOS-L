@@ -37,7 +37,7 @@ typedef struct
     sem_t sem;
 } pthread_mutex_t;
 
-typedef union
+typedef struct
 {
     int queue_size;
     pthread_mutex_t mutex;

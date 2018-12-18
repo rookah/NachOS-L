@@ -9,6 +9,7 @@ void slave1(void *d)
 {
     pthread_mutex_lock(&mtx);
     pthread_cond_wait(&cond, &mtx);
+    pthread_mutex_unlock(&mtx);
     PutInt(1);
 	UserThreadExit();
 }
@@ -17,6 +18,7 @@ void slave2(void *d)
 {
     pthread_mutex_lock(&mtx);
     pthread_cond_wait(&cond, &mtx);
+    pthread_mutex_unlock(&mtx);
     PutInt(2);
     UserThreadExit();
 }
@@ -24,9 +26,12 @@ void slave2(void *d)
 void master(void *d)
 {
     for (int i=0; i < 1000; i++) {}
+    pthread_cond_signal(&cond); // Make sure it only wakes 1 thread
 
+    for (int i=0; i < 1000; i++) {}
+    PutInt(3);
     pthread_cond_signal(&cond);
-	UserThreadExit();
+    UserThreadExit();
 }
 
 int main()
@@ -34,14 +39,13 @@ int main()
     pthread_mutex_init(&mtx, NULL);
     pthread_cond_init(&cond, NULL);
 
-    int id1 = UserThreadCreate(slave1, (void *)0);
-    UserThreadCreate(slave2, (void *)0);
-	int id3 = UserThreadCreate(master, (void *)0);
+    int slave1id = UserThreadCreate(slave1, (void *)0);
+    int slave2id = UserThreadCreate(slave2, (void *)0);
+	int masterid = UserThreadCreate(master, (void *)0);
 
-	UserThreadJoin(id1);
-    UserThreadJoin(id3);
-    // Never halts
-    //UserThreadJoin(id2);
+	UserThreadJoin(slave1id);
+    UserThreadJoin(slave2id);
+    UserThreadJoin(masterid);
 
 	PutChar('\n');
 
