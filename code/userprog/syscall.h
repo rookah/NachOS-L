@@ -41,10 +41,6 @@
 #define SC_SemInit 20
 #define SC_SemWait 21
 #define SC_SemPost 22
-#define SC_CondInit 23
-#define SC_CondWait 24
-#define SC_CondSignal 25
-#define SC_CondBroadcast 26
 
 #ifdef IN_USER_MODE
 
