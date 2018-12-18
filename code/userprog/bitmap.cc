@@ -8,8 +8,8 @@
 
 #include "bitmap.h"
 #include "copyright.h"
-#include <set>
 #include <algorithm>
+#include <set>
 
 //----------------------------------------------------------------------
 // BitMap::BitMap

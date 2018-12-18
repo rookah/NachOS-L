@@ -41,7 +41,7 @@
 #define SC_SemInit 20
 #define SC_SemWait 21
 #define SC_SemPost 22
-#define	SC_ForkExec 23
+#define SC_ForkExec 23
 
 #ifdef IN_USER_MODE
 

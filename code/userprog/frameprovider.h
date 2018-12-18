@@ -1,13 +1,12 @@
 #ifndef FRAMEPROVIDER_H
 #define FRAMEPROVIDER_H
 
-#include "copyright.h"
 #include "bitmap.h"
-
+#include "copyright.h"
 
 class FrameProvider
 {
-public:
+  public:
 	FrameProvider(int nb_frames);
 	~FrameProvider();
 
@@ -15,7 +14,7 @@ public:
 	void ReleaseFrame(int frame);
 	int NumAvailFrame();
 
-private:
+  private:
 	BitMap *frame_bitmap;
 };
 

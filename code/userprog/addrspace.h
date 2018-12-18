@@ -23,6 +23,7 @@ class Semaphore;
 #define MaxThreadNum 8
 
 #define UserStackSize 1024 // increase this as necessary!
+#define MaxVirtPage (unsigned int)100 // VM Size
 
 class AddrSpace
 {
@@ -32,7 +33,7 @@ class AddrSpace
 	// stored in the file "executable"
 	~AddrSpace(); // De-allocate an address space
 
-	void InitRegisters(); // Initialize user-level CPU registers,
+	void InitThreadRegisters(); // Initialize user-level CPU registers,
 	// before jumping to user code
 
 	void SaveState();    // Save/restore address space-specific
@@ -43,10 +44,12 @@ class AddrSpace
 
 	void Exit();
 
+	int AllocatePages(int nbPages);
+	void FreePages(unsigned int vpn, unsigned int numPages = 1);
+
   private:
-	TranslationEntry *pageTable; // Assume linear page table translation
-	// for now!
-	unsigned int numPages; // Number of pages in the virtual
+	TranslationEntry pageTable[MaxVirtPage];
+
 	int numThreads;
 	Lock *mtx;
 	Semaphore *tid[MaxThreadNum];

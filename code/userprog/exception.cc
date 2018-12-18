@@ -25,11 +25,11 @@
 
 #include "semaphore.h"
 
+#include "forkexec.h"
 #include "syscall.h"
 #include "system.h"
 #include "usersemaphore.h"
 #include "userthread.h"
-#include "forkexec.h"
 //----------------------------------------------------------------------
 // UpdatePC : Increments the Program Counter register in order to resume
 // the user program immediately after the "syscall" instruction.
@@ -156,16 +156,16 @@ void ExceptionHandler(ExceptionType which)
 
 void copyStringFromMachine(int from, char *to, unsigned size)
 {
-	char* fromptr;
-	machine->Translate(from, (int *) &fromptr, 1, false);
-	fromptr += (int) machine->mainMemory;
+	char *fromptr;
+	machine->Translate(from, (int *)&fromptr, 1, false);
+	fromptr += (int)machine->mainMemory;
 	while (*fromptr != '\0' && size > 1) {
 		*to = *fromptr;
 		from++;
 		to++;
 		size--;
-		machine->Translate(from, (int *) &fromptr, 1, false);
-		fromptr += (int) machine->mainMemory;
+		machine->Translate(from, (int *)&fromptr, 1, false);
+		fromptr += (int)machine->mainMemory;
 	}
 	*to = '\0';
 }

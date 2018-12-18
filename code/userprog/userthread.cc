@@ -16,7 +16,7 @@ int do_UserThreadCreate(int f, int arg, int userThreadExitAddr)
 	b->arg = arg;
 	b->userThreadExitAddr = userThreadExitAddr;
 	Thread *t = new Thread("newThread");
-	t->Fork(StartUserThread, (int) b);
+	t->Fork(StartUserThread, (int)b);
 	return t->id;
 }
 
@@ -33,21 +33,17 @@ void do_UserThreadExit()
 
 static void StartUserThread(int f)
 {
-
 	// arguments retrieval
 	bundle_t *b = (bundle_t *)f;
 
 	// page table load
+	currentThread->space->InitThreadRegisters();
 	currentThread->space->RestoreState();
 
 	// PC update
 	machine->WriteRegister(PCReg, b->f);
 	machine->WriteRegister(NextPCReg, b->f + 4);
 	machine->WriteRegister(31, b->userThreadExitAddr);
-
-	// stack pointer assignation
-	machine->WriteRegister(StackReg, machine->pageTableSize * PageSize - (UserStackSize / MaxThreadNum) * currentThread->id);
-	DEBUG('a', "Initializing stack register to %d\n", machine->ReadRegister(StackReg));
 
 	machine->Run();
 	ASSERT(FALSE);

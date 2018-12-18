@@ -110,6 +110,7 @@ class Thread
 		printf("%s, ", name);
 	}
 	int id;
+	int userStack; // Top of user stack
 
   private:
 	// some of the private data for this class is listed above
