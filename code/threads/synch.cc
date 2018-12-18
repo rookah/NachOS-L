@@ -140,7 +140,7 @@ void Condition::Wait(Lock *conditionLock)
 
 void Condition::Signal(Lock *conditionLock)
 {
-	ASSERT(conditionLock != nullptr);
+	ASSERT(conditionLock != NULL);
 
 	lock.Acquire();
 	if (queue_size > 0) {
@@ -154,7 +154,7 @@ void Condition::Signal(Lock *conditionLock)
 }
 void Condition::Broadcast(Lock *conditionLock)
 {
-	ASSERT(conditionLock != nullptr);
+	ASSERT(conditionLock != NULL);
 
 	lock.Acquire();
 
