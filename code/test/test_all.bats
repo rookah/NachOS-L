@@ -5,6 +5,11 @@
   [[ "$result" == "----------------------------------------------------------------------------------------------------" ]]
 }
 
+@test "mutex" {
+  result="$(./nachos-step2 -rs 1 -x mutex | head -n 1)"
+  [[ "$result" == "1400" ]]
+}
+
 @test "nohalt" {
   result="$(./nachos-step2 -rs 1 -x nohalt | head -n 1)"
   [[ "$result" == "This main function does not halt!" ]]

@@ -1,5 +1,6 @@
 
 #include "syscall.h"
+//#include "utility.h"
 #include <semaphore.h>
 
 // int    sem_close(sem_t *);
@@ -8,9 +9,9 @@
 
 int sem_init(sem_t *sid, int pshared, unsigned int value)
 {
-	if (pshared)
-		return -1;
-
+	// shared is not implemented
+//	ASSERT(pshared == 0);
+;
 	sid->__align = SemInit(value);
 	return 0;
 }

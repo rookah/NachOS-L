@@ -27,7 +27,7 @@ void do_CondWait(int cid, int lid)
 	mtx.Release();
 
 	if (cond) {
-		cond->Wait();
+//		cond->Wait();
 	}
 }
 
@@ -41,7 +41,7 @@ void do_CondSignal(int cid, int lid)
 	mtx.Release();
 
 	if (cond) {
-		cond->Signal();
+//		cond->Signal();
 	}
 }
 
@@ -55,6 +55,6 @@ void do_CondBroadcast(int cid, int lid)
     mtx.Release();
 
     if (cond) {
-        cond->Post();
+//        cond->Post();
     }
 }
