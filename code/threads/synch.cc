@@ -124,7 +124,7 @@ Condition::~Condition()
 }
 void Condition::Wait(Lock *conditionLock)
 {
-	ASSERT(conditionLock != nullptr);
+	ASSERT(conditionLock != NULL);
 
 	lock.Acquire();
 	++queue_size;
