@@ -1,6 +1,6 @@
 #include "syscall.h"
-#include <pthread.h>
-
+#include "pthread.h"
+#include <stddef.h>
 
 static pthread_mutex_t mtx;
 static pthread_cond_t cond;

@@ -1,5 +1,6 @@
-#include <pthread.h>
+#include "pthread.h"
 #include "syscall.h"
+#include <stddef.h>
 
 pthread_mutex_t protecc;
 int counter = 0;

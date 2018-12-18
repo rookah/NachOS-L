@@ -1,7 +1,7 @@
 
 #include "syscall.h"
 //#include "utility.h"
-#include <semaphore.h>
+#include "semaphore.h"
 
 // int    sem_close(sem_t *);
 // int    sem_destroy(sem_t *);
