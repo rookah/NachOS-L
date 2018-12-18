@@ -10,6 +10,16 @@
   [[ "$result" == "1400" ]]
 }
 
+@test "condition1" {
+  result="$(./nachos-step2 -rs 1 -x condition1 | head -n 1)"
+  [[ "$result" == "1" ]]
+}
+
+@test "condition2" {
+  result="$(./nachos-step2 -rs 1 -x condition2 | head -n 1)"
+  [[ "$result" == "12" ]]
+}
+
 @test "nohalt" {
   result="$(./nachos-step2 -rs 1 -x nohalt | head -n 1)"
   [[ "$result" == "This main function does not halt!" ]]
