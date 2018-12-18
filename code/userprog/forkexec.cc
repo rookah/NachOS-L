@@ -3,7 +3,7 @@
 #include <string.h>
 
 
-static void StartProcess2(int space);
+static void StarNewProcess(int space);
 
 int do_ForkExec(char *s)
 {	
@@ -18,15 +18,15 @@ int do_ForkExec(char *s)
 	delete executable; // close file
 	currentThread->space->RestoreState();
 	Thread *newProcess = new Thread("new process");
-	newProcess->Fork(StartProcess2, (int) space);
+	newProcess->Fork(StarNewProcess, (int) space);
 	return 0;
 }
 
-static void StartProcess2(int space)
+static void StarNewProcess(int space)
 {
 	currentThread->space = (AddrSpace *) space;
 	currentThread->space->InitRegisters(); // set the initial register values
-	//currentThread->space->RestoreState();  // load page table register
+	currentThread->space->RestoreState();  // load page table register
 
 	machine->Run(); // jump to the user progam
 	ASSERT(FALSE);  // machine->Run never returns;

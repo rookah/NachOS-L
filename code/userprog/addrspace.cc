@@ -98,7 +98,7 @@ AddrSpace::AddrSpace(OpenFile *executable) : mtx(new Lock("thread countlock")) {
 
 	// zero out the entire address space, to zero the unitialized data segment
 	// and the stack segment
-	bzero(machine->mainMemory, size);
+	// bzero(machine->mainMemory, size);
 
 	// then, copy in the code and data segments into memory
 	if (noffH.code.size > 0) {
