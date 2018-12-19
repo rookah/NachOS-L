@@ -67,6 +67,7 @@ static void UpdatePC()
 //      are in machine.h.
 //----------------------------------------------------------------------
 void copyStringFromMachine(int from, char *to, unsigned size);
+char* mipsPtrToKernelPtr(int mipsPtr);
 
 void ExceptionHandler(ExceptionType which)
 {
@@ -101,8 +102,7 @@ void ExceptionHandler(ExceptionType which)
 			break;
 
 		case SC_GetString: {
-			char *fromptr = (char *)(machine->ReadRegister(4) + machine->mainMemory);
-			synchconsole->SynchGetString(fromptr, machine->ReadRegister(5));
+			synchconsole->SynchGetString(mipsPtrToKernelPtr(machine->ReadRegister(4)), machine->ReadRegister(5));
 			break;
 		}
 
@@ -154,18 +154,23 @@ void ExceptionHandler(ExceptionType which)
 	}
 }
 
-void copyStringFromMachine(int from, char *to, unsigned size)
+char* mipsPtrToKernelPtr(int mipsPtr)
 {
 	char *fromptr;
-	machine->Translate(from, (int *)&fromptr, 1, false);
+	machine->Translate(mipsPtr, (int *)&fromptr, 1, false);
 	fromptr += (int)machine->mainMemory;
+	return fromptr;
+}
+
+void copyStringFromMachine(int from, char *to, unsigned size)
+{
+	char *fromptr = mipsPtrToKernelPtr(from);
 	while (*fromptr != '\0' && size > 1) {
 		*to = *fromptr;
 		from++;
 		to++;
 		size--;
-		machine->Translate(from, (int *)&fromptr, 1, false);
-		fromptr += (int)machine->mainMemory;
+		fromptr = mipsPtrToKernelPtr(from);
 	}
 	*to = '\0';
 }
