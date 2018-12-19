@@ -21,8 +21,7 @@
 class Lock;
 class Semaphore;
 
-#define MaxThreadNum 4
-#define UserStackSize 1024 // increase this as necessary!
+#define UserStackSize 1024            // increase this as necessary!
 #define MaxVirtPage (unsigned int)100 // VM Size
 
 class AddrSpace
@@ -45,7 +44,7 @@ class AddrSpace
 
 	void Exit();
 
-	int AllocatePages(int nbPages);
+	int AllocatePages(int nbPages, bool fromEnd = false);
 	void FreePages(unsigned int vpn, unsigned int numPages = 1);
 
   private:
@@ -54,6 +53,7 @@ class AddrSpace
 	int numThreads;
 	Lock *mtx;
 	std::unordered_map<int, Semaphore *> threadList;
+	unsigned int brk;
 };
 
 #endif // ADDRSPACE_H

@@ -21,7 +21,7 @@ joinlist=$(subst $(EMPTY) $(EMPTY),$1,$2)
 buildvpath=$(call joinlist,:,$(addprefix $(topsrc_dir)/,$1))
 vpath %.cc $(call buildvpath,machine threads userprog filesys network vm)
 vpath %.S $(call buildvpath,machine threads userprog filesys network vm)
-vpath %.c $(topsrc_dir)/test
+vpath %.c $(call buildvpath,test userlibs)
 vpath %.S $(topsrc_dir)/test
 
 all:

@@ -102,7 +102,7 @@ void ExceptionHandler(ExceptionType which)
 			synchconsole->SynchPutString(string);
 			break;
 
-		case SC_GetString: {
+		case SC_GetString: { // FIXME if mips string is accross multiple pages
 			synchconsole->SynchGetString(mipsPtrToKernelPtr(machine->ReadRegister(4)), machine->ReadRegister(5));
 			break;
 		}
@@ -145,6 +145,10 @@ void ExceptionHandler(ExceptionType which)
 			copyStringFromMachine((machine->ReadRegister(4)), string, MAX_STRING_SIZE);
 			do_ForkExec(string);
 			break;
+		
+		case SC_Sbrk:
+			machine->WriteRegister(2, currentThread->space->AllocatePages(machine->ReadRegister(4)) * PageSize);
+			break;
 
 		case SC_ForkJoin:
 			do_ProcessJoin(machine->ReadRegister(4));
@@ -170,6 +174,7 @@ char *mipsPtrToKernelPtr(int mipsPtr)
 void copyStringFromMachine(int from, char *to, unsigned size)
 {
 	char *fromptr = mipsPtrToKernelPtr(from);
+
 	while (*fromptr != '\0' && size > 1) {
 		*to = *fromptr;
 		from++;

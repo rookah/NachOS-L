@@ -1,24 +1,22 @@
-#include <pthread.h>
 #include "syscall.h"
+#include <pthread.h>
 
-void* thread(void* myId)
+void *thread(void *myId)
 {
-    PutInt((int)myId);
+	PutInt((int)myId);
 
-    return NULL;
+	return NULL;
 }
 
 int main()
 {
-    for (int i = 0; i < 500; ++i)
-    {
-        pthread_t id;
-        pthread_create(&id, NULL, thread, (void*)i);
-        for (int j = 0; j < 100; j++)
-        {
-            PutChar(' ');
-        }
-    }
+	for (int i = 0; i < 500; ++i) {
+		pthread_t id;
+		pthread_create(&id, NULL, thread, (void *)i);
+		for (int j = 0; j < 100; j++) {
+			PutChar(' ');
+		}
+	}
 
-    return 0;
+	return 0;
 }

@@ -256,6 +256,15 @@ ForkJoin:
 
 	.end ForkJoin
 	
+	.globl Sbrk
+	.ent Sbrk
+Sbrk:
+	addiu $2,$0,SC_Sbrk
+	syscall
+	j	$31
+
+	.end Sbrk
+
 /* dummy function to keep gcc happy */
         .globl  __main
         .ent    __main

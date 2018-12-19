@@ -144,8 +144,7 @@ AddrSpace::~AddrSpace()
 	// LB: Missing [] for delete
 	// delete pageTable;
 	for (unsigned i = 0; i < MaxVirtPage; i++) {
-		if (pageTable[i].valid)
-		{
+		if (pageTable[i].valid) {
 			fp.ReleaseFrame(pageTable[i].physicalPage);
 			pageTable[i].valid = false;
 		}
@@ -180,7 +179,7 @@ void AddrSpace::InitThreadRegisters()
 	// Set the stack register to the end of the address space, where we
 	// allocated the stack; but subtract off a bit, to make sure we don't
 	// accidentally reference off the end!
-	currentThread->userStack = AllocatePages(UserStackSize / PageSize);
+	currentThread->userStack = AllocatePages(UserStackSize / PageSize, true);
 	int stackAddr = currentThread->userStack * PageSize + UserStackSize - 16;
 
 	machine->WriteRegister(StackReg, stackAddr);
@@ -223,22 +222,19 @@ int AddrSpace::ThreadCount()
 
 void AddrSpace::AddThread(int tid)
 {
-	ASSERT(tid < MaxThreadNum);
 	Semaphore *sem = new Semaphore("thread", 0);
 	threadList.insert(std::make_pair(tid, sem));
 }
 
 void AddrSpace::SignalThread(int tid)
 {
-	ASSERT(tid < MaxThreadNum);
 	threadList.at(tid)->Post();
 }
 
 void AddrSpace::JoinThread(int tid)
 {
-	ASSERT(tid < MaxThreadNum);
 	// return if tid isn't running
-	auto it = threadList.find(tid);
+	std::unordered_map<int, Semaphore*>::iterator it = threadList.find(tid);
 	if (it == threadList.end())
 		return;
 
@@ -259,7 +255,7 @@ void AddrSpace::Exit()
 	mtx->Release();
 }
 
-int AddrSpace::AllocatePages(int numPages)
+int AddrSpace::AllocatePages(int numPages, bool fromEnd)
 {
 	std::set<int> usedVPN;
 
@@ -270,17 +266,32 @@ int AddrSpace::AllocatePages(int numPages)
 
 	unsigned int nextAvailablePage = 0;
 
-	for (nextAvailablePage = 0; nextAvailablePage < MaxVirtPage - numPages; nextAvailablePage++) {
-		bool good = true;
-		for (int i = 0; i < numPages; ++i) {
-			if (usedVPN.count(nextAvailablePage + i)) {
-				good = false;
-				break;
+	if (!fromEnd) {
+		for (nextAvailablePage = 0; nextAvailablePage < MaxVirtPage - numPages; nextAvailablePage++) {
+			bool good = true;
+			for (int i = 0; i < numPages; ++i) {
+				if (usedVPN.count(nextAvailablePage + i)) {
+					good = false;
+					break;
+				}
 			}
-		}
 
-		if (good)
-			break;
+			if (good)
+				break;
+		}
+	} else {
+		for (nextAvailablePage = MaxVirtPage - numPages; nextAvailablePage >= 0; nextAvailablePage--) {
+			bool good = true;
+			for (int i = 0; i < numPages; ++i) {
+				if (usedVPN.count(nextAvailablePage + i)) {
+					good = false;
+					break;
+				}
+			}
+
+			if (good)
+				break;
+		}
 	}
 
 	for (unsigned int i = nextAvailablePage; i < nextAvailablePage + numPages; ++i) {

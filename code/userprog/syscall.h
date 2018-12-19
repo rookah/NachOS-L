@@ -13,7 +13,7 @@
 #ifndef SYSCALLS_H
 #define SYSCALLS_H
 
-#include "copyright.h"
+//#include "copyright.h"
 
 /* system call codes -- used by the stubs to tell the kernel which system call
  * is being asked for
@@ -43,6 +43,7 @@
 #define SC_SemPost 22
 #define	SC_ForkExec 23
 #define	SC_ForkJoin 24
+#define SC_Sbrk 25
 
 #ifdef IN_USER_MODE
 
@@ -164,6 +165,8 @@ void SemPost(int sem);
 int ForkExec(char *s);
 
 void ForkJoin();
+
+int Sbrk(int n);
 
 #endif // IN_USER_MODE
 
