@@ -9,11 +9,10 @@ int counter = 0;
 
 void thread(void *d)
 {
-	for (int i=0; i < 200; i++) {
+	for (int i = 0; i < 200; i++) {
 		pthread_mutex_lock(&protecc);
 		counter += 1;
 		pthread_mutex_unlock(&protecc);
-
 	}
 
 	UserThreadExit();
@@ -21,19 +20,18 @@ void thread(void *d)
 
 int main()
 {
-    int id[NUM_THREADS];
+	int id[NUM_THREADS];
 
 	pthread_mutex_init(&protecc, NULL);
-	for (int i=0; i < NUM_THREADS; i++) {
-        id[i] = UserThreadCreate(thread, (void *)0);
+	for (int i = 0; i < NUM_THREADS; i++) {
+		id[i] = UserThreadCreate(thread, (void *)0);
 	}
 
-    for (int i=0; i < NUM_THREADS; i++) {
-        UserThreadJoin(id[i]);
-    }
+	for (int i = 0; i < NUM_THREADS; i++) {
+		UserThreadJoin(id[i]);
+	}
 
-
-    PutInt(counter);
+	PutInt(counter);
 	PutChar('\n');
 
 	Halt();

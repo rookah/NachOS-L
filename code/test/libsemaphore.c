@@ -10,8 +10,8 @@
 int sem_init(sem_t *sid, int pshared, unsigned int value)
 {
 	// shared is not implemented
-//	ASSERT(pshared == 0);
-;
+	//	ASSERT(pshared == 0);
+	;
 	sid->__align = SemInit(value);
 	return 0;
 }

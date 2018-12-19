@@ -111,7 +111,7 @@ class Thread
 	}
 	int id;
 	int userStack; // Top of user stack
-	int pid; // pid associated to the thread
+	int pid;       // pid associated to the thread
 
   private:
 	// some of the private data for this class is listed above

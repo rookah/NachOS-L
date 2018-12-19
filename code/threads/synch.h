@@ -148,8 +148,8 @@ class Condition
   private:
 	const char *name;
 	Lock lock;
-    Semaphore sem_empty;
-    Semaphore sem_full;
+	Semaphore sem_empty;
+	Semaphore sem_full;
 
 	int queue_size;
 };

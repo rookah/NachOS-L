@@ -2,7 +2,6 @@
 #include "system.h"
 #include <string.h>
 
-
 static void StartNewProcess(int space);
 
 int do_ForkExec(char *s)

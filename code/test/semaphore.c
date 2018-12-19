@@ -1,5 +1,5 @@
-#include "pthread.h"
 #include "semaphore.h"
+#include "pthread.h"
 #include <stdio.h>
 
 #define BUFFER_SIZE 10
