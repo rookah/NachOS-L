@@ -12,12 +12,12 @@
 
 @test "condition1" {
   result="$(./nachos-step2 -rs 1 -x condition1 | head -n 1)"
-  [[ "$result" == "231" ]]
+  [[ "$result" == "132" ]]
 }
 
 @test "condition2" {
   result="$(./nachos-step2 -rs 1 -x condition2 | head -n 1)"
-  [[ "$result" == "213" ]]
+  [[ "$result" == "123" ]]
 }
 
 @test "nohalt" {
@@ -37,7 +37,7 @@
 
 @test "join" {
   result="$(./nachos-step2 -rs 1 -x join | head -n 1)"
-  [[ "$result" == "133333222111212" ]]
+  [[ "$result" == "122222333111313" ]]
 }
 
 @test "getputchar" {
@@ -58,7 +58,7 @@
 
 @test "multithread" {
   result="$(./nachos-step2 -rs 1 -x multithread | head -n 1)"
-  [[ "$result" == "0111113330002332220000202000220222222220000000200000000000022000222220222222220000200022200022022222220000002222200000000000000000000000000000000000000000000000" ]]
+  [[ "$result" == "0022222111103222220000312000330222222220000000322222222222200222000002000000002222022200022200200000002222000000000000000000000000000000000000000000000000000000" ]]
 }
 
 @test "putchar" {
