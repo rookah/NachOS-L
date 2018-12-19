@@ -24,7 +24,7 @@
 #include <set>
 #include <strings.h> /* for bzero */
 
-static int process_count = 0; // TODO Protect me with mutex
+static int process_count = 0;
 static void ReadAtVirtual(OpenFile *executable, int virtualaddr, int numBytes, int position);
 static FrameProvider fp(NumPhysPages);
 
@@ -108,19 +108,17 @@ AddrSpace::AddrSpace(OpenFile *executable) : mtx(new Lock("thread countlock"))
 
 	// then, copy in the code and data segments into memory
 	if (noffH.code.size > 0) {
-		DEBUG('a', "Initializing code segment, at 0x%x, size %d\n", noffH.code.virtualAddr, noffH.code.size);
-		// executable->ReadAt(&(machine->mainMemory[noffH.code.virtualAddr]), noffH.code.size, noffH.code.inFileAddr);
+		DEBUG('a', "Initializing code segment, at 0x%x, size %d\n",
+				noffH.code.virtualAddr, noffH.code.size);
 		ReadAtVirtual(executable, noffH.code.virtualAddr, noffH.code.size, noffH.code.inFileAddr);
+
 	}
 	if (noffH.initData.size > 0) {
-		DEBUG('a', "Initializing data segment, at 0x%x, size %d\n", noffH.initData.virtualAddr, noffH.initData.size);
-		// executable->ReadAt(&(machine->mainMemory[noffH.initData.virtualAddr]), noffH.initData.size, noffH.initData.inFileAddr);
+		DEBUG('a', "Initializing data segment, at 0x%x, size %d\n",
+				noffH.initData.virtualAddr, noffH.initData.size);
 		ReadAtVirtual(executable, noffH.initData.virtualAddr, noffH.initData.size, noffH.initData.inFileAddr);
 	}
 	numThreads = 0;
-	for (int i = 0; i < MaxThreadNum; i++) {
-		tid[i] = new Semaphore("sem", 0);
-	}
 
 	mtx->Acquire();
 	process_count++;
@@ -223,16 +221,31 @@ int AddrSpace::ThreadCount()
 	return a;
 }
 
-void AddrSpace::JoinThread(int t)
+void AddrSpace::AddThread(int tid)
 {
-	ASSERT(t < MaxThreadNum);
-	tid[t]->Wait();
+	ASSERT(tid < MaxThreadNum);
+	Semaphore *sem = new Semaphore("thread", 0);
+	threadList.insert(std::make_pair(tid, sem));
 }
 
-void AddrSpace::SignalThread(int t)
+void AddrSpace::SignalThread(int tid)
 {
-	ASSERT(t < MaxThreadNum);
-	tid[t]->Post();
+	ASSERT(tid < MaxThreadNum);
+	threadList.at(tid)->Post();
+}
+
+void AddrSpace::JoinThread(int tid)
+{
+	ASSERT(tid < MaxThreadNum);
+	// return if tid isn't running
+	auto it = threadList.find(tid);
+	if (it == threadList.end())
+		return;
+
+	// wait on tid and erase entry from the map
+	threadList.at(tid)->Wait();
+	delete threadList.at(tid);
+	threadList.erase(tid);
 }
 
 void AddrSpace::Exit()

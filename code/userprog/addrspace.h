@@ -16,12 +16,12 @@
 #include "copyright.h"
 #include "filesys.h"
 #include "translate.h"
+#include <unordered_map>
 
 class Lock;
 class Semaphore;
 
-#define MaxThreadNum 8
-
+#define MaxThreadNum 4
 #define UserStackSize 1024 // increase this as necessary!
 #define MaxVirtPage (unsigned int)100 // VM Size
 
@@ -39,8 +39,9 @@ class AddrSpace
 	void SaveState();    // Save/restore address space-specific
 	void RestoreState(); // info on a context switch
 	int ThreadCount();
-	void SignalThread(int t);
-	void JoinThread(int t);
+	void AddThread(int tid);
+	void SignalThread(int tid);
+	void JoinThread(int tid);
 
 	void Exit();
 
@@ -52,8 +53,7 @@ class AddrSpace
 
 	int numThreads;
 	Lock *mtx;
-	Semaphore *tid[MaxThreadNum];
-	// address space
+	std::unordered_map<int, Semaphore *> threadList;
 };
 
 #endif // ADDRSPACE_H

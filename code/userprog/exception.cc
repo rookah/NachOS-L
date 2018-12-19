@@ -76,6 +76,7 @@ void ExceptionHandler(ExceptionType which)
 	if (which == SyscallException) {
 		switch (type) {
 		case SC_Exit:
+			SignalProcess(currentThread->pid);
 			currentThread->space->Exit();
 			currentThread->Finish();
 			break;
@@ -143,6 +144,10 @@ void ExceptionHandler(ExceptionType which)
 		case SC_ForkExec:
 			copyStringFromMachine((machine->ReadRegister(4)), string, MAX_STRING_SIZE);
 			do_ForkExec(string);
+			break;
+
+		case SC_ForkJoin:
+			do_ProcessJoin(machine->ReadRegister(4));
 			break;
 
 		default: {

@@ -247,6 +247,14 @@ ForkExec:
 
 	.end ForkExec
 
+	.globl ForkJoin
+	.ent ForkJoin
+ForkJoin:
+	addiu $2,$0,SC_ForkJoin
+	syscall
+	j	$31
+
+	.end ForkJoin
 	
 /* dummy function to keep gcc happy */
         .globl  __main
