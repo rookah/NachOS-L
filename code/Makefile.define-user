@@ -19,6 +19,8 @@ ifneq (,$(findstring arch,$(shell uname -r)))
 CPPFLAGS += -isystem /usr/include
 endif
 
+COMPILE.cc += -std=c++11
+
 # List of C files that are not userspace programs (in test/ subdirectory)
 # => add here C files that are user-space libraries
 # all other C files will be compiled as a userspace nachos program
@@ -44,7 +46,7 @@ USERPROG_LIBS=start.S libstdio.c libstdlib.c libpthread.c libsemaphore.c
 # sources and will always be linked only with start.S (USERPROG_LIBS
 # and ..._EXTRA_SOURCES are ignored for them)
 
-EXTRA_SOURCES=synchconsole.cc userthread.cc semaphore.cc
+EXTRA_SOURCES=synchconsole.cc userthread.cc semaphore.cc frameprovider.cc forkexec.cc
 
 ###########################################################################
 #                        NACHOS KERNELS                                   #

@@ -17,12 +17,16 @@
 
 #include "addrspace.h"
 #include "copyright.h"
+#include "frameprovider.h"
 #include "noff.h"
 #include "synch.h"
 #include "system.h"
+#include <set>
 #include <strings.h> /* for bzero */
 
-static int process_count = 0; // TODO Protect me with mutex
+static int process_count = 0;
+static void ReadAtVirtual(OpenFile *executable, int virtualaddr, int numBytes, int position);
+static FrameProvider fp(NumPhysPages);
 
 //----------------------------------------------------------------------
 // SwapHeader
@@ -63,7 +67,7 @@ static void SwapHeader(NoffHeader *noffH)
 AddrSpace::AddrSpace(OpenFile *executable) : mtx(new Lock("thread countlock"))
 {
 	NoffHeader noffH;
-	unsigned int i, size;
+	unsigned int size;
 
 	executable->ReadAt((char *)&noffH, sizeof(noffH), 0);
 	if ((noffH.noffMagic != NOFFMAGIC) && (WordToHost(noffH.noffMagic) == NOFFMAGIC))
@@ -71,61 +75,80 @@ AddrSpace::AddrSpace(OpenFile *executable) : mtx(new Lock("thread countlock"))
 	ASSERT(noffH.noffMagic == NOFFMAGIC);
 
 	// how big is address space?
-	size = noffH.code.size + noffH.initData.size + noffH.uninitData.size + UserStackSize; // we need to increase the size
-	// to leave room for the stack
-	numPages = divRoundUp(size, PageSize);
+	size = noffH.code.size + noffH.initData.size + noffH.uninitData.size; // we need to increase the size to leave room for the stack
+	unsigned int numPages = divRoundUp(size, PageSize);
 	size = numPages * PageSize;
 
-	ASSERT(numPages <= NumPhysPages); // check we're not trying
-	// to run anything too big --
-	// at least until we have
-	// virtual memory
+	ASSERT(numPages <= MaxVirtPage); // check we're not trying to run anything too big -- at least until we have virtual memory
 
 	DEBUG('a', "Initializing address space, num pages %d, size %d\n", numPages, size);
+
+	for (unsigned int i = 0; i < MaxVirtPage; i++) {
+		pageTable[i].virtualPage = i;
+		pageTable[i].valid = FALSE;
+	}
+
 	// first, set up the translation
-	pageTable = new TranslationEntry[numPages];
-	for (i = 0; i < numPages; i++) {
-		pageTable[i].virtualPage = i; // for now, virtual page # = phys page #
-		pageTable[i].physicalPage = i;
+	for (unsigned int i = 0; i < numPages; i++) {
+		pageTable[i].virtualPage = i;
+		pageTable[i].physicalPage = fp.GetEmptyFrame();
 		pageTable[i].valid = TRUE;
 		pageTable[i].use = FALSE;
 		pageTable[i].dirty = FALSE;
-		pageTable[i].readOnly = FALSE; // if the code segment was entirely on
-		                               // a separate page, we could set its
-		                               // pages to be read-only
+		pageTable[i].readOnly = FALSE; // if the code segment was entirely on a separate page, we could set its pages to be read-only
 	}
+
+	// write page table info to the machine
+	machine->pageTable = pageTable;
+	machine->pageTableSize = MaxVirtPage;
 
 	// zero out the entire address space, to zero the unitialized data segment
 	// and the stack segment
-	bzero(machine->mainMemory, size);
+	// bzero(machine->mainMemory, size);
 
 	// then, copy in the code and data segments into memory
 	if (noffH.code.size > 0) {
-		DEBUG('a', "Initializing code segment, at 0x%x, size %d\n", noffH.code.virtualAddr, noffH.code.size);
-		executable->ReadAt(&(machine->mainMemory[noffH.code.virtualAddr]), noffH.code.size, noffH.code.inFileAddr);
+		DEBUG('a', "Initializing code segment, at 0x%x, size %d\n",
+				noffH.code.virtualAddr, noffH.code.size);
+		ReadAtVirtual(executable, noffH.code.virtualAddr, noffH.code.size, noffH.code.inFileAddr);
+
 	}
 	if (noffH.initData.size > 0) {
-		DEBUG('a', "Initializing data segment, at 0x%x, size %d\n", noffH.initData.virtualAddr, noffH.initData.size);
-		executable->ReadAt(&(machine->mainMemory[noffH.initData.virtualAddr]), noffH.initData.size, noffH.initData.inFileAddr);
+		DEBUG('a', "Initializing data segment, at 0x%x, size %d\n",
+				noffH.initData.virtualAddr, noffH.initData.size);
+		ReadAtVirtual(executable, noffH.initData.virtualAddr, noffH.initData.size, noffH.initData.inFileAddr);
 	}
 	numThreads = 0;
-	for (i = 0; i < MaxThreadNum; i++) {
-		tid[i] = new Semaphore("sem", 0);
-	}
 
+	mtx->Acquire();
 	process_count++;
+	mtx->Release();
+}
+
+static void ReadAtVirtual(OpenFile *executable, int virtualaddr, int numBytes, int position)
+{
+	char buff[numBytes];
+	numBytes = executable->ReadAt(buff, numBytes, position);
+	for (int i = 0; i < numBytes; i++) {
+		machine->WriteMem(virtualaddr + i, 1, buff[i]);
+	}
 }
 
 //----------------------------------------------------------------------
 // AddrSpace::~AddrSpace
-//      Dealloate an address space.  Nothing for now!
+//      Deallocate an address space.  Nothing for now!
 //----------------------------------------------------------------------
 
 AddrSpace::~AddrSpace()
 {
 	// LB: Missing [] for delete
 	// delete pageTable;
-	delete[] pageTable;
+	for (unsigned i = 0; i < MaxVirtPage; i++) {
+		if (pageTable[i].valid) {
+			fp.ReleaseFrame(pageTable[i].physicalPage);
+			pageTable[i].valid = false;
+		}
+	}
 	// End of modification
 }
 
@@ -139,7 +162,7 @@ AddrSpace::~AddrSpace()
 //      when this thread is context switched out.
 //----------------------------------------------------------------------
 
-void AddrSpace::InitRegisters()
+void AddrSpace::InitThreadRegisters()
 {
 	int i;
 
@@ -156,8 +179,11 @@ void AddrSpace::InitRegisters()
 	// Set the stack register to the end of the address space, where we
 	// allocated the stack; but subtract off a bit, to make sure we don't
 	// accidentally reference off the end!
-	machine->WriteRegister(StackReg, numPages * PageSize - 16);
-	DEBUG('a', "Initializing stack register to %d\n", numPages * PageSize - 16);
+	currentThread->userStack = AllocatePages(UserStackSize / PageSize, true);
+	int stackAddr = currentThread->userStack * PageSize + UserStackSize - 16;
+
+	machine->WriteRegister(StackReg, stackAddr);
+	DEBUG('a', "Initializing stack register to %d\n", stackAddr);
 }
 
 //----------------------------------------------------------------------
@@ -183,7 +209,7 @@ void AddrSpace::SaveState()
 void AddrSpace::RestoreState()
 {
 	machine->pageTable = pageTable;
-	machine->pageTableSize = numPages;
+	machine->pageTableSize = MaxVirtPage;
 }
 
 int AddrSpace::ThreadCount()
@@ -194,22 +220,98 @@ int AddrSpace::ThreadCount()
 	return a;
 }
 
-void AddrSpace::JoinThread(int t)
+void AddrSpace::AddThread(int tid)
 {
-	ASSERT(t < MaxThreadNum);
-	tid[t]->Wait();
+	Semaphore *sem = new Semaphore("thread", 0);
+	threadList.insert(std::make_pair(tid, sem));
 }
 
-void AddrSpace::SignalThread(int t)
+void AddrSpace::SignalThread(int tid)
 {
-	ASSERT(t < MaxThreadNum);
-	tid[t]->Post();
+	threadList.at(tid)->Post();
+}
+
+void AddrSpace::JoinThread(int tid)
+{
+	// return if tid isn't running
+	std::unordered_map<int, Semaphore *>::iterator it = threadList.find(tid);
+	if (it == threadList.end())
+		return;
+
+	// wait on tid and erase entry from the map
+	threadList.at(tid)->Wait();
+	delete threadList.at(tid);
+	threadList.erase(tid);
 }
 
 void AddrSpace::Exit()
 {
-	process_count--;
+	mtx->Acquire();
 
-	if (process_count == 0)
+	process_count--;
+	if (process_count == 0) {
 		interrupt->Halt();
+	}
+
+	mtx->Release();
+}
+
+int AddrSpace::AllocatePages(int numPages, bool fromEnd)
+{
+	std::set<int> usedVPN;
+
+	for (unsigned int i = 0; i < MaxVirtPage; ++i) {
+		if (pageTable[i].valid)
+			usedVPN.insert(pageTable[i].virtualPage);
+	}
+
+	unsigned int nextAvailablePage = 0;
+
+	if (!fromEnd) {
+		for (nextAvailablePage = 0; nextAvailablePage < MaxVirtPage - numPages; nextAvailablePage++) {
+			bool good = true;
+			for (int i = 0; i < numPages; ++i) {
+				if (usedVPN.count(nextAvailablePage + i)) {
+					good = false;
+					break;
+				}
+			}
+
+			if (good)
+				break;
+		}
+	} else {
+		for (nextAvailablePage = MaxVirtPage - numPages; nextAvailablePage >= 0; nextAvailablePage--) {
+			bool good = true;
+			for (int i = 0; i < numPages; ++i) {
+				if (usedVPN.count(nextAvailablePage + i)) {
+					good = false;
+					break;
+				}
+			}
+
+			if (good)
+				break;
+		}
+	}
+
+	for (unsigned int i = nextAvailablePage; i < nextAvailablePage + numPages; ++i) {
+		pageTable[i].physicalPage = fp.GetEmptyFrame();
+		pageTable[i].valid = TRUE;
+		pageTable[i].use = FALSE;
+		pageTable[i].dirty = FALSE;
+		pageTable[i].readOnly = FALSE;
+	}
+
+	return nextAvailablePage;
+}
+
+void AddrSpace::FreePages(unsigned int vpn, unsigned int numPages)
+{
+	for (unsigned int j = vpn; j < vpn + numPages; j++) {
+		if (pageTable[j].valid) {
+			fp.ReleaseFrame(pageTable[j].physicalPage);
+			pageTable[j].valid = false;
+		}
+	}
 }

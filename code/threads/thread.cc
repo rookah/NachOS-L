@@ -170,6 +170,11 @@ void Thread::Finish()
 	// End of addition
 
 	threadToBeDestroyed = currentThread;
+
+#ifdef USER_PROGRAM
+	currentThread->space->FreePages(userStack, UserStackSize / PageSize); // See AddrSpace::InitThreadRegisters
+#endif
+
 	Sleep(); // invokes SWITCH
 	         // not reached
 }

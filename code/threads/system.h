@@ -15,6 +15,7 @@
 #include "thread.h"
 #include "timer.h"
 #include "utility.h"
+#include <unordered_map>
 
 #define MAX_STRING_SIZE 256
 
@@ -38,6 +39,7 @@ extern Timer *timer;                // the hardware alarm clock
 #include "synchconsole.h"
 extern Machine *machine; // user program memory and registers
 extern SynchConsole *synchconsole;
+extern std::unordered_map<int, Semaphore *> processList; // list of running (non-joined) user processes & their termination status
 #endif
 
 #ifdef FILESYS_NEEDED // FILESYS or FILESYS_STUB

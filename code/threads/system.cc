@@ -7,7 +7,9 @@
 
 #include "system.h"
 #include "copyright.h"
-// #include "synchconsole.h"
+#include <unordered_map>
+#include <vector>
+
 // This defines *all* of the global data structures used by Nachos.
 // These are all initialized and de-allocated by this file.
 
@@ -30,6 +32,7 @@ SynchDisk *synchDisk;
 #ifdef USER_PROGRAM // requires either FILESYS or FILESYS_STUB
 Machine *machine;   // user program memory and registers
 SynchConsole *synchconsole;
+std::unordered_map<int, Semaphore *> processList;
 #endif
 
 #ifdef NETWORK

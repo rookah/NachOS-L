@@ -32,11 +32,13 @@ void StartProcess(char *filename)
 	}
 	space = new AddrSpace(executable);
 	currentThread->space = space;
-
 	delete executable; // close file
 
-	space->InitRegisters(); // set the initial register values
-	space->RestoreState();  // load page table register
+	currentThread->pid = currentThread->id; // pid = main thread's id
+	Semaphore *sem = new Semaphore("main_process", 0);
+	processList.insert(std::make_pair(currentThread->pid, sem));
+	space->InitThreadRegisters(); // set the initial register values
+	space->RestoreState();        // load page table register
 
 	machine->Run(); // jump to the user progam
 	ASSERT(FALSE);  // machine->Run never returns;

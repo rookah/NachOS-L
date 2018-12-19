@@ -25,6 +25,7 @@
 
 #include "semaphore.h"
 
+#include "forkexec.h"
 #include "syscall.h"
 #include "system.h"
 #include "usersemaphore.h"
@@ -66,15 +67,19 @@ static void UpdatePC()
 //      are in machine.h.
 //----------------------------------------------------------------------
 void copyStringFromMachine(int from, char *to, unsigned size);
+char *mipsPtrToKernelPtr(int mipsPtr);
 
 void ExceptionHandler(ExceptionType which)
 {
 	int type = machine->ReadRegister(2);
 	char string[MAX_STRING_SIZE];
+
 	if (which == SyscallException) {
 		switch (type) {
 		case SC_Exit:
+			SignalProcess(currentThread->pid);
 			currentThread->space->Exit();
+			currentThread->Finish();
 			break;
 
 		case SC_Halt: {
@@ -98,9 +103,8 @@ void ExceptionHandler(ExceptionType which)
 			synchconsole->SynchPutString(string);
 			break;
 
-		case SC_GetString: {
-			char *fromptr = (char *)(machine->ReadRegister(4) + machine->mainMemory);
-			synchconsole->SynchGetString(fromptr, machine->ReadRegister(5));
+		case SC_GetString: { // FIXME if mips string is accross multiple pages
+			synchconsole->SynchGetString(mipsPtrToKernelPtr(machine->ReadRegister(4)), machine->ReadRegister(5));
 			break;
 		}
 
@@ -109,7 +113,7 @@ void ExceptionHandler(ExceptionType which)
 			break;
 
 		case SC_GetInt: {
-			int *n = (int *)(machine->ReadRegister(4) + machine->mainMemory);
+			int *n = (int *)(mipsPtrToKernelPtr(machine->ReadRegister(4)));
 			synchconsole->SynchGetInt(n);
 			break;
 		}
@@ -138,6 +142,19 @@ void ExceptionHandler(ExceptionType which)
 			do_SemPost(machine->ReadRegister(4));
 			break;
 
+		case SC_ForkExec:
+			copyStringFromMachine((machine->ReadRegister(4)), string, MAX_STRING_SIZE);
+			machine->WriteRegister(2, do_ForkExec(string));
+			break;
+
+		case SC_Sbrk:
+			machine->WriteRegister(2, currentThread->space->AllocatePages(machine->ReadRegister(4)) * PageSize);
+			break;
+
+		case SC_ForkJoin:
+			do_ProcessJoin(machine->ReadRegister(4));
+			break;
+
 		default: {
 			printf("Unexpected user mode exception %d %d\n", which, type);
 			ASSERT(FALSE);
@@ -147,14 +164,24 @@ void ExceptionHandler(ExceptionType which)
 	}
 }
 
+char *mipsPtrToKernelPtr(int mipsPtr)
+{
+	char *fromptr;
+	machine->Translate(mipsPtr, (int *)&fromptr, 1, false);
+	fromptr += (int)machine->mainMemory;
+	return fromptr;
+}
+
 void copyStringFromMachine(int from, char *to, unsigned size)
 {
-	char *fromptr = (char *)(from + machine->mainMemory);
+	char *fromptr = mipsPtrToKernelPtr(from);
+
 	while (*fromptr != '\0' && size > 1) {
 		*to = *fromptr;
-		fromptr++;
+		from++;
 		to++;
 		size--;
+		fromptr = mipsPtrToKernelPtr(from);
 	}
 	*to = '\0';
 }
