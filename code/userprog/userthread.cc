@@ -18,7 +18,7 @@ int do_UserThreadCreate(int f, int arg, int userThreadExitAddr)
 	Thread *t = new Thread("newThread");
 	t->pid = currentThread->pid;
 	currentThread->space->AddThread(t->id); // add new thread to the list of threads to run
-	t->Fork(StartUserThread, (int) b);
+	t->Fork(StartUserThread, (int)b);
 	return t->id;
 }
 
@@ -47,11 +47,7 @@ static void StartUserThread(int f)
 	machine->WriteRegister(NextPCReg, b->f + 4);
 	machine->WriteRegister(31, b->userThreadExitAddr);
 
-	// stack pointer assignation
-	machine->WriteRegister(StackReg, machine->pageTableSize * PageSize - (UserStackSize / MaxThreadNum) * currentThread->id);
-	DEBUG('a', "Initializing stack register to %d\n", machine->ReadRegister(StackReg));
-
-	// add thread to the table of joinable threads
+	machine->WriteRegister(4, b->arg);
 
 	machine->Run();
 	ASSERT(FALSE);

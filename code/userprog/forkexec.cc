@@ -6,11 +6,11 @@
 static void StartNewProcess(int space);
 
 int do_ForkExec(char *s)
-{	
+{
 	// open file
-	OpenFile *executable = fileSystem->Open((char *) s);
+	OpenFile *executable = fileSystem->Open((char *)s);
 	if (executable == NULL) {
-		printf("Unable to open file %s\n", (char *) s);
+		printf("Unable to open file %s\n", (char *)s);
 		return -1;
 	}
 	AddrSpace *space;
@@ -19,16 +19,16 @@ int do_ForkExec(char *s)
 	currentThread->space->RestoreState();
 	Thread *newProcess = new Thread("new process");
 	AddProcess(newProcess->id); // add new process to the list of running processes
-	newProcess->Fork(StartNewProcess, (int) space);
+	newProcess->Fork(StartNewProcess, (int)space);
 	return newProcess->id;
 }
 
 static void StartNewProcess(int space)
 {
 	currentThread->pid = currentThread->pid; // sets pid
-	currentThread->space = (AddrSpace *) space;
-	currentThread->space->InitRegisters(); // set the initial register values
-	currentThread->space->RestoreState();  // load page table register
+	currentThread->space = (AddrSpace *)space;
+	currentThread->space->InitThreadRegisters(); // set the initial register values
+	currentThread->space->RestoreState();        // load page table register
 
 	machine->Run(); // jump to the user progam
 	ASSERT(FALSE);  // machine->Run never returns;

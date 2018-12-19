@@ -145,7 +145,7 @@ void ExceptionHandler(ExceptionType which)
 			copyStringFromMachine((machine->ReadRegister(4)), string, MAX_STRING_SIZE);
 			do_ForkExec(string);
 			break;
-		
+
 		case SC_Sbrk:
 			machine->WriteRegister(2, currentThread->space->AllocatePages(machine->ReadRegister(4)) * PageSize);
 			break;

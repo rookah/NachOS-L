@@ -234,7 +234,7 @@ void AddrSpace::SignalThread(int tid)
 void AddrSpace::JoinThread(int tid)
 {
 	// return if tid isn't running
-	std::unordered_map<int, Semaphore*>::iterator it = threadList.find(tid);
+	std::unordered_map<int, Semaphore *>::iterator it = threadList.find(tid);
 	if (it == threadList.end())
 		return;
 
