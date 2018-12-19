@@ -25,7 +25,7 @@ int do_ForkExec(char *s)
 
 static void StartNewProcess(int space)
 {
-	currentThread->pid = currentThread->pid; // sets pid
+	currentThread->pid = currentThread->id; // sets pid
 	currentThread->space = (AddrSpace *)space;
 	currentThread->space->InitThreadRegisters(); // set the initial register values
 	currentThread->space->RestoreState();        // load page table register

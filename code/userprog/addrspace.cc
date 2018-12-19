@@ -249,8 +249,9 @@ void AddrSpace::Exit()
 	mtx->Acquire();
 
 	process_count--;
-	if (process_count == 0)
+	if (process_count == 0) {
 		interrupt->Halt();
+	}
 
 	mtx->Release();
 }

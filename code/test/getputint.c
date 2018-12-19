@@ -8,5 +8,5 @@ int main()
 	PutInt(n);
 	PutChar('\n');
 
-	Halt();
+	// Halt();
 }

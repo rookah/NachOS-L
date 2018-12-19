@@ -73,6 +73,7 @@ void ExceptionHandler(ExceptionType which)
 {
 	int type = machine->ReadRegister(2);
 	char string[MAX_STRING_SIZE];
+
 	if (which == SyscallException) {
 		switch (type) {
 		case SC_Exit:
@@ -143,7 +144,7 @@ void ExceptionHandler(ExceptionType which)
 
 		case SC_ForkExec:
 			copyStringFromMachine((machine->ReadRegister(4)), string, MAX_STRING_SIZE);
-			do_ForkExec(string);
+			machine->WriteRegister(2, do_ForkExec(string));
 			break;
 
 		case SC_Sbrk:

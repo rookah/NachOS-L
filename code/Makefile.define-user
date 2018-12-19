@@ -27,7 +27,7 @@ COMPILE.cc += -std=c++11
 USERPROG_NOPROGRAM=libstdio.c libstdlib.c libpthread.c libsemaphore.c
 
 # source files that must be included in any userspace nachos program
-USERPROG_LIBS=start.S libstdio.c libstdlib.c libpthread.c libsemaphore.c libmemalloc.c
+USERPROG_LIBS=start.S libstdio.c libstdlib.c libpthread.c libsemaphore.c
 
 # each program 'p' can specify extra sources in 'p'_EXTRA_SOURCES
 # => declare here program sources to add in addition to

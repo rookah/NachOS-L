@@ -55,6 +55,6 @@ int main()
 
 	PutChar('\n');
 
-	Halt();
+	// Halt();
 	return 0;
 }
