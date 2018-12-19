@@ -31,7 +31,7 @@ void *consumer(void *d)
 	for (int i = 0; i < DATA_SIZE; ++i) {
 		sem_wait(&sem_full);
 
-		// putchar(buffer[out]); FIXME Display number
+		// putchar(buffer[out]); FIXME Display number in stdio
 		putchar('-');
 
 		out = (out + 1) % BUFFER_SIZE;
