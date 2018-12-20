@@ -17,7 +17,7 @@ typedef enum { FIRST_FIT = 1, NEXT_FIT = 2 } std_pool_placement_policy_t;
 
 /* Structure declaration for the header or footer of a standard block */
 typedef struct mem_standard_block_headerfooter {
-	uint64_t flag_and_size; // bit 63: boolean (0 = free); bits 62-0: payload size
+	uint32_t flag_and_size; // bit 31: boolean (0 = free); bits 30-0: payload size
 } mem_standard_block_header_footer_t;
 
 /* Structure declaration for the start of a standard free block */

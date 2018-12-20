@@ -5,12 +5,51 @@
 #include "mem_alloc_standard_pool.h"
 #include "syscall.h"
 
+/* Returns 1 if the block is used, or 0 if the block is free */
+int is_block_used(mem_standard_block_header_footer_t *m)
+{
+	return (((m->flag_and_size) >> 31) & 1UL);
+}
+
+/* Returns 1 the if block is free, or 1 if the block is free */
+int is_block_free(mem_standard_block_header_footer_t *m)
+{
+	return (is_block_used(m) == 0);
+}
+
+/* Modifies a block header (or footer) to mark it as used */
+void set_block_used(mem_standard_block_header_footer_t *m)
+{
+	m->flag_and_size = ((m->flag_and_size) | (1UL << 31));
+}
+
+/* Modifies a block header (or footer) to mark it as free */
+void set_block_free(mem_standard_block_header_footer_t *m)
+{
+	m->flag_and_size = ((m->flag_and_size) & ~(1UL << 31));
+}
+
+/* Returns the size of a block (as stored in the header/footer) */
+size_t get_block_size(mem_standard_block_header_footer_t *m)
+{
+	uint64_t res = ((m->flag_and_size) & ~(1UL << 31));
+	return (size_t)res;
+}
+
+/* Modifies a block header (or footer) to update the size of the block */
+void set_block_size(mem_standard_block_header_footer_t *m, size_t size)
+{
+	uint64_t s = (uint64_t)size;
+	uint64_t flag = (m->flag_and_size) & (1UL << 31);
+	m->flag_and_size = flag | s;
+}
+
 // FIXME first_free could be used instead, but then continuing the search at the beginning would require backtracking
 // by repeatedly accessing free_block->prev which has a bad complexity (especially if there are a lot of small free blocks)
 // NOTE: This is not multi-standard-pool safe as it's a global. It should be put in the pool structure to make it safe.
 void *next_lookup = NULL;
 
-const int MEM_ALIGNMENT = 8;
+const int MEM_ALIGNMENT = 4;
 const size_t PADDED_HEADER_SIZE = sizeof(mem_standard_block_header_footer_t);
 
 size_t align_size(size_t size)
@@ -31,7 +70,7 @@ void *align_addr(void *addr)
 
 void init_standard_pool(mem_pool_t *p, size_t size, size_t min_request_size, size_t max_request_size)
 {
-	void *block = Sbrk(size);
+	void *block = (void *)Sbrk(25);
 
 	p->start = block;
 	p->end = block + size;
@@ -219,24 +258,4 @@ int at_exit_standard_pool(mem_pool_t *pool)
 		return 0;
 
 	return 1;
-}
-
-void display_standard_pool_state(mem_pool_t *pool)
-{
-	printf("[");
-
-	void *block = pool->start;
-
-	while (block < pool->end) {
-		size_t block_size = get_block_size(block);
-
-		if (is_block_free(block))
-			printf("F%ld->", block_size);
-		else
-			printf("A%ld->", block_size);
-
-		block += block_size + 2 * PADDED_HEADER_SIZE;
-	}
-
-	printf("]\n");
 }
