@@ -276,6 +276,10 @@ int AddrSpace::AllocatePages(int numPages, bool fromEnd)
 
 			if (good)
 				break;
+			else if (nextAvailablePage == MaxVirtPage - numPages - 1) {
+				DEBUG('a', "Could not allocate %d pages\n", numPages);
+				return -1;
+			}
 		}
 	} else {
 		for (nextAvailablePage = MaxVirtPage - numPages; nextAvailablePage >= 0; nextAvailablePage--) {
@@ -289,6 +293,10 @@ int AddrSpace::AllocatePages(int numPages, bool fromEnd)
 
 			if (good)
 				break;
+			else if (nextAvailablePage == 0) {
+				DEBUG('a', "Could not allocate %d pages\n", numPages);
+				return -1;
+			}
 		}
 	}
 
