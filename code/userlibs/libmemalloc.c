@@ -46,7 +46,7 @@ void *calloc(size_t nmemb, size_t size)
 	}
 
 	res = mem_alloc_standard_pool(&standard_pool_1025_and_above, size * nmemb);
-	
+
 	if (res != NULL) {
 		memset(res, 0, size * nmemb);
 	}

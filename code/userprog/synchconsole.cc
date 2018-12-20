@@ -23,7 +23,8 @@ SynchConsole::SynchConsole(char *readFile, char *writeFile)
 {
 	readAvail = new Semaphore("read avail", 0);
 	writeDone = new Semaphore("write done", 0);
-	mutex = new Lock("lock");
+	mutexGet = new Lock("lock get console");
+	mutexPut = new Lock("lock put console");
 	console = new Console(readFile, writeFile, ReadAvail, WriteDone, 0);
 }
 
@@ -32,23 +33,24 @@ SynchConsole::~SynchConsole()
 	delete console;
 	delete writeDone;
 	delete readAvail;
-	delete mutex;
+	delete mutexGet;
+	delete mutexPut;
 }
 
 void SynchConsole::SynchPutChar(const char ch)
 {
-	mutex->Acquire();
+	mutexPut->Acquire();
 	console->PutChar(ch);
 	writeDone->Wait(); // wait for write to finish
-	mutex->Release();
+	mutexPut->Release();
 }
 
 int SynchConsole::SynchGetChar()
 {
-	mutex->Acquire();
+	mutexGet->Acquire();
 	readAvail->Wait(); // wait for character to arrive
 	int c = console->GetChar();
-	mutex->Release();
+	mutexGet->Release();
 	return c;
 }
 void SynchConsole::SynchPutString(char *s)

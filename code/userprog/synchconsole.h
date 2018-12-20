@@ -23,6 +23,7 @@ class SynchConsole
 
   private:
 	Console *console;
-	Lock *mutex;
+	Lock *mutexGet;
+	Lock *mutexPut;
 };
 #endif // SYNCHCONSOLE_H
