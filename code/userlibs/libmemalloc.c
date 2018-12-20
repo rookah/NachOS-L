@@ -13,13 +13,16 @@ static mem_pool_t standard_pool_1025_and_above = {
 void *malloc(size_t size)
 {
 	void *res;
+
 	if (!__mem_alloc_init_flag) {
 		__mem_alloc_init_flag = 1;
-		// init_bootstrap_buffers();
+
 		init_standard_pool(&standard_pool_1025_and_above, standard_pool_1025_and_above.pool_size, standard_pool_1025_and_above.min_request_size,
 		                   standard_pool_1025_and_above.max_request_size);
 	}
+
 	res = mem_alloc_standard_pool(&standard_pool_1025_and_above, size);
+
 	return res;
 }
 
@@ -27,6 +30,7 @@ void free(void *p)
 {
 	if (p == NULL)
 		return;
+
 	mem_free_standard_pool(&standard_pool_1025_and_above, p);
 }
 
@@ -36,14 +40,16 @@ void *calloc(size_t nmemb, size_t size)
 
 	if (!__mem_alloc_init_flag) {
 		__mem_alloc_init_flag = 1;
-		// init_bootstrap_buffers();
+
 		init_standard_pool(&standard_pool_1025_and_above, standard_pool_1025_and_above.pool_size, standard_pool_1025_and_above.min_request_size,
 		                   standard_pool_1025_and_above.max_request_size);
 	}
 
 	res = mem_alloc_standard_pool(&standard_pool_1025_and_above, size * nmemb);
+	
 	if (res != NULL) {
-		// explicit_bzero(res, size); // FIXME
+		memset(res, 0, size * nmemb);
 	}
+
 	return res;
 }
