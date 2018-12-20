@@ -22,7 +22,7 @@ class Lock;
 class Semaphore;
 
 #define UserStackSize 1024            // increase this as necessary!
-#define MaxVirtPage (unsigned int)100 // VM Size
+#define MaxVirtPage (unsigned int)512 // VM Size
 
 class AddrSpace
 {

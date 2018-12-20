@@ -98,10 +98,16 @@ void ExceptionHandler(ExceptionType which)
 			break;
 		}
 
-		case SC_PutString:
-			copyStringFromMachine((machine->ReadRegister(4)), string, MAX_STRING_SIZE);
-			synchconsole->SynchPutString(string);
-			break;
+		case SC_PutString: {
+			int from = machine->ReadRegister(4);
+			char *str = mipsPtrToKernelPtr(from);
+
+			while (*str != '\0') {
+				synchconsole->SynchPutChar(*str);
+				++from;
+				str = mipsPtrToKernelPtr(from);
+			}
+		} break;
 
 		case SC_GetString: { // FIXME if mips string is accross multiple pages
 			synchconsole->SynchGetString(mipsPtrToKernelPtr(machine->ReadRegister(4)), machine->ReadRegister(5));

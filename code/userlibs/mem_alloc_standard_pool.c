@@ -5,6 +5,8 @@
 #include "mem_alloc_standard_pool.h"
 #include "syscall.h"
 
+#define PAGE_SIZE 128
+
 /* Returns 1 if the block is used, or 0 if the block is free */
 int is_block_used(mem_standard_block_header_footer_t *m)
 {
@@ -70,7 +72,7 @@ void *align_addr(void *addr)
 
 void init_standard_pool(mem_pool_t *p, size_t size, size_t min_request_size, size_t max_request_size)
 {
-	void *block = (void *)Sbrk(25);
+	void *block = (void *)Sbrk(size / PAGE_SIZE + 1);
 
 	p->start = block;
 	p->end = block + size;
