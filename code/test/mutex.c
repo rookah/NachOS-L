@@ -34,6 +34,5 @@ int main()
 	PutInt(counter);
 	PutChar('\n');
 
-	Halt();
 	return 0;
 }

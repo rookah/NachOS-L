@@ -5,5 +5,4 @@ int main()
 	PutChar(GetChar());
 	PutChar('\n');
 
-	Halt();
 }

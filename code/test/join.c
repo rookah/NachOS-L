@@ -40,6 +40,5 @@ int main()
 
 	PutChar('\n');
 
-	Halt();
 	return 0;
 }
