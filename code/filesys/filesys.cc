@@ -124,6 +124,7 @@ FileSystem::FileSystem(bool format)
 		DEBUG('f', "Writing bitmap and directory back to disk.\n");
 		freeMap->WriteBack(freeMapFile); // flush changes to disk
 		directory->WriteBack(directoryFile);
+		currentDirectory = directory;
 
 		if (DebugIsEnabled('f')) {
 			freeMap->Print();

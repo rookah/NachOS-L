@@ -58,16 +58,6 @@ class FileSystem
 		return TRUE;
 	}
 
-	bool CreateDir(const char *name)
-	{
-		int fileDescriptor = OpenForWrite(name);
-
-		if (fileDescriptor == -1)
-			return FALSE;
-		Close(fileDescriptor);
-		return TRUE;
-	}
-
 	OpenFile *Open(char *name)
 	{
 		int fileDescriptor = OpenForReadWrite(name, FALSE);
@@ -110,6 +100,8 @@ class FileSystem
 	                         // represented as a file
 	OpenFile *directoryFile; // "Root" directory -- list of
 	                         // file names, represented as a file
+	Directory *currentDirectory; // Current open directory
+	char pwd[FileNameMaxLen + 1] = "/"; // Current directory's path
 };
 
 #endif // FILESYS
