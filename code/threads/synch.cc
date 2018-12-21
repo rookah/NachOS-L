@@ -144,7 +144,7 @@ void Condition::Signal(Lock *conditionLock)
 
 	lock.Acquire();
 	if (queue_size > 0) {
-		conditionLock->Acquire();
+		//conditionLock->Acquire();
 
 		--queue_size;
 		sem_empty.Post();
@@ -164,7 +164,7 @@ void Condition::Broadcast(Lock *conditionLock)
 
 	while (queue_size > 0) {
 		--queue_size;
-		conditionLock->Acquire();
+		//conditionLock->Acquire();
 
 		sem_full.Wait();
 	}
