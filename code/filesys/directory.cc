@@ -35,12 +35,24 @@
 //	"size" is the number of entries in the directory
 //----------------------------------------------------------------------
 
-Directory::Directory(int size)
+Directory::Directory(int size, int sector, int parentSector) : m_sector(sector), m_parentSector(parentSector)
 {
 	table = new DirectoryEntry[size];
 	tableSize = size;
 	for (int i = 0; i < tableSize; i++)
 		table[i].inUse = FALSE;
+
+    table[0].inUse = TRUE;
+	table[0].name[0] = '.';
+	table[0].name[1] = '\0';
+	table[0].sector = sector;
+
+    table[1].inUse = TRUE;
+    table[1].name[0] = '.';
+    table[1].name[1] = '.';
+    table[1].name[2] = '\0';
+    table[1].sector = parentSector;
+
 }
 
 //----------------------------------------------------------------------

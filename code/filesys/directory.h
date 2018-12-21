@@ -52,7 +52,7 @@ class DirectoryEntry
 class Directory
 {
   public:
-	Directory(int size); // Initialize an empty directory
+	Directory(int size, int sector = 1, int parentSector = 1); // Initialize an empty directory
 	                     // with space for "size" files
 	~Directory();        // De-allocate the directory
 
@@ -77,6 +77,8 @@ class Directory
 	int tableSize;         // Number of directory entries
 	DirectoryEntry *table; // Table of pairs:
 	                       // <file name, file header location>
+	int m_sector; // Sector of this directory
+	int m_parentSector; // Sector of parent directory
 
 	int FindIndex(const char *name); // Find the index into the directory
 	                                 //  table corresponding to "name"
