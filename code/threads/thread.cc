@@ -42,8 +42,10 @@ Thread::Thread(const char *threadName)
 	thread_mutex.Acquire();
 	id = tid++;
 	thread_mutex.Release();
+
 #ifdef USER_PROGRAM
 	space = NULL;
+	userStack = -1;
 	// FBT: Need to initialize special registers of simulator to 0
 	// in particular LoadReg or it could crash when switching
 	// user threads.
@@ -172,7 +174,8 @@ void Thread::Finish()
 	threadToBeDestroyed = currentThread;
 
 #ifdef USER_PROGRAM
-	currentThread->space->FreePages(userStack, UserStackSize / PageSize); // See AddrSpace::InitThreadRegisters
+	if (userStack != -1)
+		currentThread->space->FreePages(userStack, UserStackSize / PageSize); // See AddrSpace::InitThreadRegisters
 #endif
 
 	Sleep(); // invokes SWITCH

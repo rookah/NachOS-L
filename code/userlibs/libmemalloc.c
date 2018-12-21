@@ -53,3 +53,25 @@ void *calloc(size_t nmemb, size_t size)
 
 	return res;
 }
+
+// void *realloc(void *ptr, size_t size) // FIXME Make it more intelligent?
+// {
+// 	size_t oldSize = get_block_size(ptr - sizeof(mem_standard_block_header_footer_t));
+// 	void* nptr = malloc(size);
+// 	memcpy(nptr, ptr, oldSize);
+// 	free(ptr);
+
+// 	return nptr;
+// }
+
+void *memcpy(void *dest, const void *src, size_t n)
+{
+	char *destc = dest;
+	const char *srcc = src;
+
+	for (n -= 1; n >= 0; --n) {
+		destc[n] = srcc[n];
+	}
+
+	return dest;
+}

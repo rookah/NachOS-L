@@ -53,6 +53,7 @@ int SynchConsole::SynchGetChar()
 	mutexGet->Release();
 	return c;
 }
+
 void SynchConsole::SynchPutString(char *s)
 {
 	int i = 0;
