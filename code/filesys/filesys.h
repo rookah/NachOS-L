@@ -37,10 +37,14 @@
 
 #include "copyright.h"
 #include "openfile.h"
+#include "directory.h"
 
 #ifdef FILESYS_STUB // Temporarily implement file system calls as
                     // calls to UNIX, until the real file system
                     // implementation is available
+
+#define MaxDepth 10
+
 class FileSystem
 {
   public:
@@ -101,9 +105,8 @@ class FileSystem
 	OpenFile *directoryFile; // "Root" directory -- list of
 	                         // file names, represented as a file
 	Directory *currentDirectory; // Current open directory
-	char pwd[FileNameMaxLen + 1] = "/"; // Current directory's path
+	char pwd[(FileNameMaxLen + 1) * MaxDepth + 1] = "/"; // Current directory's path
 };
 
 #endif // FILESYS
-
 #endif // FS_H
