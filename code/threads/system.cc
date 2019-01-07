@@ -37,6 +37,7 @@ std::unordered_map<int, Semaphore *> processList;
 
 #ifdef NETWORK
 PostOffice *postOffice;
+RConnPool *connPool;
 #endif
 
 // External definition, to allow us to take a pointer to this function
@@ -162,6 +163,7 @@ void Initialize(int argc, char **argv)
 
 #ifdef NETWORK
 	postOffice = new PostOffice(netname, rely, 10);
+	connPool = new RConnPool(postOffice);
 #endif
 }
 
