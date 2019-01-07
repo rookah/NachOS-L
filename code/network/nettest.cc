@@ -75,8 +75,8 @@ void MailTest(int farAddr)
 
 void RConnTest(int farAddr)
 {
-	RConn* conn = new RConn(postOffice, farAddr, 2);
-	
+	RConn *conn = new RConn(postOffice, farAddr, 2);
+
 	std::string str("Hell World!");
 	conn->send(std::vector<char>(str.begin(), str.end()));
 

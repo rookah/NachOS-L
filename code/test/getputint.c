@@ -7,5 +7,4 @@ int main()
 	GetInt(&n);
 	PutInt(n);
 	PutChar('\n');
-
 }

@@ -40,7 +40,7 @@ void RConn::Receive(int size, char *data)
 		;
 	}
 
-	RInMessage* in = mInMessages[friendSeqId];
+	RInMessage *in = mInMessages[friendSeqId];
 	mInMessages.erase(friendSeqId);
 
 	memcpy(data, in->data.data(), in->data.size());
