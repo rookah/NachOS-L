@@ -39,11 +39,12 @@
 #include "openfile.h"
 #include "directory.h"
 
+#define MaxDepth 10
+
+
 #ifdef FILESYS_STUB // Temporarily implement file system calls as
                     // calls to UNIX, until the real file system
                     // implementation is available
-
-#define MaxDepth 10
 
 class FileSystem
 {
