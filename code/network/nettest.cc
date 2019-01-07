@@ -43,7 +43,7 @@ void MailTest(int farAddr)
 		// To: destination machine, mailbox 0
 		// From: our machine, reply to: mailbox 1
 		outPktHdr.to = farAddr;
-		outMailHdr.to = 0;
+		outMailHdr.to = 1;
 		outMailHdr.from = 1;
 		outMailHdr.length = strlen(data) + 1;
 
@@ -51,7 +51,7 @@ void MailTest(int farAddr)
 		postOffice->Send(outPktHdr, outMailHdr, data);
 
 		// Wait for the first message from the other machine
-		postOffice->Receive(0, &inPktHdr, &inMailHdr, buffer);
+		postOffice->Receive(1, &inPktHdr, &inMailHdr, buffer);
 		printf("Got \"%s\" from %d, box %d\n", buffer, inPktHdr.from, inMailHdr.from);
 		fflush(stdout);
 

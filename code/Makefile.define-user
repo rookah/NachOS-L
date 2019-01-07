@@ -74,7 +74,7 @@ $(eval $(call define-flavor,userprog,userprog filesys-stub,$(EXTRA_SOURCES)))
 ######### filesys
 $(eval $(call define-flavor,filesys,userprog filesys,$(EXTRA_SOURCES)))
 ######### network
-$(eval $(call define-flavor,network,thread-test userprog filesys network,$(EXTRA_SOURCES)))
+$(eval $(call define-flavor,network,thread-test userprog filesys network,$(EXTRA_SOURCES) rconn.cc))
 ######### vm
 $(eval $(call define-flavor,vm,userprog filesys-stub,$(EXTRA_SOURCES) vm))
 ###########################################################################
