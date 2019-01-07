@@ -21,6 +21,7 @@
 #include "interrupt.h"
 #include "network.h"
 #include "post.h"
+#include "rconn.h"
 #include "system.h"
 
 // Test out message delivery, by doing the following:
@@ -67,6 +68,24 @@ void MailTest(int farAddr)
 		printf("Got \"%s\" from %d, box %d\n", buffer, inPktHdr.from, inMailHdr.from);
 		fflush(stdout);
 	}
+
+	// Then we're done!
+	interrupt->Halt();
+}
+
+void RConnTest(int farAddr)
+{
+	RConn* conn = new RConn(postOffice, farAddr, 2);
+	
+	std::string str("Hell World!");
+	conn->send(std::vector<char>(str.begin(), str.end()));
+
+	char data[MaxMailSize] = {'\0'};
+
+	conn->Receive(0, data);
+	printf("Got %s\n", data);
+
+	delete conn;
 
 	// Then we're done!
 	interrupt->Halt();
