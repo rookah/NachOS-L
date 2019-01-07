@@ -265,6 +265,33 @@ Sbrk:
 
 	.end Sbrk
 
+	.globl Connect
+	.ent Connect
+Connect:
+	addiu $2,$0,SC_Connect
+	syscall
+	j	$31
+
+	.end Connect
+
+	.globl Send
+	.ent Send
+Send:
+	addiu $2,$0,SC_Send
+	syscall
+	j	$31
+
+	.end Send
+
+	.globl Recv
+	.ent Recv
+Recv:
+	addiu $2,$0,SC_Recv
+	syscall
+	j	$31
+
+	.end Recv
+
 /* dummy function to keep gcc happy */
         .globl  __main
         .ent    __main

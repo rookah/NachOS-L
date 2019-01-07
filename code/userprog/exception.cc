@@ -161,6 +161,12 @@ void ExceptionHandler(ExceptionType which)
 			do_ProcessJoin(machine->ReadRegister(4));
 			break;
 
+#ifdef NETWORK
+		case SC_Connect:
+			machine->WriteRegister(2, connPool->connect(machine->ReadRegister(4), machine->ReadRegister(5)));
+			break;
+#endif
+
 		default: {
 			printf("Unexpected user mode exception %d %d\n", which, type);
 			ASSERT(FALSE);

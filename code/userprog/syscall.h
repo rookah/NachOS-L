@@ -44,6 +44,9 @@
 #define SC_ForkExec 23
 #define SC_ForkJoin 24
 #define SC_Sbrk 25
+#define SC_Connect 26
+#define SC_Recv 27
+#define SC_Send 28
 
 #ifdef IN_USER_MODE
 
@@ -167,6 +170,11 @@ int ForkExec(char *s);
 void ForkJoin();
 
 int Sbrk(int n);
+
+int Connect(int addr, int mailbox);
+
+int Send(int connId, int size, char *data);
+int Recv(int connId, int size, char *data);
 
 #endif // IN_USER_MODE
 
