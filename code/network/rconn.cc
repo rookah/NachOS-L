@@ -9,10 +9,9 @@ RConn::RConn(PostOffice *post, int to_addr, int mailboxId) : mPost(post), addr(t
 {
 	seqId = 1;
 	friendSeqId = 1;
-
 	Thread *t = new Thread("ack receiver");
 
-	t->Fork(Receive, (int)this);
+	t->Fork(ReceiveThread, (int)this);
 }
 
 RConn::~RConn()
@@ -30,14 +29,14 @@ void RConn::send(const std::vector<char> &data)
 
 	mOutMessages[seqId] = mess;
 	SendData(seqId, data);
-	interrupt->Schedule(RConn::CheckAck, (int)mess, REEMISSION_DELAY * 2, NetworkSendInt);
+	interrupt->Schedule(CheckAck, (int)mess, REEMISSION_DELAY * 2, NetworkSendInt);
 	seqId = (seqId % INT32_MAX) + 1;
 }
 
 void RConn::Receive(int size, char *data)
 {
 	while (!mInMessages.count(friendSeqId)) {
-		;
+		currentThread->Yield();
 	}
 
 	RInMessage *in = mInMessages[friendSeqId];
@@ -55,15 +54,16 @@ void RConn::CheckAck(int messageAddr)
 
 	if (mess->ackReceived || mess->transmissionCount == MAX_REEMISSIONS) {
 		if (!mess->ackReceived) {
-			DEBUG('n', "Failed sending message after %d tries", MAX_REEMISSIONS);
+			DEBUG('n', "Failed sending message after %d tries\n", MAX_REEMISSIONS);
 		}
 
 		mess->parent->mOutMessages.erase(mess->id);
 		delete mess;
 	} else {
+		DEBUG('n', "Trying to send message\n");
 		mess->transmissionCount++;
-		mess->parent->SendData(mess->id, mess->data);
-		interrupt->Schedule(CheckAck, messageAddr, REEMISSION_DELAY, NetworkSendInt);
+		// mess->parent->SendData(mess->id, mess->data);
+		interrupt->Schedule(CheckAck, messageAddr, REEMISSION_DELAY * 1000, NetworkSendInt);
 	}
 }
 
@@ -73,8 +73,11 @@ void RConn::SendAck(SeqId id)
 	MailHeader mailHdr;
 
 	pktHdr.to = addr;
+	mailHdr.from = mailbox;
 	mailHdr.to = mailbox;
 	mailHdr.length = sizeof(RHeader);
+
+	id = -id;
 
 	mPost->Send(pktHdr, mailHdr, (const char *)&id);
 }
@@ -87,6 +90,7 @@ void RConn::SendData(SeqId id, const std::vector<char> &data)
 	MailHeader mailHdr;
 
 	pktHdr.to = addr;
+	mailHdr.from = mailbox;
 	mailHdr.to = mailbox;
 	mailHdr.length = sizeof(RHeader) + data.size();
 
@@ -97,7 +101,7 @@ void RConn::SendData(SeqId id, const std::vector<char> &data)
 	mPost->Send(pktHdr, mailHdr, withHeader);
 }
 
-void RConn::Receive(int con)
+void RConn::ReceiveThread(int con)
 {
 	RConn *conn = (RConn *)con;
 	PostOffice *post = conn->mPost;
@@ -109,18 +113,26 @@ void RConn::Receive(int con)
 		MailHeader mailH;
 		post->Receive(conn->mailbox, &pktH, &mailH, data);
 
-		if (mailH.length > sizeof(RHeader)) {
+		if (mailH.length >= sizeof(RHeader)) {
 			RHeader *hdr = (RHeader *)data;
 
 			if (hdr->id < 0) // Ack
 			{
+
+				printf("RECEIVED ACK\n");
+				fflush(stdout);
+
 				SeqId realSeqId = -hdr->id;
 				if (conn->mOutMessages.count(realSeqId)) {
 					conn->mOutMessages[realSeqId]->ackReceived = true;
 				}
 			} else // Message
 			{
+				printf("RECEIVED MESSAGE\n");
+				fflush(stdout);
 				conn->SendAck(hdr->id);
+				printf("ACK sent %d\n", conn->friendSeqId);
+				fflush(stdout);
 
 				if (conn->mInMessages.count(conn->friendSeqId) == 0) {
 					RInMessage *in = new RInMessage;
@@ -128,11 +140,13 @@ void RConn::Receive(int con)
 					in->id = conn->friendSeqId;
 					in->data = std::vector<char>(mailH.length - sizeof(RHeader), 0);
 					memcpy(in->data.data(), data + sizeof(RHeader), mailH.length - sizeof(RHeader));
+					printf("Inserting %d\n", conn->friendSeqId);
+					fflush(stdout);
 					conn->mInMessages[conn->friendSeqId] = in;
 				}
 			}
 		} else {
-			DEBUG('n', "Malformed reliable packet");
+			DEBUG('n', "Malformed reliable packet of size %d\n", mailH.length);
 		}
 	}
 }

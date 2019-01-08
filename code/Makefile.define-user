@@ -91,7 +91,7 @@ USER_FLAVORS=filesys network userprog threads step2
 # to the personal flavors
 # USER_FLAVORS=step2 step5 mynetwork final
 
-$(eval $(call define-flavor,step2,userprog filesys-stub,$(EXTRA_SOURCES)))
+$(eval $(call define-flavor,step2,userprog filesys-stub network,$(EXTRA_SOURCES) rconn.cc rconnpool.cc))
 # $(eval $(call define-flavor,step5,userprog filesys,\
 #     $(EXTRA_SOURCES)))
 # $(eval $(call define-flavor,mynetwork,userprog filesys-stub network, \

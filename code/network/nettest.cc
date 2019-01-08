@@ -78,13 +78,39 @@ void RConnTest(int farAddr)
 	RConn *conn = new RConn(postOffice, farAddr, 2);
 
 	std::string str("Hell World!");
-	conn->send(std::vector<char>(str.begin(), str.end()));
+	if (farAddr == 1)
+		conn->send(std::vector<char>(str.begin(), str.end()));
+
+	std::string str2("Hell Wosld!");
+	if (farAddr == 1)
+		conn->send(std::vector<char>(str2.begin(), str2.end()));
+
+	std::string str3("Hell qorld!");
+	if (farAddr == 1)
+		conn->send(std::vector<char>(str3.begin(), str3.end()));
 
 	char data[MaxMailSize] = {'\0'};
 
-	conn->Receive(0, data);
-	printf("Got %s\n", data);
+	if (farAddr == 0) {
+		conn->Receive(0, data);
+		printf("Got %s\n", data);
+		fflush(stdout);
+	}
 
+	if (farAddr == 0) {
+		conn->Receive(0, data);
+		printf("Got %s\n", data);
+		fflush(stdout);
+	}
+
+	if (farAddr == 0) {
+		conn->Receive(0, data);
+		printf("Got %s\n", data);
+		fflush(stdout);
+	}
+
+	while (true)
+		currentThread->Yield();
 	delete conn;
 
 	// Then we're done!

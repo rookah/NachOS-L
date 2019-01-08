@@ -42,7 +42,7 @@ class RConn
 
   private:
 	static void CheckAck(int mess);
-	static void Receive(int mailHdr);
+	static void ReceiveThread(int mailHdr);
 	void SendAck(SeqId id);
 	void SendData(SeqId id, const std::vector<char> &data);
 
