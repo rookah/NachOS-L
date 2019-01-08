@@ -64,7 +64,6 @@ class FileHeader
 	int isDirectory;
 
     // NOTE: Modify the constant NumDirect if you add / remove fields above!
-
 	int dataSectors[NumDirect]; // Disk sector numbers for each data
 	                            // block in the file
 };

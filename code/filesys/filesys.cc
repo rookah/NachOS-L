@@ -51,6 +51,8 @@
 #include "filehdr.h"
 #include "filesys.h"
 
+#include <filesystem>
+
 // Sectors containing the file headers for the bitmap of free sectors,
 // and the directory of files.  These file headers are placed in well-known
 // sectors, so that they can be located on boot-up.
@@ -349,4 +351,32 @@ Directory *FileSystem::getCurrentDirectory() const {
 
 const char *FileSystem::getCurrentDirectoryPath() const {
     return pwd;
+}
+
+bool PathParser(char *path) {
+	switch(path[0]) {
+		case '.':
+			switch(path[1]) {
+				case '.':
+					switch(path[2]) {
+						case '/': //parent directory
+							int cd = currentDirectory->Find("..");
+							OpenFile *f = new OpenFile(cd);
+							directory = new Directory(f);
+							directory->FetchFrom(a);
+							break;
+						default: //filename
+							break;
+					}
+					break;
+				case '/': //current directory
+					break;
+				default: //filename
+					break;
+			}
+			break;
+		case '/': //invalid path
+			return false;
+		default: //filename
+	}
 }
