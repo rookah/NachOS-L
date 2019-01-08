@@ -77,32 +77,28 @@ void RConnTest(int farAddr)
 {
 	RConn *conn = new RConn(postOffice, farAddr, 2);
 
-	if (farAddr == 1) {
-		std::string str("Hello World!");
-		conn->send(std::vector<char>(str.begin(), str.end()));
-		printf("Sent #1\n");
+	std::string str("Hello World!");
+	conn->send(std::vector<char>(str.begin(), str.end()));
+	printf("Sent #1\n");
 
-		str = "Hell World!";
-		conn->send(std::vector<char>(str.begin(), str.end()));
-		printf("Sent #2\n");
+	str = "Hell World!";
+	conn->send(std::vector<char>(str.begin(), str.end()));
+	printf("Sent #2\n");
 
-		str = "Hell Lord!";
-		conn->send(std::vector<char>(str.begin(), str.end()));
-		printf("Sent #3\n");
-	}
+	str = "Hell Lord!";
+	conn->send(std::vector<char>(str.begin(), str.end()));
+	printf("Sent #3\n");
 
-	if (farAddr == 0) {
-		char data[MaxMailSize] = {'\0'};
+	char data[MaxMailSize] = {'\0'};
 
-		conn->Receive(0, data);
-		printf("Got %s\n", data);
+	conn->Receive(0, data);
+	printf("Got %s\n", data);
 
-		conn->Receive(0, data);
-		printf("Got %s\n", data);
+	conn->Receive(0, data);
+	printf("Got %s\n", data);
 
-		conn->Receive(0, data);
-		printf("Got %s\n", data);
-	}
+	conn->Receive(0, data);
+	printf("Got %s\n", data);
 
 	for (int i = 0; i < 10000; ++i)
 		currentThread->Yield();

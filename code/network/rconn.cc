@@ -32,9 +32,11 @@ void RConn::send(const std::vector<char> &data)
 
 	seqId = (seqId % INT32_MAX) + 1;
 
-	interrupt->Schedule(ProcAckSem, (int)mess->ackCond, REEMISSION_DELAY * 200, NetworkSendInt);
-	mess->ackCond->Wait();
+	interrupt->Schedule(ProcAckSem, (int)mess->ackCond, REEMISSION_DELAY * 4800, NetworkSendInt);
+	
 	for (int i = 0; i < MAX_REEMISSIONS; i++) {
+		mess->ackCond->Wait();
+
 		if (mess->ackReceived) {
 			mess->parent->mOutMessages.erase(mess->id);
 			// delete mess->ackCond;
@@ -42,9 +44,8 @@ void RConn::send(const std::vector<char> &data)
 			return;
 		} else {
 			DEBUG('n', "Trying to send message\n");
-			mess->transmissionCount++;
 			mess->parent->SendData(mess->id, mess->data);
-			interrupt->Schedule(ProcAckSem, (int)mess->ackCond, REEMISSION_DELAY * 100, NetworkSendInt);
+			interrupt->Schedule(ProcAckSem, (int)mess->ackCond, REEMISSION_DELAY * 4800, NetworkSendInt);
 		}
 	}
 
