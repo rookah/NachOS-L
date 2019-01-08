@@ -12,13 +12,14 @@ typedef int SeqId;
 
 class PostOffice;
 class RConn;
+class Semaphore;
 
 struct ROutMessage {
 	RConn *parent;
-	int transmissionCount;
 	std::vector<char> data;
 	bool ackReceived;
 	SeqId id;
+	Semaphore *ackCond;
 };
 
 struct RInMessage {
@@ -41,7 +42,7 @@ class RConn
 	void Receive(int size, char *data);
 
   private:
-	static void CheckAck(int mess);
+	static void ProcAckSem(int mess);
 	static void ReceiveThread(int mailHdr);
 	void SendAck(SeqId id);
 	void SendData(SeqId id, const std::vector<char> &data);

@@ -24,13 +24,33 @@ void RConn::send(const std::vector<char> &data)
 	mess->id = seqId;
 	mess->parent = this;
 	mess->data = data;
-	mess->transmissionCount = 1;
 	mess->ackReceived = false;
+	mess->ackCond = new Semaphore("ack condvar", 0);
 
 	mOutMessages[seqId] = mess;
 	SendData(seqId, data);
-	interrupt->Schedule(CheckAck, (int)mess, REEMISSION_DELAY * 2, NetworkSendInt);
+
 	seqId = (seqId % INT32_MAX) + 1;
+
+	interrupt->Schedule(ProcAckSem, (int)mess->ackCond, REEMISSION_DELAY * 200, NetworkSendInt);
+	mess->ackCond->Wait();
+	for (int i = 0; i < MAX_REEMISSIONS; i++) {
+		if (mess->ackReceived) {
+			mess->parent->mOutMessages.erase(mess->id);
+			// delete mess->ackCond;
+			// delete mess;
+			return;
+		} else {
+			DEBUG('n', "Trying to send message\n");
+			mess->transmissionCount++;
+			mess->parent->SendData(mess->id, mess->data);
+			interrupt->Schedule(ProcAckSem, (int)mess->ackCond, REEMISSION_DELAY * 100, NetworkSendInt);
+		}
+	}
+
+	if (!mess->ackReceived) {
+		DEBUG('n', "Failed sending message after %d tries\n", MAX_REEMISSIONS);
+	}
 }
 
 void RConn::Receive(int size, char *data)
@@ -48,23 +68,10 @@ void RConn::Receive(int size, char *data)
 	friendSeqId = (friendSeqId % INT32_MAX) + 1;
 }
 
-void RConn::CheckAck(int messageAddr)
+void RConn::ProcAckSem(int sem)
 {
-	ROutMessage *mess = (ROutMessage *)messageAddr;
-
-	if (mess->ackReceived || mess->transmissionCount == MAX_REEMISSIONS) {
-		if (!mess->ackReceived) {
-			DEBUG('n', "Failed sending message after %d tries\n", MAX_REEMISSIONS);
-		}
-
-		mess->parent->mOutMessages.erase(mess->id);
-		delete mess;
-	} else {
-		DEBUG('n', "Trying to send message\n");
-		mess->transmissionCount++;
-		// mess->parent->SendData(mess->id, mess->data);
-		interrupt->Schedule(CheckAck, messageAddr, REEMISSION_DELAY * 1000, NetworkSendInt);
-	}
+	Semaphore *sema = (Semaphore *)sem;
+	sema->Post();
 }
 
 void RConn::SendAck(SeqId id)
@@ -118,31 +125,26 @@ void RConn::ReceiveThread(int con)
 
 			if (hdr->id < 0) // Ack
 			{
-
-				printf("RECEIVED ACK\n");
-				fflush(stdout);
+				DEBUG('n', "RECEIVED ACK\n");
 
 				SeqId realSeqId = -hdr->id;
 				if (conn->mOutMessages.count(realSeqId)) {
 					conn->mOutMessages[realSeqId]->ackReceived = true;
+					conn->mOutMessages[realSeqId]->ackCond->Post();
 				}
 			} else // Message
 			{
-				printf("RECEIVED MESSAGE\n");
-				fflush(stdout);
+				DEBUG('n', "RECEIVED MESSAGE\n");
 				conn->SendAck(hdr->id);
-				printf("ACK sent %d\n", conn->friendSeqId);
-				fflush(stdout);
+				DEBUG('n', "ACK sent %d\n", hdr->id);
 
-				if (conn->mInMessages.count(conn->friendSeqId) == 0) {
+				if (hdr->id >= conn->friendSeqId && conn->mInMessages.count(hdr->id) == 0) {
 					RInMessage *in = new RInMessage;
 					in->parent = conn;
-					in->id = conn->friendSeqId;
+					in->id = hdr->id;
 					in->data = std::vector<char>(mailH.length - sizeof(RHeader), 0);
 					memcpy(in->data.data(), data + sizeof(RHeader), mailH.length - sizeof(RHeader));
-					printf("Inserting %d\n", conn->friendSeqId);
-					fflush(stdout);
-					conn->mInMessages[conn->friendSeqId] = in;
+					conn->mInMessages[hdr->id] = in;
 				}
 			}
 		} else {
