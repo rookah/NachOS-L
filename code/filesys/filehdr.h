@@ -56,13 +56,14 @@ class FileHeader
 	                  // in bytes
 
 	void Print(); // Print the contents of the file.
+    int IsDirectory() const;
 
   private:
 	int numBytes;               // Number of bytes in the file
 	int numSectors;             // Number of data sectors in the file
 	int isDirectory;
 
-	// NOTE: Modify the constant NumDirect if you add / remove fields above!
+    // NOTE: Modify the constant NumDirect if you add / remove fields above!
 
 	int dataSectors[NumDirect]; // Disk sector numbers for each data
 	                            // block in the file

@@ -172,8 +172,15 @@ FileSystem::FileSystem(bool format)
 //	"initialSize" -- size of file to be created
 //----------------------------------------------------------------------
 
-bool FileSystem::Create(const char *name, int initialSize)
+bool FileSystem::Create(const char *name, int initialSize, bool is_directory)
 {
+	if (is_directory) {
+		if (initialSize != DirectoryFileSize)
+			DEBUG('f', "Forcing initialSize from %d to %d because creating a directory\n", initialSize, DirectoryFileSize);
+
+		initialSize = DirectoryFileSize;
+	}
+
 	Directory *directory;
 	BitMap *freeMap;
 	FileHeader *hdr;
@@ -197,7 +204,7 @@ bool FileSystem::Create(const char *name, int initialSize)
 			success = FALSE; // no space in directory
 		else {
 			hdr = new FileHeader;
-			if (!hdr->Allocate(freeMap, initialSize))
+			if (!hdr->Allocate(freeMap, initialSize, is_directory))
 				success = FALSE; // no space on disk for data
 			else {
 				success = TRUE;
@@ -334,4 +341,12 @@ void FileSystem::Print()
 	delete dirHdr;
 	delete freeMap;
 	delete directory;
+}
+
+Directory *FileSystem::getCurrentDirectory() const {
+    return currentDirectory;
+}
+
+const char *FileSystem::getCurrentDirectoryPath() const {
+    return pwd;
 }

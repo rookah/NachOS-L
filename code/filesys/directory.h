@@ -52,7 +52,7 @@ class DirectoryEntry
 class Directory
 {
   public:
-	Directory(int size, int sector = 1, int parentSector = 1); // Initialize an empty directory
+	explicit Directory(int size, int sector = 1, int parentSector = 1); // Initialize an empty directory
 	                     // with space for "size" files
 	~Directory();        // De-allocate the directory
 

@@ -89,7 +89,7 @@ class FileSystem
 	                         // the disk, so initialize the directory
 	                         // and the bitmap of free blocks.
 
-	bool Create(const char *name, int initialSize);
+	bool Create(const char *name, int initialSize, bool is_directory = false);
 	// Create a file (UNIX creat)
 
 	OpenFile *Open(const char *name); // Open a file (UNIX open)
@@ -100,13 +100,18 @@ class FileSystem
 
 	void Print(); // List all the files and their contents
 
+    Directory *getCurrentDirectory() const;
+    const char *getCurrentDirectoryPath() const;
+
   private:
 	OpenFile *freeMapFile;   // Bit map of free disk blocks,
 	                         // represented as a file
 	OpenFile *directoryFile; // "Root" directory -- list of
 	                         // file names, represented as a file
-	Directory *currentDirectory; // Current open directory
-	char pwd[(FileNameMaxLen + 1) * MaxDepth + 1] = "/"; // Current directory's path
+	Directory *currentDirectory;
+
+    // Current open directory
+	char pwd[(FileNameMaxLen + 1) * MaxDepth + 1] = "/";
 };
 
 #endif // FILESYS

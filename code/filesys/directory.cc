@@ -175,8 +175,15 @@ bool Directory::Remove(const char *name)
 void Directory::List()
 {
 	for (int i = 0; i < tableSize; i++)
-		if (table[i].inUse)
-			printf("%s\n", table[i].name);
+		if (table[i].inUse) {
+			FileHeader hdr;
+			hdr.FetchFrom(table[i].sector);
+
+			if (hdr.IsDirectory())
+				printf("%s\n", table[i].name);
+			else
+				printf("%s*\n", table[i].name);
+		}
 }
 
 //----------------------------------------------------------------------
