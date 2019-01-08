@@ -44,6 +44,10 @@
 #define SC_ForkExec 23
 #define SC_ForkJoin 24
 #define SC_Sbrk 25
+#define SC_cd 26
+#define SC_ls 27
+#define SC_touch 28
+#define SC_mkdir 29
 
 #ifdef IN_USER_MODE
 
@@ -167,6 +171,14 @@ int ForkExec(char *s);
 void ForkJoin();
 
 int Sbrk(int n);
+
+void touch(char *filename);
+
+void cd(char *path);
+
+void ls();
+
+void mkdir(char* name);
 
 #endif // IN_USER_MODE
 
