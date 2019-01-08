@@ -35,7 +35,7 @@
 //	"size" is the number of entries in the directory
 //----------------------------------------------------------------------
 
-Directory::Directory(int size, int sector, int parentSector) : m_sector(sector), m_parentSector(parentSector)
+Directory::Directory(int size, int sector, int parentSector)
 {
 	table = new DirectoryEntry[size];
 	tableSize = size;
@@ -97,7 +97,7 @@ void Directory::WriteBack(OpenFile *file)
 //	"name" -- the file name to look up
 //----------------------------------------------------------------------
 
-int Directory::FindIndex(const char *name)
+int Directory::FindIndex(const char *name) const
 {
 	for (int i = 0; i < tableSize; i++)
 		if (table[i].inUse && !strncmp(table[i].name, name, FileNameMaxLen))
@@ -114,7 +114,7 @@ int Directory::FindIndex(const char *name)
 //	"name" -- the file name to look up
 //----------------------------------------------------------------------
 
-int Directory::Find(const char *name)
+int Directory::Find(const char *name) const
 {
 	int i = FindIndex(name);
 

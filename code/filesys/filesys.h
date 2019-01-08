@@ -99,6 +99,8 @@ class FileSystem
 
 	void Print(); // List all the files and their contents
 
+    Directory* PathParser(Directory *startDir, char *path);
+
     Directory *getCurrentDirectory() const;
     const char *getCurrentDirectoryPath() const;
 
@@ -107,7 +109,7 @@ class FileSystem
 	                         // represented as a file
 	OpenFile *directoryFile; // "Root" directory -- list of
 	                         // file names, represented as a file
-	Directory *currentDirectory = new directory(nu)
+	Directory *currentDirectory;
 
     // Current open directory
 	char pwd[(FileNameMaxLen + 1) * MaxDepth + 1] = "/";

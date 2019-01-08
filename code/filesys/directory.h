@@ -60,7 +60,7 @@ class Directory
 	void WriteBack(OpenFile *file); // Write modifications to
 	                                // directory contents back to disk
 
-	int Find(const char *name); // Find the sector number of the
+	int Find(const char *name) const; // Find the sector number of the
 	                            // FileHeader for file: "name"
 
 	bool Add(const char *name, int newSector); // Add a file name into the directory
@@ -77,10 +77,7 @@ class Directory
 	int tableSize;         // Number of directory entries
 	DirectoryEntry *table; // Table of pairs:
 	                       // <file name, file header location>
-	int m_sector; // Sector of this directory
-	int m_parentSector; // Sector of parent directory
-
-	int FindIndex(const char *name); // Find the index into the directory
+	int FindIndex(const char *name) const; // Find the index into the directory
 	                                 //  table corresponding to "name"
 };
 

@@ -56,7 +56,7 @@ class FileHeader
 	                  // in bytes
 
 	void Print(); // Print the contents of the file.
-    int IsDirectory() const;
+    int IsDirectory();
 
   private:
 	int numBytes;               // Number of bytes in the file

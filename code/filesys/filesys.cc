@@ -353,30 +353,39 @@ const char *FileSystem::getCurrentDirectoryPath() const {
     return pwd;
 }
 
-bool PathParser(char *path) {
-	switch(path[0]) {
-		case '.':
-			switch(path[1]) {
-				case '.':
-					switch(path[2]) {
-						case '/': //parent directory
-							int cd = currentDirectory->Find("..");
-							OpenFile *f = new OpenFile(cd);
-							directory = new Directory(f);
-							directory->FetchFrom(a);
-							break;
-						default: //filename
-							break;
-					}
-					break;
-				case '/': //current directory
-					break;
-				default: //filename
-					break;
-			}
-			break;
-		case '/': //invalid path
-			return false;
-		default: //filename
+Directory* FileSystem::PathParser(Directory *startDir, char *path) {
+
+	Directory *directory = new Directory(DirectoryFileSize);
+
+	char *pch = strtok (path, "/");
+	if (pch == nullptr)
+		return startDir;
+
+	while (pch != nullptr)
+	{
+		int hdrSector = startDir->Find(pch);
+		if (hdrSector == -1) {
+			DEBUG('f', "Wrong path! %s does not exist\n", pch);
+			return nullptr;
+		}
+
+		FileHeader *fh = new FileHeader();
+		fh->FetchFrom(hdrSector);
+
+		if (!fh->IsDirectory()) {
+			DEBUG('f', "Wrong path! %s is a file, not a directory\n", pch);
+			return nullptr;
+		}
+
+		// FIXME Stop leak
+		OpenFile* f = new OpenFile(hdrSector);
+		directory->FetchFrom(f);
+
+		// "This works" - Lucas
+		startDir = directory;
+
+		pch = strtok (nullptr, "/");
 	}
+
+	return directory;
 }

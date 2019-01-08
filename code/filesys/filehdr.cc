@@ -143,6 +143,6 @@ void FileHeader::Print()
 	delete[] data;
 }
 
-int FileHeader::IsDirectory() const {
+int FileHeader::IsDirectory() {
     return isDirectory;
 }
