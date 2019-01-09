@@ -173,6 +173,10 @@ void ExceptionHandler(ExceptionType which)
 		case SC_Recv:
 			machine->WriteRegister(2, connPool->recv(machine->ReadRegister(4), machine->ReadRegister(5), mipsPtrToKernelPtr(machine->ReadRegister(6))));
 			break;
+
+		case SC_CloseConn:
+			connPool->close(machine->ReadRegister(4));
+			break;
 #endif
 
 		default: {

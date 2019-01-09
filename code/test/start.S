@@ -292,6 +292,15 @@ Recv:
 
 	.end Recv
 
+	.globl CloseConn
+	.ent CloseConn
+CloseConn:
+	addiu $2,$0,SC_CloseConn
+	syscall
+	j	$31
+
+	.end CloseConn
+
 /* dummy function to keep gcc happy */
         .globl  __main
         .ent    __main

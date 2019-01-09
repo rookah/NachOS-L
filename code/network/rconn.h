@@ -1,7 +1,6 @@
 #ifndef RELIABLEPOST_H
 #define RELIABLEPOST_H
 
-#include <deque>
 #include <unordered_map>
 #include <vector>
 
@@ -11,6 +10,7 @@ typedef int SeqId;
 #define REEMISSION_DELAY 100
 
 class PostOffice;
+class Thread;
 class RConn;
 class Semaphore;
 
@@ -36,22 +36,24 @@ class RConn
 {
   public:
 	RConn(PostOffice *post, int to_addr, int mailboxId);
-	~RConn();
-
+	void close();
 	int send(int size, const char* data);
 	int recv(int size, char *data);
 
   private:
+	~RConn();
 	static void ProcAckSem(int mess);
 	static void ReceiveThread(int mailHdr);
 	void SendAck(SeqId id);
 	void SendData(SeqId id, const std::vector<char> &data);
 
 	PostOffice *mPost;
+	Thread* t;
 	SeqId seqId; // Between 1 and INT32_MAX
 	SeqId friendSeqId;
 	int addr;
 	int mailbox;
+	bool closed;
 
 	std::unordered_map<SeqId, ROutMessage *> mOutMessages;
 	std::unordered_map<SeqId, RInMessage *> mInMessages;

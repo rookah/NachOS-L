@@ -47,6 +47,7 @@
 #define SC_Connect 26
 #define SC_Recv 27
 #define SC_Send 28
+#define SC_CloseConn 29
 
 #ifdef IN_USER_MODE
 
@@ -175,6 +176,7 @@ int Connect(int addr, int mailbox);
 
 int Send(int connId, int size, const char *data);
 int Recv(int connId, int size, char *data);
+int CloseConn(int connId);
 
 #endif // IN_USER_MODE
 

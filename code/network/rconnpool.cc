@@ -33,4 +33,8 @@ int RConnPool::recv(int connId, int size, char *data)
 
 void RConnPool::close(int connId)
 {
+	if (mConnList.count(connId)) {
+		mConnList[connId]->close();
+		mConnList.erase(connId);
+	}
 }

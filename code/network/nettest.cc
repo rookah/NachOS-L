@@ -103,7 +103,7 @@ void RConnTest(int farAddr)
 	for (int i = 0; i < 10000; ++i)
 		currentThread->Yield();
 
-	delete conn;
+	conn->close();
 
 	// Then we're done!
 	interrupt->Halt();

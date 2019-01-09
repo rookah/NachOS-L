@@ -8,7 +8,7 @@ void receive_thread(void *arg)
 
 	while (1) {
 		Recv(socket, 36, buff);
-		puts("\n0 sent: ");
+		puts("\n0: ");
 		puts(buff);
 	}
 }
@@ -33,6 +33,7 @@ int main()
 		Send(socket, 36, buffer);
 	}
 
+	CloseConn(socket);
 	PutChar('\n');
 
 	return 0;

@@ -9,13 +9,20 @@ RConn::RConn(PostOffice *post, int to_addr, int mailboxId) : mPost(post), addr(t
 {
 	seqId = 1;
 	friendSeqId = 1;
-	Thread *t = new Thread("ack receiver");
+	closed = false;
+
+	t = new Thread("ack receiver");
 
 	t->Fork(ReceiveThread, (int)this);
 }
 
 RConn::~RConn()
 {
+}
+
+void RConn::close()
+{
+	closed = true;
 }
 
 int RConn::send(int size, const char *data)
@@ -41,8 +48,8 @@ int RConn::send(int size, const char *data)
 
 		if (mess->ackReceived) {
 			mess->parent->mOutMessages.erase(mess->id);
-			// delete mess->ackCond;
-			// delete mess; // FIXME double free
+			// delete mess->ackCond; // Possible use after free in interrupt handler
+			delete mess;
 			return 0;
 		} else {
 			DEBUG('n', "Trying to send message\n");
@@ -122,7 +129,7 @@ void RConn::ReceiveThread(int con)
 
 	char data[MaxMailSize];
 
-	while (1) {
+	while (!conn->closed) {
 		PacketHeader pktH;
 		MailHeader mailH;
 		post->Receive(conn->mailbox, &pktH, &mailH, data);
@@ -158,4 +165,6 @@ void RConn::ReceiveThread(int con)
 			DEBUG('n', "Malformed reliable packet of size %d\n", mailH.length);
 		}
 	}
+
+	currentThread->Finish();
 }
