@@ -127,31 +127,31 @@ int main(int argc, char **argv)
 			ASSERT(argc > 2);
 			Copy(*(argv + 1), *(argv + 2));
 			argCount = 3;
-			exit(1);
+
 		} else if (!strcmp(*argv, "-mkdir")) { // copy from UNIX to Nachos
 			ASSERT(argc == 2);
 			fileSystem->Create(*(argv+1), 0, true);
 			argCount = 2;
-			exit(1);
+
 		} else if (!strcmp(*argv, "-p")) { // print a Nachos file
 			ASSERT(argc > 1);
 			Print(*(argv + 1));
 			argCount = 2;
-      exit(1);
+
 		} else if (!strcmp(*argv, "-r")) { // remove Nachos file
 			ASSERT(argc > 1);
 			fileSystem->Remove(*(argv + 1));
 			argCount = 2;
-      exit(1);
+
 		} else if (!strcmp(*argv, "-l")) { // list Nachos directory
 			fileSystem->List();
-      exit(1);
+
 		} else if (!strcmp(*argv, "-D")) { // print entire filesystem
 			fileSystem->Print();
-      exit(1);
+
 		} else if (!strcmp(*argv, "-t")) { // performance test
 			PerformanceTest();
-      exit(1);
+
 		}
 
 #endif // FILESYS
@@ -167,6 +167,7 @@ int main(int argc, char **argv)
 #endif // NETWORK
 	}
 
+    interrupt->Halt();
 	currentThread->Finish(); // NOTE: if the procedure "main"
 	// returns, then the program "nachos"
 	// will exit (as any other normal program
