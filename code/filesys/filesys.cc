@@ -114,6 +114,7 @@ FileSystem::FileSystem(bool format)
 
 		freeMapFile = new OpenFile(FreeMapSector);
 		directoryFile = new OpenFile(DirectorySector);
+		curDirFile = directoryFile;
 
 		// Once we have the files "open", we can write the initial version
 		// of each file back to disk.  The directory at this point is completely
@@ -124,7 +125,6 @@ FileSystem::FileSystem(bool format)
 		DEBUG('f', "Writing bitmap and directory back to disk.\n");
 		freeMap->WriteBack(freeMapFile); // flush changes to disk
 		directory->WriteBack(directoryFile);
-		currentDirectory = directory;
 
 		if (DebugIsEnabled('f')) {
 			freeMap->Print();
@@ -140,6 +140,7 @@ FileSystem::FileSystem(bool format)
 		// the bitmap and directory; these are left open while Nachos is running
 		freeMapFile = new OpenFile(FreeMapSector);
 		directoryFile = new OpenFile(DirectorySector);
+		curDirFile = directoryFile;
 	}
 }
 
@@ -192,6 +193,7 @@ bool FileSystem::Create(const char *name, int initialSize, bool is_directory)
 	directory = new Directory(NumDirEntries);
 	directory->FetchFrom(directoryFile);
 
+
 	if (directory->Find(name) != -1)
 		success = FALSE; // file is already in directory
 	else {
@@ -233,12 +235,14 @@ bool FileSystem::Create(const char *name, int initialSize, bool is_directory)
 
 OpenFile *FileSystem::Open(const char *name)
 {
-	Directory *directory = new Directory(NumDirEntries);
+	Directory *directory = getCurrentDirectory();
 	OpenFile *openFile = NULL;
 	int sector;
 
 	DEBUG('f', "Opening file %s\n", name);
-	directory->FetchFrom(directoryFile);
+
+	// FIXME Parse name as a path
+
 	sector = directory->Find(name);
 	if (sector >= 0)
 		openFile = new OpenFile(sector); // name was found in directory
@@ -262,13 +266,12 @@ OpenFile *FileSystem::Open(const char *name)
 
 bool FileSystem::Remove(const char *name)
 {
-	Directory *directory;
+	Directory *directory = getCurrentDirectory();
+
 	BitMap *freeMap;
 	FileHeader *fileHdr;
 	int sector;
 
-	directory = new Directory(NumDirEntries);
-	directory->FetchFrom(directoryFile);
 	sector = directory->Find(name);
 	if (sector == -1) {
 		delete directory;
@@ -299,9 +302,7 @@ bool FileSystem::Remove(const char *name)
 
 void FileSystem::List()
 {
-	Directory *directory = new Directory(NumDirEntries);
-
-	directory->FetchFrom(directoryFile);
+	Directory *directory = getCurrentDirectory();
 	directory->List();
 	delete directory;
 }
@@ -344,30 +345,33 @@ void FileSystem::Print()
 }
 
 Directory *FileSystem::getCurrentDirectory() const {
-    return currentDirectory;
+    auto directory = new Directory(NumDirEntries);
+    directory->FetchFrom(curDirFile);
+    return directory;
 }
 
 const char *FileSystem::getCurrentDirectoryPath() const {
     return pwd;
 }
 
-Directory* FileSystem::PathParser(Directory *startDir, char *path) {
-
-	Directory *directory = new Directory(DirectoryFileSize);
-
+OpenFile* FileSystem::PathParser(OpenFile *startDir, char *path) {
 	char *pch = strtok (path, "/");
 	if (pch == nullptr)
 		return startDir;
 
+	auto directory = new Directory(DirectoryFileSize);
+
 	while (pch != nullptr)
 	{
-		int hdrSector = startDir->Find(pch);
+        directory->FetchFrom(startDir);
+
+		int hdrSector = directory->Find(pch);
 		if (hdrSector == -1) {
 			DEBUG('f', "Wrong path! %s does not exist\n", pch);
 			return nullptr;
 		}
 
-		FileHeader *fh = new FileHeader();
+		auto fh = new FileHeader();
 		fh->FetchFrom(hdrSector);
 
 		if (!fh->IsDirectory()) {
@@ -376,14 +380,10 @@ Directory* FileSystem::PathParser(Directory *startDir, char *path) {
 		}
 
 		// FIXME Stop leak
-		OpenFile* f = new OpenFile(hdrSector);
-		directory->FetchFrom(f);
-
-		// "This works" - Lucas
-		startDir = directory;
+        startDir = new OpenFile(hdrSector);
 
 		pch = strtok (nullptr, "/");
 	}
 
-	return directory;
+	return startDir;
 }
