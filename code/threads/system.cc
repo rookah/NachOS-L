@@ -176,6 +176,7 @@ void Cleanup()
 	printf("\nCleaning up...\n");
 #ifdef NETWORK
 	delete postOffice;
+	delete connPool;
 #endif
 
 #ifdef USER_PROGRAM
