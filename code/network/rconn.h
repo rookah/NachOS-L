@@ -38,8 +38,8 @@ class RConn
 	RConn(PostOffice *post, int to_addr, int mailboxId);
 	~RConn();
 
-	void send(const std::vector<char> &data);
-	void Receive(int size, char *data);
+	int send(int size, const char* data);
+	int recv(int size, char *data);
 
   private:
 	static void ProcAckSem(int mess);

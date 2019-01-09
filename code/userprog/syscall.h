@@ -173,7 +173,7 @@ int Sbrk(int n);
 
 int Connect(int addr, int mailbox);
 
-int Send(int connId, int size, char *data);
+int Send(int connId, int size, const char *data);
 int Recv(int connId, int size, char *data);
 
 #endif // IN_USER_MODE

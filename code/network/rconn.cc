@@ -18,30 +18,32 @@ RConn::~RConn()
 {
 }
 
-void RConn::send(const std::vector<char> &data)
+int RConn::send(int size, const char *data)
 {
 	ROutMessage *mess = new ROutMessage;
 	mess->id = seqId;
 	mess->parent = this;
-	mess->data = data;
+	mess->data = std::vector<char>(size, 0);
+	memcpy(mess->data.data(), data, size);
+
 	mess->ackReceived = false;
 	mess->ackCond = new Semaphore("ack condvar", 0);
 
 	mOutMessages[seqId] = mess;
-	SendData(seqId, data);
+	SendData(seqId, mess->data);
 
 	seqId = (seqId % INT32_MAX) + 1;
 
 	interrupt->Schedule(ProcAckSem, (int)mess->ackCond, REEMISSION_DELAY * 4800, NetworkSendInt);
-	
+
 	for (int i = 0; i < MAX_REEMISSIONS; i++) {
 		mess->ackCond->Wait();
 
 		if (mess->ackReceived) {
 			mess->parent->mOutMessages.erase(mess->id);
 			// delete mess->ackCond;
-			// delete mess;
-			return;
+			// delete mess; // FIXME double free
+			return 0;
 		} else {
 			DEBUG('n', "Trying to send message\n");
 			mess->parent->SendData(mess->id, mess->data);
@@ -52,9 +54,11 @@ void RConn::send(const std::vector<char> &data)
 	if (!mess->ackReceived) {
 		DEBUG('n', "Failed sending message after %d tries\n", MAX_REEMISSIONS);
 	}
+
+	return -1;
 }
 
-void RConn::Receive(int size, char *data)
+int RConn::recv(int size, char *data)
 {
 	while (!mInMessages.count(friendSeqId)) {
 		currentThread->Yield();
@@ -67,6 +71,8 @@ void RConn::Receive(int size, char *data)
 
 	delete in;
 	friendSeqId = (friendSeqId % INT32_MAX) + 1;
+
+	return 0;
 }
 
 void RConn::ProcAckSem(int sem)
@@ -92,7 +98,7 @@ void RConn::SendAck(SeqId id)
 
 void RConn::SendData(SeqId id, const std::vector<char> &data)
 {
-	ASSERT(data.size() < MaxMailSize - sizeof(RHeader));
+	ASSERT(data.size() <= MaxMailSize - sizeof(RHeader));
 
 	PacketHeader pktHdr;
 	MailHeader mailHdr;

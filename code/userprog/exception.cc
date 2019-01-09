@@ -165,6 +165,14 @@ void ExceptionHandler(ExceptionType which)
 		case SC_Connect:
 			machine->WriteRegister(2, connPool->connect(machine->ReadRegister(4), machine->ReadRegister(5)));
 			break;
+
+		case SC_Send:
+			machine->WriteRegister(2, connPool->send(machine->ReadRegister(4), machine->ReadRegister(5), mipsPtrToKernelPtr(machine->ReadRegister(6))));
+			break;
+
+		case SC_Recv:
+			machine->WriteRegister(2, connPool->recv(machine->ReadRegister(4), machine->ReadRegister(5), mipsPtrToKernelPtr(machine->ReadRegister(6))));
+			break;
 #endif
 
 		default: {

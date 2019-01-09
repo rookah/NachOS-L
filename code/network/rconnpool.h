@@ -21,6 +21,7 @@ class RConnPool
   private:
 	PostOffice *mPost;
 	std::unordered_map<int, RConn *> mConnList;
+	unsigned int nextId;
 };
 
 #endif
