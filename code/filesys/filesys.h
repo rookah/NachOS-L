@@ -88,7 +88,7 @@ class FileSystem
 	                         // the disk, so initialize the directory
 	                         // and the bitmap of free blocks.
 
-	bool Create(const char *name, int initialSize, bool is_directory = false);
+	bool Create(const char *name, unsigned int initialSize, bool is_directory = false);
 	// Create a file (UNIX creat)
 
 	OpenFile *Open(const char *name); // Open a file (UNIX open)

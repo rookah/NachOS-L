@@ -130,7 +130,7 @@ int main(int argc, char **argv)
 
 		} else if (!strcmp(*argv, "-mkdir")) { // copy from UNIX to Nachos
 			ASSERT(argc == 2);
-			fileSystem->Create(*(argv+1), 0, true);
+			fileSystem->Create((const char*)*(argv+1), 0, true);
 			argCount = 2;
 
 		} else if (!strcmp(*argv, "-p")) { // print a Nachos file
