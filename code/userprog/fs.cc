@@ -2,6 +2,11 @@
 #include "system.h"
 #include <string.h>
 
+#ifdef FILESYS
+
+int fd_index = 0;
+std::unordered_map<int, OpenFile *> openFileList;
+
 int do_Create(char *filename)
 {
 	 return fileSystem->Create(filename, 0) ? 1 : 0;
@@ -54,3 +59,6 @@ int do_Close(int fd)
 	}
 	return 0;
 }
+
+
+#endif

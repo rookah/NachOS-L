@@ -51,7 +51,6 @@ extern FileSystem *fileSystem;
 #ifdef FILESYS
 #include "synchdisk.h"
 extern SynchDisk *synchDisk;
-int fd_index = 0;
 extern std::unordered_map<int, OpenFile *> openFileList; // list of open files and their associated file descriptor
 #endif
 
