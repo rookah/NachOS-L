@@ -261,3 +261,28 @@ int at_exit_standard_pool(mem_pool_t *pool)
 
 	return 1;
 }
+
+void display_standard_pool_state(mem_pool_t *pool)
+{
+	puts("[");
+
+	void *block = pool->start;
+
+	while (block < pool->end) {
+		size_t block_size = get_block_size(block);
+
+		if (is_block_free(block)) {
+			putchar((int)'F');
+			PutInt(block_size);
+			puts("->");
+		} else {
+			putchar((int)'A');
+			PutInt(block_size);
+			puts("->");
+		}
+
+		block += block_size + 2 * PADDED_HEADER_SIZE;
+	}
+
+	puts("]\n");
+}

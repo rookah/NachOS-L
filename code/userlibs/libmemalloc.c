@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "syscall.h"
 #include "mem_alloc_standard_pool.h"
 
 static int __mem_alloc_init_flag = 0;

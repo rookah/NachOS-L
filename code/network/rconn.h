@@ -44,6 +44,8 @@ class RConn
 	~RConn();
 	static void ProcAckSem(int mess);
 	static void ReceiveThread(int mailHdr);
+	int sendOne(int size, const char* data);
+	int recvOne(int size, char *data);
 	void SendAck(SeqId id);
 	void SendData(SeqId id, const std::vector<char> &data);
 

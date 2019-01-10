@@ -1,9 +1,12 @@
 #include "rconn.h"
 
 #include "post.h"
+#include <math.h>
 #include <system.h>
 
 void ReceiveAck(int conn);
+
+static const int MaxRMailSize = MaxMailSize - sizeof(RHeader);
 
 RConn::RConn(PostOffice *post, int to_addr, int mailboxId) : mPost(post), addr(to_addr), mailbox(mailboxId)
 {
@@ -27,6 +30,20 @@ void RConn::close()
 
 int RConn::send(int size, const char *data)
 {
+	for (int i = 0; i < size; i += MaxRMailSize) {
+		int r = sendOne(std::min(MaxRMailSize, size - i), data + i);
+
+		if (r != 0)
+			return r;
+	}
+
+	return 0;
+}
+
+int RConn::sendOne(int size, const char *data)
+{
+	ASSERT(size <= MaxRMailSize);
+
 	ROutMessage *mess = new ROutMessage;
 	mess->id = seqId;
 	mess->parent = this;
@@ -67,6 +84,20 @@ int RConn::send(int size, const char *data)
 
 int RConn::recv(int size, char *data)
 {
+	for (int i = 0; i < size; i += MaxRMailSize) {
+		int r = recvOne(std::min(MaxRMailSize, size - i), data + i);
+
+		if (r != 0)
+			return r;
+	}
+
+	return 0;
+}
+
+int RConn::recvOne(int size, char *data)
+{
+	ASSERT(size <= MaxRMailSize);
+
 	while (!mInMessages.count(friendSeqId)) {
 		currentThread->Yield();
 	}
@@ -74,7 +105,7 @@ int RConn::recv(int size, char *data)
 	RInMessage *in = mInMessages[friendSeqId];
 	mInMessages.erase(friendSeqId);
 
-	memcpy(data, in->data.data(), in->data.size());
+	memcpy(data, in->data.data(), std::min(in->data.size(), (size_t)size));
 
 	delete in;
 	friendSeqId = (friendSeqId % INT32_MAX) + 1;
@@ -105,7 +136,7 @@ void RConn::SendAck(SeqId id)
 
 void RConn::SendData(SeqId id, const std::vector<char> &data)
 {
-	ASSERT(data.size() <= MaxMailSize - sizeof(RHeader));
+	ASSERT(data.size() <= MaxRMailSize);
 
 	PacketHeader pktHdr;
 	MailHeader mailHdr;
