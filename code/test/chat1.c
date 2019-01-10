@@ -42,7 +42,7 @@ int main()
 	}
 
 	CloseConn(socket);
-	PutChar('\n');
+	putchar('\n');
 	free(buffer);
 
 	return 0;

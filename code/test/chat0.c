@@ -6,7 +6,6 @@ void receive_thread(void *arg)
 {
 	int socket = (int)arg;
 	char *buff = malloc(2040);
-	PutInt((int)buff);
 
 	int size = 0;
 
@@ -43,7 +42,7 @@ int main()
 	}
 
 	CloseConn(socket);
-	PutChar('\n');
+	putchar('\n');
 	free(buffer);
 
 	return 0;
