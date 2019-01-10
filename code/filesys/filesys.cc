@@ -355,6 +355,9 @@ const char *FileSystem::getCurrentDirectoryPath() const {
 }
 
 OpenFile* FileSystem::PathParser(OpenFile *startDir, char *path) {
+	ASSERT(startDir != nullptr);
+	ASSERT(path != nullptr);
+
 	char *pch = strtok (path, "/");
 	if (pch == nullptr)
 		return startDir;
@@ -386,4 +389,23 @@ OpenFile* FileSystem::PathParser(OpenFile *startDir, char *path) {
 	}
 
 	return startDir;
+}
+
+void FileSystem::ChangeDirectory(OpenFile *dir) {
+	ASSERT(dir != nullptr);
+
+    curDirFile = dir;
+}
+
+bool FileSystem::ChangeDirectory(char *relative_path) {
+	ASSERT(relative_path != nullptr);
+
+	OpenFile* file = PathParser(curDirFile, relative_path);
+	if (file != nullptr) {
+		curDirFile = file;
+		return true;
+	}
+
+	DEBUG('f', "Path parsing failed, directory not changed\n");
+	return false;
 }

@@ -104,6 +104,9 @@ class FileSystem
     Directory *getCurrentDirectory() const;
     const char *getCurrentDirectoryPath() const;
 
+    void ChangeDirectory(OpenFile *dir);
+    bool ChangeDirectory(char *relative_path);
+
   private:
 	OpenFile *freeMapFile;   // Bit map of free disk blocks,
 	                         // represented as a file
