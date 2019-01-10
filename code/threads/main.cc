@@ -152,8 +152,7 @@ int main(int argc, char **argv)
 			// start up another nachos
 			MailTest(atoi(*(argv + 1)));
 			argCount = 2;
-		}
-		else if (!strcmp(*argv, "-po")) {
+		} else if (!strcmp(*argv, "-po")) {
 			ASSERT(argc > 1);
 			Delay(5); // delay for 2 seconds
 			// to give the user time to

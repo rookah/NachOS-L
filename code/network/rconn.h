@@ -37,20 +37,20 @@ class RConn
   public:
 	RConn(PostOffice *post, int to_addr, int mailboxId);
 	void close();
-	int send(int size, const char* data);
+	int send(int size, const char *data);
 	int recv(int size, char *data);
 
   private:
 	~RConn();
 	static void ProcAckSem(int mess);
 	static void ReceiveThread(int mailHdr);
-	int sendOne(int size, const char* data);
+	int sendOne(int size, const char *data);
 	int recvOne(int size, char *data);
 	void SendAck(SeqId id);
 	void SendData(SeqId id, const std::vector<char> &data);
 
 	PostOffice *mPost;
-	Thread* t;
+	Thread *t;
 	SeqId seqId; // Between 1 and INT32_MAX
 	SeqId friendSeqId;
 	int addr;
