@@ -160,6 +160,12 @@ void ExceptionHandler(ExceptionType which)
 		case SC_ForkJoin:
 			do_ProcessJoin(machine->ReadRegister(4));
 			break;
+		#ifdef FILESYS
+		case SC_ls:
+			// FIXME This uses printf instead of the console
+			fileSystem->List();
+			break;
+        #endif
 
 		default: {
 			printf("Unexpected user mode exception %d %d\n", which, type);
