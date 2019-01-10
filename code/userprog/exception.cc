@@ -24,8 +24,8 @@
 #include "copyright.h"
 
 #include "semaphore.h"
-
 #include "forkexec.h"
+#include "fs.h"
 #include "syscall.h"
 #include "system.h"
 #include "usersemaphore.h"
@@ -160,11 +160,39 @@ void ExceptionHandler(ExceptionType which)
 		case SC_ForkJoin:
 			do_ProcessJoin(machine->ReadRegister(4));
 			break;
+
 		#ifdef FILESYS
+		case SC_Create:
+			copyStringFromMachine((machine->ReadRegister(4)), string, MAX_STRING_SIZE);
+			machine->WriteRegister(2, do_Create(string));
+			break;
+
+		case SC_Open:
+			copyStringFromMachine((machine->ReadRegister(4)), string, MAX_STRING_SIZE);
+			machine->WriteRegister(2, do_Open(string));
+			break;
+
+		case SC_Read:
+			break;
+
+		case SC_Write:
+			break;
+
+		case SC_Close:
+			break;
+
 		case SC_ls:
-			// FIXME This uses printf instead of the console
 			fileSystem->List();
 			break;
+
+		case SC_pwd: {
+			const char* pwd = fileSystem->getCurrentDirectoryPath();
+			while (*pwd != '\0') {
+				synchconsole->SynchPutChar(*pwd);
+				++pwd;
+			}
+			break;
+		}
         #endif
 
 		default: {

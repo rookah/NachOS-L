@@ -46,7 +46,7 @@
 #define SC_Sbrk 25
 #define SC_cd 26
 #define SC_ls 27
-#define SC_touch 28
+#define SC_pwd 28
 #define SC_mkdir 29
 
 #ifdef IN_USER_MODE
@@ -172,7 +172,7 @@ void ForkJoin(int pid);
 
 int Sbrk(int n);
 
-void touch(char *filename);
+void pwd(char *filename);
 
 void cd(char *path);
 

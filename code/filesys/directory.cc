@@ -124,6 +124,22 @@ int Directory::Find(const char *name) const
 }
 
 //----------------------------------------------------------------------
+// Directory::FindName
+//  Same as Find but returns the name of the directory instead
+//
+//  "sector" -- the sector of the file which name we want to retrieve
+//----------------------------------------------------------------------
+
+char* Directory::FindName(const int sector) const
+{
+	for (int i = 0; i < tableSize; i++)
+		if (table[i].sector == sector)
+			return table[i].name;
+	return nullptr;
+}
+
+
+//----------------------------------------------------------------------
 // Directory::Add
 // 	Add a file into the directory.  Return TRUE if successful;
 //	return FALSE if the file name is already in the directory, or if

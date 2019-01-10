@@ -51,6 +51,8 @@
 #include "filehdr.h"
 #include "filesys.h"
 
+#include <string>
+
 // Sectors containing the file headers for the bitmap of free sectors,
 // and the directory of files.  These file headers are placed in well-known
 // sectors, so that they can be located on boot-up.
@@ -63,6 +65,8 @@
 #define FreeMapFileSize (NumSectors / BitsInByte)
 #define NumDirEntries 10
 #define DirectoryFileSize (sizeof(DirectoryEntry) * NumDirEntries)
+
+#define MaxPwdSize (FileNameMaxLen + 1) * MaxDepth + 1
 
 //----------------------------------------------------------------------
 // FileSystem::FileSystem
@@ -351,7 +355,22 @@ Directory *FileSystem::getCurrentDirectory() const {
 }
 
 const char *FileSystem::getCurrentDirectoryPath() const {
-    return pwd;
+	auto directory = getCurrentDirectory();
+	std::string ret = "";
+	char *tmp;
+	int parent_sector, child_sector;
+	OpenFile *f;
+
+	while ((parent_sector = directory->Find("..")) != DirectorySector) {
+		child_sector = directory->Find(".");
+		f = new OpenFile(parent_sector);
+		directory->FetchFrom(f);
+		tmp = directory->FindName(child_sector);
+		if (tmp != nullptr)
+			ret = std::string(tmp) + "/" + ret;
+	}
+	ret = "/" + ret;
+	return ret.c_str();
 }
 
 OpenFile* FileSystem::PathParser(OpenFile *startDir, char *path) {
@@ -393,7 +412,6 @@ OpenFile* FileSystem::PathParser(OpenFile *startDir, char *path) {
 
 void FileSystem::ChangeDirectory(OpenFile *dir) {
 	ASSERT(dir != nullptr);
-
     curDirFile = dir;
 }
 

@@ -47,7 +47,7 @@ USERPROG_LIBS=start.S libstdio.c libstdlib.c libpthread.c libsemaphore.c libmema
 # sources and will always be linked only with start.S (USERPROG_LIBS
 # and ..._EXTRA_SOURCES are ignored for them)
 
-EXTRA_SOURCES=synchconsole.cc userthread.cc semaphore.cc frameprovider.cc forkexec.cc
+EXTRA_SOURCES=synchconsole.cc userthread.cc semaphore.cc frameprovider.cc forkexec.cc fs.cc
 
 ###########################################################################
 #                        NACHOS KERNELS                                   #

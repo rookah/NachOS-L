@@ -113,9 +113,6 @@ class FileSystem
 	OpenFile *directoryFile; // "Root" directory -- list of
 	                         // file names, represented as a file
 	OpenFile *curDirFile;
-
-    // Current open directory
-	char pwd[(FileNameMaxLen + 1) * MaxDepth + 1] = "/";
 };
 
 #endif // FILESYS
