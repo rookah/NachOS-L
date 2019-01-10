@@ -8,7 +8,7 @@ int do_ForkExec(char *s)
 {
 	// open file
 	OpenFile *executable = fileSystem->Open((char *)s);
-	if (executable == NULL) {
+	if (executable == nullptr) {
 		printf("Unable to open file %s\n", (char *)s);
 		return -1;
 	}

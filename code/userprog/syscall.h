@@ -168,7 +168,7 @@ void SemPost(int sem);
 
 int ForkExec(char *s);
 
-void ForkJoin();
+void ForkJoin(int pid);
 
 int Sbrk(int n);
 

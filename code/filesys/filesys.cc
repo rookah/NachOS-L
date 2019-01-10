@@ -236,7 +236,7 @@ bool FileSystem::Create(const char *name, unsigned int initialSize, bool is_dire
 OpenFile *FileSystem::Open(const char *name)
 {
 	Directory *directory = getCurrentDirectory();
-	OpenFile *openFile = NULL;
+	OpenFile *openFile = nullptr;
 	int sector;
 
 	DEBUG('f', "Opening file %s\n", name);
