@@ -292,14 +292,14 @@ mkdir:
 
 	.end mkdir
 
-	.globl touch
-	.ent touch
-touch:
-	addiu $2,$0,SC_touch
+	.globl pwd
+	.ent pwd
+pwd:
+	addiu $2,$0,SC_pwd
 	syscall
 	j	$31
 
-	.end touch
+	.end pwd
 	
 /* dummy function to keep gcc happy */
         .globl  __main

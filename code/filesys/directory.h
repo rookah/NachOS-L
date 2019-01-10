@@ -60,8 +60,8 @@ class Directory
 	void WriteBack(OpenFile *file); // Write modifications to
 	                                // directory contents back to disk
 
-	int Find(const char *name) const; // Find the sector number of the
-	                            // FileHeader for file: "name"
+	int Find(const char *name) const; // Find the sector number of the FileHeader for file: "name"
+	char* FindName(const int sector) const; // Find the name of the file with sector: "sector"
 
 	bool Add(const char *name, int newSector); // Add a file name into the directory
 
