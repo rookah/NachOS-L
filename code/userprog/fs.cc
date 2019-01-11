@@ -20,7 +20,7 @@ int do_Open(char *filename)
 	}
 
 	OpenFile *f = fileSystem->Open(filename);
-	if (f == NULL) {
+	if (f == nullptr) {
 		printf("Unable to open file %s: file not found\n", filename);
 		return -1;
 	}

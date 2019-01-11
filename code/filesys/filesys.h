@@ -40,6 +40,7 @@
 #include "directory.h"
 
 #define MaxDepth 10
+#define NumDirEntries 10
 
 #ifdef FILESYS_STUB // Temporarily implement file system calls as
                     // calls to UNIX, until the real file system
@@ -78,6 +79,7 @@ class FileSystem
 };
 
 #else // FILESYS
+
 class FileSystem
 {
   public:

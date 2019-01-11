@@ -24,6 +24,7 @@
 #include "copyright.h"
 #include "filehdr.h"
 #include "utility.h"
+#include "filesys.h"
 
 //----------------------------------------------------------------------
 // Directory::Directory
@@ -37,6 +38,8 @@
 
 Directory::Directory(int size, int sector, int parentSector)
 {
+	ASSERT(size == NumDirEntries);
+
 	table = new DirectoryEntry[size];
 	tableSize = size;
 	for (int i = 0; i < tableSize; i++)

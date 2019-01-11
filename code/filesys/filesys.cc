@@ -57,7 +57,7 @@
 // and the directory of files.  These file headers are placed in well-known
 // sectors, so that they can be located on boot-up.
 #define FreeMapSector 0
-#define DirectorySector 1
+#define RootDirectorySector 1
 
 // Initial file sizes for the bitmap and directory; until the file system
 // supports extensible files, the directory size sets the maximum number
@@ -95,7 +95,7 @@ FileSystem::FileSystem(bool format)
 		// First, allocate space for FileHeaders for the directory and bitmap
 		// (make sure no one else grabs these!)
 		freeMap->Mark(FreeMapSector);
-		freeMap->Mark(DirectorySector);
+		freeMap->Mark(RootDirectorySector);
 
 		// Second, allocate space for the data blocks containing the contents
 		// of the directory and bitmap files.  There better be enough space!
@@ -110,14 +110,14 @@ FileSystem::FileSystem(bool format)
 
 		DEBUG('f', "Writing headers back to disk.\n");
 		mapHdr->WriteBack(FreeMapSector);
-		dirHdr->WriteBack(DirectorySector);
+		dirHdr->WriteBack(RootDirectorySector);
 
 		// OK to open the bitmap and directory files now
 		// The file system operations assume these two files are left open
 		// while Nachos is running.
 
 		freeMapFile = new OpenFile(FreeMapSector);
-		directoryFile = new OpenFile(DirectorySector);
+		directoryFile = new OpenFile(RootDirectorySector);
 		curDirFile = directoryFile;
 
 		// Once we have the files "open", we can write the initial version
@@ -143,7 +143,7 @@ FileSystem::FileSystem(bool format)
 		// if we are not formatting the disk, just open the files representing
 		// the bitmap and directory; these are left open while Nachos is running
 		freeMapFile = new OpenFile(FreeMapSector);
-		directoryFile = new OpenFile(DirectorySector);
+		directoryFile = new OpenFile(RootDirectorySector);
 		curDirFile = directoryFile;
 	}
 }
@@ -210,12 +210,20 @@ bool FileSystem::Create(const char *name, unsigned int initialSize, bool is_dire
 			success = FALSE; // no space in directory
 		else {
 			hdr = new FileHeader;
-			if (!hdr->Allocate(freeMap, initialSize, is_directory))
+			if (!hdr->Allocate(freeMap, initialSize, is_directory)) {
 				success = FALSE; // no space on disk for data
+			}
 			else {
+                hdr->WriteBack(sector);
+				if (is_directory) {
+					auto newDir = Directory(NumDirEntries, sector, directory->Find("."));
+
+                    auto dirFile = OpenFile(sector);
+					newDir.WriteBack(&dirFile);
+				}
+
 				success = TRUE;
 				// everything worked, flush all changes back to disk
-				hdr->WriteBack(sector);
 				directory->WriteBack(curDirFile);
 				freeMap->WriteBack(freeMapFile);
 			}
@@ -333,7 +341,7 @@ void FileSystem::Print()
 	bitHdr->Print();
 
 	printf("Directory file header:\n");
-	dirHdr->FetchFrom(DirectorySector);
+	dirHdr->FetchFrom(RootDirectorySector);
 	dirHdr->Print();
 
 	freeMap->FetchFrom(freeMapFile);
@@ -349,19 +357,19 @@ void FileSystem::Print()
 }
 
 Directory *FileSystem::getCurrentDirectory() const {
-    auto directory = new Directory(NumDirEntries);
-    directory->FetchFrom(curDirFile);
-    return directory;
+	auto directory = new Directory(NumDirEntries);
+	directory->FetchFrom(curDirFile);
+	return directory;
 }
 
 const char *FileSystem::getCurrentDirectoryPath() const {
 	auto directory = getCurrentDirectory();
-	std::string ret = "";
+	std::string ret;
 	char *tmp;
 	int parent_sector, child_sector;
 	OpenFile *f;
 
-	while ((parent_sector = directory->Find("..")) != DirectorySector) {
+	while ((parent_sector = directory->Find("..")) != RootDirectorySector || directory->Find(".") != RootDirectorySector) {
 		child_sector = directory->Find(".");
 		f = new OpenFile(parent_sector);
 		directory->FetchFrom(f);
@@ -390,7 +398,7 @@ OpenFile* FileSystem::PathParser(OpenFile *startDir, char *path) {
 
 	while (pch != nullptr)
 	{
-        directory->FetchFrom(tmp);
+		directory->FetchFrom(tmp);
 
 		int hdrSector = directory->Find(pch);
 		if (hdrSector == -1) {
@@ -407,7 +415,7 @@ OpenFile* FileSystem::PathParser(OpenFile *startDir, char *path) {
 		}
 
 		// FIXME Stop leak
-        tmp = new OpenFile(hdrSector);
+		tmp = new OpenFile(hdrSector);
 		pch = strtok(nullptr, "/");
 	}
 
@@ -416,7 +424,7 @@ OpenFile* FileSystem::PathParser(OpenFile *startDir, char *path) {
 
 void FileSystem::ChangeDirectory(OpenFile *dir) {
 	ASSERT(dir != nullptr);
-    curDirFile = dir;
+	curDirFile = dir;
 }
 
 bool FileSystem::ChangeDirectory(char *relative_path) {

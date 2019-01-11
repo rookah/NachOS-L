@@ -198,6 +198,7 @@ void ExceptionHandler(ExceptionType which)
 				synchconsole->SynchPutChar(*pwd);
 				++pwd;
 			}
+			synchconsole->SynchPutChar('\n');
 			break;
 		}
 
