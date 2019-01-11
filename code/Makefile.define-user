@@ -74,7 +74,7 @@ $(eval $(call define-flavor,userprog,userprog filesys-stub,$(EXTRA_SOURCES)))
 ######### filesys
 $(eval $(call define-flavor,filesys,userprog filesys,$(EXTRA_SOURCES)))
 ######### network
-$(eval $(call define-flavor,network,thread-test userprog filesys network,$(EXTRA_SOURCES)))
+$(eval $(call define-flavor,network,thread-test userprog filesys network,$(EXTRA_SOURCES) rconn.cc rconnpool.cc))
 ######### vm
 $(eval $(call define-flavor,vm,userprog filesys-stub,$(EXTRA_SOURCES) vm))
 ###########################################################################
@@ -91,7 +91,7 @@ USER_FLAVORS=filesys network userprog threads step2
 # to the personal flavors
 # USER_FLAVORS=step2 step5 mynetwork final
 
-$(eval $(call define-flavor,step2,userprog filesys-stub,$(EXTRA_SOURCES)))
+$(eval $(call define-flavor,step2,userprog filesys-stub network,$(EXTRA_SOURCES) rconn.cc rconnpool.cc))
 # $(eval $(call define-flavor,step5,userprog filesys,\
 #     $(EXTRA_SOURCES)))
 # $(eval $(call define-flavor,mynetwork,userprog filesys-stub network, \

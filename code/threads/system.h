@@ -54,7 +54,9 @@ extern SynchDisk *synchDisk;
 
 #ifdef NETWORK
 #include "post.h"
+#include "rconnpool.h"
 extern PostOffice *postOffice;
+extern RConnPool *connPool;
 #endif
 
 #endif // SYSTEM_H

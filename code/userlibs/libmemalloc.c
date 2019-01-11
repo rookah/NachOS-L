@@ -3,12 +3,13 @@
 #include <string.h>
 
 #include "mem_alloc_standard_pool.h"
+#include "syscall.h"
 
 static int __mem_alloc_init_flag = 0;
 
 /* Note: the other fields will be setup by the init procedure */
 static mem_pool_t standard_pool_1025_and_above = {
-    .pool_id = 3, .pool_name = "pool-3-std (1024_Max)", .pool_size = 4096, .min_request_size = 1, .max_request_size = SIZE_MAX, .pool_type = STANDARD_POOL};
+    .pool_id = 3, .pool_name = "pool-3-std (1024_Max)", .pool_size = 1024, .min_request_size = 1, .max_request_size = SIZE_MAX, .pool_type = STANDARD_POOL};
 
 void *malloc(size_t size)
 {

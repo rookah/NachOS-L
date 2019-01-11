@@ -61,6 +61,7 @@ extern void StartProcess(char *file);
 extern void ConsoleTest(char *in, char *out);
 extern void SynchConsoleTest(char *in, char *out);
 extern void MailTest(int networkID);
+extern void RConnTest(int networkID);
 
 //----------------------------------------------------------------------
 // main
@@ -146,10 +147,17 @@ int main(int argc, char **argv)
 #ifdef NETWORK
 		if (!strcmp(*argv, "-o")) {
 			ASSERT(argc > 1);
-			Delay(2); // delay for 2 seconds
+			Delay(5); // delay for 2 seconds
 			// to give the user time to
 			// start up another nachos
 			MailTest(atoi(*(argv + 1)));
+			argCount = 2;
+		} else if (!strcmp(*argv, "-po")) {
+			ASSERT(argc > 1);
+			Delay(5); // delay for 2 seconds
+			// to give the user time to
+			// start up another nachos
+			RConnTest(atoi(*(argv + 1)));
 			argCount = 2;
 		}
 #endif // NETWORK

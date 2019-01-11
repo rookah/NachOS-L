@@ -21,6 +21,7 @@
 #include "interrupt.h"
 #include "network.h"
 #include "post.h"
+#include "rconn.h"
 #include "system.h"
 
 // Test out message delivery, by doing the following:
@@ -38,33 +39,71 @@ void MailTest(int farAddr)
 	const char *ack = "Got it!";
 	char buffer[MaxMailSize];
 
-	// construct packet, mail header for original message
-	// To: destination machine, mailbox 0
-	// From: our machine, reply to: mailbox 1
-	outPktHdr.to = farAddr;
-	outMailHdr.to = 0;
-	outMailHdr.from = 1;
-	outMailHdr.length = strlen(data) + 1;
+	for (int i = 0; i < 10; ++i) {
+		// construct packet, mail header for original message
+		// To: destination machine, mailbox 0
+		// From: our machine, reply to: mailbox 1
+		outPktHdr.to = farAddr;
+		outMailHdr.to = 1;
+		outMailHdr.from = 1;
+		outMailHdr.length = strlen(data) + 1;
 
-	// Send the first message
-	postOffice->Send(outPktHdr, outMailHdr, data);
+		// Send the first message
+		postOffice->Send(outPktHdr, outMailHdr, data);
 
-	// Wait for the first message from the other machine
-	postOffice->Receive(0, &inPktHdr, &inMailHdr, buffer);
-	printf("Got \"%s\" from %d, box %d\n", buffer, inPktHdr.from, inMailHdr.from);
-	fflush(stdout);
+		// Wait for the first message from the other machine
+		postOffice->Receive(1, &inPktHdr, &inMailHdr, buffer);
+		printf("Got \"%s\" from %d, box %d\n", buffer, inPktHdr.from, inMailHdr.from);
+		fflush(stdout);
 
-	// Send acknowledgement to the other machine (using "reply to" mailbox
-	// in the message that just arrived
-	outPktHdr.to = inPktHdr.from;
-	outMailHdr.to = inMailHdr.from;
-	outMailHdr.length = strlen(ack) + 1;
-	postOffice->Send(outPktHdr, outMailHdr, ack);
+		// Send acknowledgement to the other machine (using "reply to" mailbox
+		// in the message that just arrived
+		outPktHdr.to = inPktHdr.from;
+		outMailHdr.to = inMailHdr.from;
+		outMailHdr.length = strlen(ack) + 1;
+		postOffice->Send(outPktHdr, outMailHdr, ack);
 
-	// Wait for the ack from the other machine to the first message we sent.
-	postOffice->Receive(1, &inPktHdr, &inMailHdr, buffer);
-	printf("Got \"%s\" from %d, box %d\n", buffer, inPktHdr.from, inMailHdr.from);
-	fflush(stdout);
+		// Wait for the ack from the other machine to the first message we sent.
+		postOffice->Receive(1, &inPktHdr, &inMailHdr, buffer);
+		printf("Got \"%s\" from %d, box %d\n", buffer, inPktHdr.from, inMailHdr.from);
+		fflush(stdout);
+	}
+
+	// Then we're done!
+	interrupt->Halt();
+}
+
+void RConnTest(int farAddr)
+{
+	RConn *conn = new RConn(postOffice, farAddr, 2);
+
+	std::string str("Hello World!");
+	conn->send(str.length() + 1, str.c_str());
+	printf("Sent #1\n");
+
+	str = "Hell World!";
+	conn->send(str.length() + 1, str.c_str());
+	printf("Sent #2\n");
+
+	str = "Hell Lord!";
+	conn->send(str.length() + 1, str.c_str());
+	printf("Sent #3\n");
+
+	char data[MaxMailSize] = {'\0'};
+
+	conn->recv(0, data);
+	printf("Got %s\n", data);
+
+	conn->recv(0, data);
+	printf("Got %s\n", data);
+
+	conn->recv(0, data);
+	printf("Got %s\n", data);
+
+	for (int i = 0; i < 10000; ++i)
+		currentThread->Yield();
+
+	conn->close();
 
 	// Then we're done!
 	interrupt->Halt();

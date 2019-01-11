@@ -7,6 +7,8 @@
 
 #define PAGE_SIZE 128
 
+int allocate_more_pages(mem_pool_t *pool, size_t to_fit);
+
 /* Returns 1 if the block is used, or 0 if the block is free */
 int is_block_used(mem_standard_block_header_footer_t *m)
 {
@@ -73,6 +75,7 @@ void *align_addr(void *addr)
 void init_standard_pool(mem_pool_t *p, size_t size, size_t min_request_size, size_t max_request_size)
 {
 	void *block = (void *)Sbrk(size / PAGE_SIZE + 1);
+	size = (size / PAGE_SIZE + 1) * PAGE_SIZE;
 
 	p->start = block;
 	p->end = block + size;
@@ -98,8 +101,13 @@ void *mem_alloc_standard_pool(mem_pool_t *pool, size_t size)
 	while (suitable_block && (suitable_block_size = get_block_size(&suitable_block->header)) < size)
 		suitable_block = suitable_block->next;
 
-	if (!suitable_block)
+	if (!suitable_block) {
+		if (allocate_more_pages(pool, size) == 0) {
+			return mem_alloc_standard_pool(pool, size);
+		}
+
 		return NULL;
+	}
 
 	mem_standard_free_block_t *prev_block = suitable_block->prev;
 	mem_standard_free_block_t *next_block = suitable_block->next;
@@ -260,4 +268,77 @@ int at_exit_standard_pool(mem_pool_t *pool)
 		return 0;
 
 	return 1;
+}
+
+void display_standard_pool_state(mem_pool_t *pool)
+{
+	puts("[");
+
+	void *block = pool->start;
+
+	while (block < pool->end) {
+		size_t block_size = get_block_size(block);
+
+		if (is_block_free(block)) {
+			putchar((int)'F');
+			PutInt(block_size);
+			puts("->");
+		} else {
+			putchar((int)'A');
+			PutInt(block_size);
+			puts("->");
+		}
+
+		block += block_size + 2 * PADDED_HEADER_SIZE;
+	}
+
+	puts("]\n");
+}
+
+int allocate_more_pages(mem_pool_t *pool, size_t to_fit)
+{
+	to_fit += 2 * PADDED_HEADER_SIZE;
+	void *new_mem = (void *)Sbrk(to_fit / PAGE_SIZE + 1);
+	to_fit = (to_fit / PAGE_SIZE + 1) * PAGE_SIZE;
+
+	if (new_mem != pool->end) { // Our allocator can't deal with non-contiguous memory
+		return -1;
+	} else {
+		pool->end = new_mem + to_fit;
+		pool->pool_size += to_fit;
+
+		mem_standard_free_block_t *last_block = pool->first_free;
+		while (last_block && last_block->next)
+			last_block = last_block->next;
+
+		if (last_block) {
+			size_t last_size = get_block_size(&last_block->header);
+			void *footer = (void *)last_block + PADDED_HEADER_SIZE + last_size;
+			if (footer + PADDED_HEADER_SIZE == new_mem) {
+
+				set_block_size(&last_block->header, last_size + to_fit); // + PADDED_HEADER_SIZE - PADDED_HEADER_SIZE
+
+				mem_standard_free_block_t *new_footer = (void *)last_block + last_size + to_fit;
+				set_block_size(&new_footer->header, last_size + to_fit);
+
+			} else {
+				mem_standard_free_block_t *first_free = new_mem;
+				set_block_free(&first_free->header);
+				set_block_size(&first_free->header, to_fit - 2 * PADDED_HEADER_SIZE);
+
+				last_block->next = first_free;
+				first_free->prev = last_block;
+			}
+		} else {
+			mem_standard_free_block_t *first_free = new_mem;
+			set_block_free(&first_free->header);
+			set_block_size(&first_free->header, to_fit - 2 * PADDED_HEADER_SIZE);
+
+			first_free->prev = last_block;
+			first_free->next = NULL;
+			pool->first_free = first_free;
+		}
+
+		return 0;
+	}
 }
