@@ -2,10 +2,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#define BUFFER_SIZE 4096 // Corresponds to stdin buffer limit
+
 void receive_thread(void *arg)
 {
 	int socket = (int)arg;
-	char *buff = malloc(2040);
+	char *buff = malloc(BUFFER_SIZE);
 
 	int size = 0;
 
@@ -22,11 +24,11 @@ void receive_thread(void *arg)
 int main()
 {
 	int socket = Connect(1, 2);
-	char *buffer = malloc(2040);
+	char *buffer = malloc(BUFFER_SIZE);
 	UserThreadCreate(receive_thread, (void *)socket);
 
 	while (1) {
-		fgets(buffer, 2040, stdin);
+		fgets(buffer, BUFFER_SIZE, stdin);
 
 		int i = 0;
 		while (buffer[i] != '\0') {

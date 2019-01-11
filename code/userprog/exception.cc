@@ -67,6 +67,8 @@ static void UpdatePC()
 //      are in machine.h.
 //----------------------------------------------------------------------
 void copyStringFromMachine(int from, char *to, unsigned size);
+void copyDataFromMachine(int from, char *to, unsigned size);
+void copyDataToMachine(char *from, int to, unsigned size);
 char *mipsPtrToKernelPtr(int mipsPtr);
 
 void ExceptionHandler(ExceptionType which)
@@ -109,8 +111,11 @@ void ExceptionHandler(ExceptionType which)
 			}
 		} break;
 
-		case SC_GetString: { // FIXME if mips string is accross multiple pages
-			synchconsole->SynchGetString(mipsPtrToKernelPtr(machine->ReadRegister(4)), machine->ReadRegister(5));
+		case SC_GetString: {
+			char *buff = new char[machine->ReadRegister(5)];
+			synchconsole->SynchGetString(buff, machine->ReadRegister(5));
+			copyDataToMachine(buff, machine->ReadRegister(4), machine->ReadRegister(5));
+			delete[] buff;
 			break;
 		}
 
@@ -166,13 +171,21 @@ void ExceptionHandler(ExceptionType which)
 			machine->WriteRegister(2, connPool->connect(machine->ReadRegister(4), machine->ReadRegister(5)));
 			break;
 
-		case SC_Send:
-			machine->WriteRegister(2, connPool->send(machine->ReadRegister(4), machine->ReadRegister(5), mipsPtrToKernelPtr(machine->ReadRegister(6))));
+		case SC_Send: {
+			char *buff = new char[machine->ReadRegister(5)];
+			copyDataFromMachine(machine->ReadRegister(6), buff, machine->ReadRegister(5));
+			machine->WriteRegister(2, connPool->send(machine->ReadRegister(4), machine->ReadRegister(5), buff));
+			delete[] buff;
 			break;
+		}
 
-		case SC_Recv:
-			machine->WriteRegister(2, connPool->recv(machine->ReadRegister(4), machine->ReadRegister(5), mipsPtrToKernelPtr(machine->ReadRegister(6))));
+		case SC_Recv: {
+			char *buff = new char[machine->ReadRegister(5)];
+			machine->WriteRegister(2, connPool->recv(machine->ReadRegister(4), machine->ReadRegister(5), buff));
+			copyDataToMachine(buff, machine->ReadRegister(6), machine->ReadRegister(5));
+			delete[] buff;
 			break;
+		}
 
 		case SC_CloseConn:
 			connPool->close(machine->ReadRegister(4));
@@ -196,7 +209,16 @@ char *mipsPtrToKernelPtr(int mipsPtr)
 	return fromptr;
 }
 
-void copyStringFromMachine(int from, char *to, unsigned size)
+void copyDataFromMachine(int from, char *to, unsigned int size)
+{
+	for (unsigned int i = 0; i < size; i++) {
+		char *fromptr = mipsPtrToKernelPtr(from);
+		to[i] = *fromptr;
+		from++;
+	}
+}
+
+void copyStringFromMachine(int from, char *to, unsigned int size)
 {
 	char *fromptr = mipsPtrToKernelPtr(from);
 
@@ -208,4 +230,13 @@ void copyStringFromMachine(int from, char *to, unsigned size)
 		fromptr = mipsPtrToKernelPtr(from);
 	}
 	*to = '\0';
+}
+
+void copyDataToMachine(char *from, int to, unsigned int size)
+{
+	for (unsigned int i = 0; i < size; i++) {
+		char *toptr = mipsPtrToKernelPtr(to);
+		*toptr = from[i];
+		to++;
+	}
 }
