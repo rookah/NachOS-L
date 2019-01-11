@@ -1,20 +1,26 @@
 #include "semaphore.h"
 
 #include "synch.h"
-#include <set>
+#include <unordered_map>
 
 static Lock mtx("SemList Lock"); // TODO Use rwLock
-static std::set<int> SEM_LIST;
+static std::unordered_map<int, int> SEM_LIST;
 
 int do_SemInit(int value)
 {
 	int sid = (int)new Semaphore("User Mode Sem", value);
 
 	mtx.Acquire();
-	SEM_LIST.insert(sid);
+
+	int id = rand();
+	while (SEM_LIST.count(id)) {
+		id = rand();
+	}
+
+	SEM_LIST[id] = sid;
 	mtx.Release();
 
-	return sid;
+	return id;
 }
 
 void do_SemWait(int sid)
@@ -23,7 +29,7 @@ void do_SemWait(int sid)
 
 	mtx.Acquire();
 	if (SEM_LIST.count(sid))
-		sem = (Semaphore *)sid;
+		sem = (Semaphore *)SEM_LIST[sid];
 	mtx.Release();
 
 	if (sem) {
@@ -37,7 +43,7 @@ void do_SemPost(int sid)
 
 	mtx.Acquire();
 	if (SEM_LIST.count(sid))
-		sem = (Semaphore *)sid;
+		sem = (Semaphore *)SEM_LIST[sid];
 	mtx.Release();
 
 	if (sem) {
