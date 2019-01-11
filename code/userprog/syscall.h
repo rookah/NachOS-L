@@ -172,7 +172,7 @@ void ForkJoin(int pid);
 
 int Sbrk(int n);
 
-void pwd(char *filename);
+void pwd();
 
 void cd(char *path);
 

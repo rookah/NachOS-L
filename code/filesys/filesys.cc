@@ -370,7 +370,9 @@ const char *FileSystem::getCurrentDirectoryPath() const {
 			ret = std::string(tmp) + "/" + ret;
 	}
 	ret = "/" + ret;
-	return ret.c_str();
+	char *ret_char = new char[ret.size() + 1];
+	strcpy(ret_char, ret.c_str());
+	return ret_char;
 }
 
 OpenFile* FileSystem::PathParser(OpenFile *startDir, char *path) {

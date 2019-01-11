@@ -176,9 +176,16 @@ void ExceptionHandler(ExceptionType which)
 			break;
 
 		case SC_Write:
+			copyStringFromMachine((machine->ReadRegister(4)), string, MAX_STRING_SIZE);
 			break;
 
 		case SC_Close:
+			copyStringFromMachine((machine->ReadRegister(4)), string, MAX_STRING_SIZE);
+			break;
+
+		case SC_cd:
+			copyStringFromMachine((machine->ReadRegister(4)), string, MAX_STRING_SIZE);
+			fileSystem->ChangeDirectory(string);
 			break;
 
 		case SC_ls:
@@ -193,7 +200,13 @@ void ExceptionHandler(ExceptionType which)
 			}
 			break;
 		}
-        #endif
+
+		case SC_mkdir:
+			copyStringFromMachine((machine->ReadRegister(4)), string, MAX_STRING_SIZE);
+			fileSystem->Create(string, 0, true);
+			break;
+			
+		#endif
 
 		default: {
 			printf("Unexpected user mode exception %d %d\n", which, type);
