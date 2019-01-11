@@ -3,7 +3,9 @@
 int main() {
 	mkdir("test_dir");
 	cd("./test_dir");
+	PutChar('\n');
+	mkdir("test_dir");
 	ls();
-	pwd();
+	//pwd();
 	return 0;
 }

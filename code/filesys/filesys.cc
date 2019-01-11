@@ -195,7 +195,7 @@ bool FileSystem::Create(const char *name, unsigned int initialSize, bool is_dire
 	DEBUG('f', "Creating file %s, size %d\n", name, initialSize);
 
 	directory = new Directory(NumDirEntries);
-	directory->FetchFrom(directoryFile);
+	directory->FetchFrom(curDirFile);
 
 
 	if (directory->Find(name) != -1)
@@ -216,7 +216,7 @@ bool FileSystem::Create(const char *name, unsigned int initialSize, bool is_dire
 				success = TRUE;
 				// everything worked, flush all changes back to disk
 				hdr->WriteBack(sector);
-				directory->WriteBack(directoryFile);
+				directory->WriteBack(curDirFile);
 				freeMap->WriteBack(freeMapFile);
 			}
 			delete hdr;
@@ -292,7 +292,7 @@ bool FileSystem::Remove(const char *name)
 	directory->Remove(name);
 
 	freeMap->WriteBack(freeMapFile);     // flush to disk
-	directory->WriteBack(directoryFile); // flush to disk
+	directory->WriteBack(curDirFile); // flush to disk
 	delete fileHdr;
 	delete directory;
 	delete freeMap;
@@ -379,15 +379,18 @@ OpenFile* FileSystem::PathParser(OpenFile *startDir, char *path) {
 	ASSERT(startDir != nullptr);
 	ASSERT(path != nullptr);
 
-	char *pch = strtok (path, "/");
+	auto pch = new char[MaxPwdSize];
+	strcpy(pch, path);
+	strtok(pch, "/");
 	if (pch == nullptr)
 		return startDir;
 
-	auto directory = new Directory(DirectoryFileSize);
+	auto tmp = startDir;
+	auto directory = new Directory(NumDirEntries);
 
 	while (pch != nullptr)
 	{
-        directory->FetchFrom(startDir);
+        directory->FetchFrom(tmp);
 
 		int hdrSector = directory->Find(pch);
 		if (hdrSector == -1) {
@@ -404,12 +407,11 @@ OpenFile* FileSystem::PathParser(OpenFile *startDir, char *path) {
 		}
 
 		// FIXME Stop leak
-        startDir = new OpenFile(hdrSector);
-
-		pch = strtok (nullptr, "/");
+        tmp = new OpenFile(hdrSector);
+		pch = strtok(nullptr, "/");
 	}
 
-	return startDir;
+	return tmp;
 }
 
 void FileSystem::ChangeDirectory(OpenFile *dir) {

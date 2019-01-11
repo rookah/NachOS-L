@@ -52,7 +52,6 @@ Directory::Directory(int size, int sector, int parentSector)
     table[1].name[1] = '.';
     table[1].name[2] = '\0';
     table[1].sector = parentSector;
-
 }
 
 //----------------------------------------------------------------------
@@ -200,6 +199,7 @@ void Directory::List()
 			else
 				printf("%s*\n", table[i].name);
 		}
+
 }
 
 //----------------------------------------------------------------------
