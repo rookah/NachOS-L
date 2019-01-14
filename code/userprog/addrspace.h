@@ -47,6 +47,11 @@ class AddrSpace
 	int AllocatePages(int nbPages, bool fromEnd = false);
 	void FreePages(unsigned int vpn, unsigned int numPages = 1);
 
+	#ifdef FILESYS
+	OpenFile *getCurDirFile();
+	void setCurDirFile(OpenFile *file);
+	#endif
+
   private:
 	TranslationEntry pageTable[MaxVirtPage];
 
@@ -54,6 +59,10 @@ class AddrSpace
 	Lock *mtx;
 	std::unordered_map<int, Semaphore *> threadList;
 	unsigned int brk;
+
+	#ifdef FILESYS
+	OpenFile *curDirFile;
+	#endif
 };
 
 #endif // ADDRSPACE_H

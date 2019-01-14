@@ -52,7 +52,7 @@ class DirectoryEntry
 class Directory
 {
   public:
-	Directory(int size); // Initialize an empty directory
+	explicit Directory(int size, int sector = 1, int parentSector = 1); // Initialize an empty directory
 	                     // with space for "size" files
 	~Directory();        // De-allocate the directory
 
@@ -60,8 +60,8 @@ class Directory
 	void WriteBack(OpenFile *file); // Write modifications to
 	                                // directory contents back to disk
 
-	int Find(const char *name); // Find the sector number of the
-	                            // FileHeader for file: "name"
+	int Find(const char *name) const; // Find the sector number of the FileHeader for file: "name"
+	char* FindName(const int sector) const; // Find the name of the file with sector: "sector"
 
 	bool Add(const char *name, int newSector); // Add a file name into the directory
 
@@ -77,8 +77,7 @@ class Directory
 	int tableSize;         // Number of directory entries
 	DirectoryEntry *table; // Table of pairs:
 	                       // <file name, file header location>
-
-	int FindIndex(const char *name); // Find the index into the directory
+	int FindIndex(const char *name) const; // Find the index into the directory
 	                                 //  table corresponding to "name"
 };
 

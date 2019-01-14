@@ -38,15 +38,37 @@
 //	"fileSize" is the bit map of free disk sectors
 //----------------------------------------------------------------------
 
-bool FileHeader::Allocate(BitMap *freeMap, int fileSize)
+bool FileHeader::Allocate(BitMap *freeMap, unsigned int fileSize, bool is_directory)
 {
+	isDirectory = is_directory;
 	numBytes = fileSize;
 	numSectors = divRoundUp(fileSize, SectorSize);
+
+	// FIXME Not thread-safe (cannot assume the number of clear sectors won't change)
 	if (freeMap->NumClear() < numSectors)
 		return FALSE; // not enough space
 
-	for (int i = 0; i < numSectors; i++)
-		dataSectors[i] = freeMap->Find();
+	// Number of entries in the indirect table
+	unsigned int numIndir = divRoundUp(numSectors, NumDirect);
+
+	for (unsigned int i=0; i < numIndir; i++) {
+		// New entry in indirect table, allocate a segment for it
+		indirectDataSectors[i] = freeMap->Find();
+		ASSERT(indirectDataSectors[i] != -1)
+
+		int directSectors[NumDirect] = {0};
+		ASSERT(sizeof(directSectors) == SectorSize);
+
+		// A table has max NumDirect segments, and doesn't have more segments than what is needed
+		for (unsigned int j=0; (j < NumDirect && i*NumDirect + j < numSectors); j++) {
+			// New entry in direct table, allocate segment for it
+			directSectors[j] = freeMap->Find();
+			ASSERT(directSectors[j] != -1)
+		}
+
+		synchDisk->WriteSector(indirectDataSectors[i], (char *)directSectors);
+	}
+
 	return TRUE;
 }
 
@@ -59,9 +81,25 @@ bool FileHeader::Allocate(BitMap *freeMap, int fileSize)
 
 void FileHeader::Deallocate(BitMap *freeMap)
 {
-	for (int i = 0; i < numSectors; i++) {
-		ASSERT(freeMap->Test((int)dataSectors[i])); // ought to be marked!
-		freeMap->Clear((int)dataSectors[i]);
+	unsigned int numIndir = divRoundUp(numSectors, NumDirect);
+
+	for (unsigned int i=0; i < numIndir; i++) {
+
+		int directSectors[NumDirect] = {0};
+		ASSERT(sizeof(directSectors) == SectorSize);
+
+		synchDisk->ReadSector(indirectDataSectors[i], (char *) directSectors);
+
+		// A table has max NumDirect segments, and doesn't have more segments than what is needed
+		for (unsigned int j=0; (j < NumDirect && i*NumDirect + j < numSectors); j++) {
+			ASSERT(freeMap->Test(directSectors[j]));
+			// Remove data sector
+			freeMap->Clear(directSectors[j]);
+		}
+
+		// Remove current segment table
+		ASSERT(freeMap->Test(indirectDataSectors[i]));
+		freeMap->Clear(indirectDataSectors[i]);
 	}
 }
 
@@ -101,7 +139,19 @@ void FileHeader::WriteBack(int sector)
 
 int FileHeader::ByteToSector(int offset)
 {
-	return (dataSectors[offset / SectorSize]);
+	// Position in the file (unit: a sector)
+	int sectorDirectNumber = offset / SectorSize;
+	int sectorIndirectIndex = sectorDirectNumber / NumDirect;
+
+	int sectors[NumDirect] = {0};
+	ASSERT(sizeof(sectors) == SectorSize);
+
+	// Fetch the direct segments table
+	synchDisk->ReadSector(indirectDataSectors[sectorIndirectIndex], (char *) sectors);
+
+	int sectorDirectIndex = sectorDirectNumber % NumDirect;
+
+	return sectors[sectorDirectIndex];
 }
 
 //----------------------------------------------------------------------
@@ -122,15 +172,15 @@ int FileHeader::FileLength()
 
 void FileHeader::Print()
 {
-	int i, j, k;
+	unsigned int i, j, k;
 	char *data = new char[SectorSize];
 
 	printf("FileHeader contents.  File size: %d.  File blocks:\n", numBytes);
 	for (i = 0; i < numSectors; i++)
-		printf("%d ", dataSectors[i]);
+		printf("%d ", indirectDataSectors[i]);
 	printf("\nFile contents:\n");
 	for (i = k = 0; i < numSectors; i++) {
-		synchDisk->ReadSector(dataSectors[i], data);
+		synchDisk->ReadSector(indirectDataSectors[i], data);
 		for (j = 0; (j < SectorSize) && (k < numBytes); j++, k++) {
 			if ('\040' <= data[j] && data[j] <= '\176') // isprint(data[j])
 				printf("%c", data[j]);
@@ -140,4 +190,8 @@ void FileHeader::Print()
 		printf("\n");
 	}
 	delete[] data;
+}
+
+int FileHeader::IsDirectory() {
+    return isDirectory;
 }

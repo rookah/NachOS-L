@@ -126,7 +126,7 @@ int BitMap::FindRandom()
 //      (In other words, how many bits are unallocated?)
 //----------------------------------------------------------------------
 
-int BitMap::NumClear()
+unsigned int BitMap::NumClear()
 {
 	int count = 0;
 

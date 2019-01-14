@@ -301,6 +301,42 @@ CloseConn:
 
 	.end CloseConn
 
+	.globl ls
+	.ent ls
+ls:
+	addiu $2,$0,SC_ls
+	syscall
+	j	$31
+
+	.end ls
+
+	.globl cd
+	.ent cd
+cd:
+	addiu $2,$0,SC_cd
+	syscall
+	j	$31
+
+	.end cd
+
+	.globl mkdir
+	.ent mkdir
+mkdir:
+	addiu $2,$0,SC_mkdir
+	syscall
+	j	$31
+
+	.end mkdir
+
+	.globl pwd
+	.ent pwd
+pwd:
+	addiu $2,$0,SC_pwd
+	syscall
+	j	$31
+
+	.end pwd
+	
 /* dummy function to keep gcc happy */
         .globl  __main
         .ent    __main

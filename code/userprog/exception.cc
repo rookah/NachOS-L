@@ -24,8 +24,8 @@
 #include "copyright.h"
 
 #include "semaphore.h"
-
 #include "forkexec.h"
+#include "fs.h"
 #include "syscall.h"
 #include "system.h"
 #include "usersemaphore.h"
@@ -166,7 +166,7 @@ void ExceptionHandler(ExceptionType which)
 			do_ProcessJoin(machine->ReadRegister(4));
 			break;
 
-#ifdef NETWORK
+		#ifdef NETWORK
 		case SC_Connect:
 			machine->WriteRegister(2, connPool->connect(machine->ReadRegister(4), machine->ReadRegister(5)));
 			break;
@@ -190,7 +190,55 @@ void ExceptionHandler(ExceptionType which)
 		case SC_CloseConn:
 			connPool->close(machine->ReadRegister(4));
 			break;
-#endif
+		#endif
+
+		#ifdef FILESYS
+		case SC_Create:
+			copyStringFromMachine((machine->ReadRegister(4)), string, MAX_STRING_SIZE);
+			machine->WriteRegister(2, do_Create(string));
+			break;
+
+		case SC_Open:
+			copyStringFromMachine((machine->ReadRegister(4)), string, MAX_STRING_SIZE);
+			machine->WriteRegister(2, do_Open(string));
+			break;
+
+		case SC_Read:
+			break;
+
+		case SC_Write:
+			copyStringFromMachine((machine->ReadRegister(4)), string, MAX_STRING_SIZE);
+			break;
+
+		case SC_Close:
+			copyStringFromMachine((machine->ReadRegister(4)), string, MAX_STRING_SIZE);
+			break;
+
+		case SC_cd:
+			copyStringFromMachine((machine->ReadRegister(4)), string, MAX_STRING_SIZE);
+			fileSystem->ChangeDirectory(string);
+			break;
+
+		case SC_ls:
+			fileSystem->List();
+			break;
+
+		case SC_pwd: {
+			const char* pwd = fileSystem->getCurrentDirectoryPath();
+			while (*pwd != '\0') {
+				synchconsole->SynchPutChar(*pwd);
+				++pwd;
+			}
+			synchconsole->SynchPutChar('\n');
+			break;
+		}
+
+		case SC_mkdir:
+			copyStringFromMachine((machine->ReadRegister(4)), string, MAX_STRING_SIZE);
+			fileSystem->Create(string, 0, true);
+			break;
+			
+		#endif
 
 		default: {
 			printf("Unexpected user mode exception %d %d\n", which, type);

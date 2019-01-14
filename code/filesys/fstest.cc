@@ -48,7 +48,7 @@ void Copy(const char *from, const char *to)
 
 	// Create a Nachos file of the same length
 	DEBUG('f', "Copying file %s, size %d, to file %s\n", from, fileLength, to);
-	if (!fileSystem->Create(to, fileLength)) { // Create Nachos file
+	if (!fileSystem->Create(to, (unsigned int)fileLength)) { // Create Nachos file
 		printf("Copy: couldn't create output file %s\n", to);
 		fclose(fp);
 		return;

@@ -48,6 +48,10 @@
 #define SC_Recv 27
 #define SC_Send 28
 #define SC_CloseConn 29
+#define SC_cd 30
+#define SC_ls 31
+#define SC_pwd 32
+#define SC_mkdir 33
 
 #ifdef IN_USER_MODE
 
@@ -168,15 +172,25 @@ void SemPost(int sem);
 
 int ForkExec(char *s);
 
-void ForkJoin();
+void ForkJoin(int pid);
 
 int Sbrk(int n);
 
 int Connect(int addr, int mailbox);
 
 int Send(int connId, int size, const char *data);
+
 int Recv(int connId, int size, char *data);
+
 void CloseConn(int connId);
+
+void pwd();
+
+void cd(char *path);
+
+void ls();
+
+void mkdir(char* name);
 
 #endif // IN_USER_MODE
 

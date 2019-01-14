@@ -6,8 +6,8 @@ int main()
 	int newProc;
 	char prompt[3], buffer[60];
 
-	prompt[0] = '-';
-	prompt[1] = '-';
+	prompt[0] = '$';
+	prompt[1] = ' ';
 	prompt[2] = '\0';
 
 	while (1) {

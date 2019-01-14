@@ -29,6 +29,8 @@
 class OpenFile
 {
   public:
+	int file; // It's actually the sector number
+
 	OpenFile(int f)
 	{
 		file = f;
@@ -70,7 +72,6 @@ class OpenFile
 	}
 
   private:
-	int file;
 	int currentOffset;
 };
 

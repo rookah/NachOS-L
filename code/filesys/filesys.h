@@ -37,10 +37,15 @@
 
 #include "copyright.h"
 #include "openfile.h"
+#include "directory.h"
+
+#define MaxDepth 10
+#define NumDirEntries 10
 
 #ifdef FILESYS_STUB // Temporarily implement file system calls as
                     // calls to UNIX, until the real file system
                     // implementation is available
+
 class FileSystem
 {
   public:
@@ -74,17 +79,18 @@ class FileSystem
 };
 
 #else // FILESYS
+
 class FileSystem
 {
   public:
-	FileSystem(bool format); // Initialize the file system.
+    explicit FileSystem(bool format); // Initialize the file system.
 	                         // Must be called *after* "synchDisk"
 	                         // has been initialized.
 	                         // If "format", there is nothing on
 	                         // the disk, so initialize the directory
 	                         // and the bitmap of free blocks.
 
-	bool Create(const char *name, int initialSize);
+	bool Create(const char *name, unsigned int initialSize, bool is_directory = false);
 	// Create a file (UNIX creat)
 
 	OpenFile *Open(const char *name); // Open a file (UNIX open)
@@ -95,13 +101,22 @@ class FileSystem
 
 	void Print(); // List all the files and their contents
 
+    OpenFile* PathParser(OpenFile *startDir, char *path);
+
+    OpenFile *getRoot();
+	OpenFile *getDirectory();
+    const char *getCurrentDirectoryPath();
+
+    void ChangeDirectory(OpenFile *dir);
+    bool ChangeDirectory(char *relative_path);
+
   private:
 	OpenFile *freeMapFile;   // Bit map of free disk blocks,
 	                         // represented as a file
 	OpenFile *directoryFile; // "Root" directory -- list of
 	                         // file names, represented as a file
+    Directory *getCurrentDirectory();
 };
 
 #endif // FILESYS
-
 #endif // FS_H

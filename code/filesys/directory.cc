@@ -24,6 +24,7 @@
 #include "copyright.h"
 #include "filehdr.h"
 #include "utility.h"
+#include "filesys.h"
 
 //----------------------------------------------------------------------
 // Directory::Directory
@@ -35,12 +36,25 @@
 //	"size" is the number of entries in the directory
 //----------------------------------------------------------------------
 
-Directory::Directory(int size)
+Directory::Directory(int size, int sector, int parentSector)
 {
+	ASSERT(size == NumDirEntries);
+
 	table = new DirectoryEntry[size];
 	tableSize = size;
 	for (int i = 0; i < tableSize; i++)
 		table[i].inUse = FALSE;
+
+    table[0].inUse = TRUE;
+	table[0].name[0] = '.';
+	table[0].name[1] = '\0';
+	table[0].sector = sector;
+
+    table[1].inUse = TRUE;
+    table[1].name[0] = '.';
+    table[1].name[1] = '.';
+    table[1].name[2] = '\0';
+    table[1].sector = parentSector;
 }
 
 //----------------------------------------------------------------------
@@ -85,7 +99,7 @@ void Directory::WriteBack(OpenFile *file)
 //	"name" -- the file name to look up
 //----------------------------------------------------------------------
 
-int Directory::FindIndex(const char *name)
+int Directory::FindIndex(const char *name) const
 {
 	for (int i = 0; i < tableSize; i++)
 		if (table[i].inUse && !strncmp(table[i].name, name, FileNameMaxLen))
@@ -102,7 +116,7 @@ int Directory::FindIndex(const char *name)
 //	"name" -- the file name to look up
 //----------------------------------------------------------------------
 
-int Directory::Find(const char *name)
+int Directory::Find(const char *name) const
 {
 	int i = FindIndex(name);
 
@@ -110,6 +124,22 @@ int Directory::Find(const char *name)
 		return table[i].sector;
 	return -1;
 }
+
+//----------------------------------------------------------------------
+// Directory::FindName
+//  Same as Find but returns the name of the directory instead
+//
+//  "sector" -- the sector of the file which name we want to retrieve
+//----------------------------------------------------------------------
+
+char* Directory::FindName(const int sector) const
+{
+	for (int i = 0; i < tableSize; i++)
+		if (table[i].sector == sector)
+			return table[i].name;
+	return nullptr;
+}
+
 
 //----------------------------------------------------------------------
 // Directory::Add
@@ -163,8 +193,16 @@ bool Directory::Remove(const char *name)
 void Directory::List()
 {
 	for (int i = 0; i < tableSize; i++)
-		if (table[i].inUse)
-			printf("%s\n", table[i].name);
+		if (table[i].inUse) {
+			FileHeader hdr;
+			hdr.FetchFrom(table[i].sector);
+
+			if (hdr.IsDirectory())
+				printf("%s\n", table[i].name);
+			else
+				printf("%s*\n", table[i].name);
+		}
+
 }
 
 //----------------------------------------------------------------------

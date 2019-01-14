@@ -18,6 +18,7 @@
 #include <unordered_map>
 
 #define MAX_STRING_SIZE 256
+#define MAX_OPEN_FILES 10
 
 class SynchConsole;
 
@@ -50,6 +51,7 @@ extern FileSystem *fileSystem;
 #ifdef FILESYS
 #include "synchdisk.h"
 extern SynchDisk *synchDisk;
+extern std::unordered_map<int, OpenFile *> openFileList; // list of open files and their associated file descriptor
 #endif
 
 #ifdef NETWORK
