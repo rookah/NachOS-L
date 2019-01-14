@@ -50,6 +50,7 @@
 #include "disk.h"
 #include "filehdr.h"
 #include "filesys.h"
+#include "system.h"
 
 #include <string>
 
@@ -118,7 +119,6 @@ FileSystem::FileSystem(bool format)
 
 		freeMapFile = new OpenFile(FreeMapSector);
 		directoryFile = new OpenFile(RootDirectorySector);
-		curDirFile = directoryFile;
 
 		// Once we have the files "open", we can write the initial version
 		// of each file back to disk.  The directory at this point is completely
@@ -144,7 +144,6 @@ FileSystem::FileSystem(bool format)
 		// the bitmap and directory; these are left open while Nachos is running
 		freeMapFile = new OpenFile(FreeMapSector);
 		directoryFile = new OpenFile(RootDirectorySector);
-		curDirFile = directoryFile;
 	}
 }
 
@@ -195,8 +194,7 @@ bool FileSystem::Create(const char *name, unsigned int initialSize, bool is_dire
 	DEBUG('f', "Creating file %s, size %d\n", name, initialSize);
 
 	directory = new Directory(NumDirEntries);
-	directory->FetchFrom(curDirFile);
-
+		directory->FetchFrom(getDirectory());
 
 	if (directory->Find(name) != -1)
 		success = FALSE; // file is already in directory
@@ -224,7 +222,7 @@ bool FileSystem::Create(const char *name, unsigned int initialSize, bool is_dire
 
 				success = TRUE;
 				// everything worked, flush all changes back to disk
-				directory->WriteBack(curDirFile);
+				directory->WriteBack(getDirectory());
 				freeMap->WriteBack(freeMapFile);
 			}
 			delete hdr;
@@ -300,7 +298,7 @@ bool FileSystem::Remove(const char *name)
 	directory->Remove(name);
 
 	freeMap->WriteBack(freeMapFile);     // flush to disk
-	directory->WriteBack(curDirFile); // flush to disk
+	directory->WriteBack(getDirectory()); // flush to disk
 	delete fileHdr;
 	delete directory;
 	delete freeMap;
@@ -356,13 +354,13 @@ void FileSystem::Print()
 	delete directory;
 }
 
-Directory *FileSystem::getCurrentDirectory() const {
+Directory *FileSystem::getCurrentDirectory() {
 	auto directory = new Directory(NumDirEntries);
-	directory->FetchFrom(curDirFile);
+	directory->FetchFrom(getDirectory());
 	return directory;
 }
 
-const char *FileSystem::getCurrentDirectoryPath() const {
+const char *FileSystem::getCurrentDirectoryPath() {
 	auto directory = getCurrentDirectory();
 	std::string ret;
 	char *tmp;
@@ -422,17 +420,29 @@ OpenFile* FileSystem::PathParser(OpenFile *startDir, char *path) {
 	return tmp;
 }
 
+OpenFile * FileSystem::getRoot() {
+	return directoryFile;
+}
+
+OpenFile * FileSystem::getDirectory() {
+	if (currentThread->space == NULL) //in the main
+		return getRoot();
+	else
+		return currentThread->space->getCurDirFile();
+}
+
 void FileSystem::ChangeDirectory(OpenFile *dir) {
 	ASSERT(dir != nullptr);
-	curDirFile = dir;
+	ASSERT(currentThread->space != nullptr);
+	currentThread->space->setCurDirFile(dir);
 }
 
 bool FileSystem::ChangeDirectory(char *relative_path) {
 	ASSERT(relative_path != nullptr);
 
-	OpenFile* file = PathParser(curDirFile, relative_path);
+	OpenFile* file = PathParser(getDirectory(), relative_path);
 	if (file != nullptr) {
-		curDirFile = file;
+		ChangeDirectory(file);
 		return true;
 	}
 

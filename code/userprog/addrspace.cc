@@ -120,6 +120,10 @@ AddrSpace::AddrSpace(OpenFile *executable) : mtx(new Lock("thread countlock"))
 	mtx->Acquire();
 	process_count++;
 	mtx->Release();
+
+	#ifdef FILESYS
+	setCurDirFile(fileSystem->getRoot());
+	#endif
 }
 
 static void ReadAtVirtual(OpenFile *executable, int virtualaddr, int numBytes, int position)
@@ -320,3 +324,13 @@ void AddrSpace::FreePages(unsigned int vpn, unsigned int numPages)
 		}
 	}
 }
+
+#ifdef FILESYS
+OpenFile * AddrSpace::getCurDirFile() {
+	return curDirFile;
+}
+
+void AddrSpace::setCurDirFile(OpenFile *file) {
+	curDirFile = file;
+}
+#endif

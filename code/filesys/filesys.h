@@ -103,8 +103,9 @@ class FileSystem
 
     OpenFile* PathParser(OpenFile *startDir, char *path);
 
-    Directory *getCurrentDirectory() const;
-    const char *getCurrentDirectoryPath() const;
+    OpenFile *getRoot();
+	OpenFile *getDirectory();
+    const char *getCurrentDirectoryPath();
 
     void ChangeDirectory(OpenFile *dir);
     bool ChangeDirectory(char *relative_path);
@@ -114,7 +115,7 @@ class FileSystem
 	                         // represented as a file
 	OpenFile *directoryFile; // "Root" directory -- list of
 	                         // file names, represented as a file
-	OpenFile *curDirFile;
+    Directory *getCurrentDirectory();
 };
 
 #endif // FILESYS
