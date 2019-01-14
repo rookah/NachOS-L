@@ -176,7 +176,7 @@ int Connect(int addr, int mailbox);
 
 int Send(int connId, int size, const char *data);
 int Recv(int connId, int size, char *data);
-int CloseConn(int connId);
+void CloseConn(int connId);
 
 #endif // IN_USER_MODE
 
