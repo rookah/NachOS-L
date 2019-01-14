@@ -180,7 +180,7 @@ void ExceptionHandler(ExceptionType which)
 			break;
 
 		case SC_Close:
-			copyStringFromMachine((machine->ReadRegister(4)), string, MAX_STRING_SIZE);
+			machine->WriteRegister(2,do_Close(machine->ReadRegister(4)));
 			break;
 
 		case SC_cd:
