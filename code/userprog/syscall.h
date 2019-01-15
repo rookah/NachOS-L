@@ -52,6 +52,7 @@
 #define SC_ls 31
 #define SC_pwd 32
 #define SC_mkdir 33
+#define SC_rm 34
 
 #ifdef IN_USER_MODE
 
@@ -111,7 +112,7 @@ typedef int OpenFileId;
 #define ConsoleOutput 1
 
 /* Create a Nachos file, with "name" */
-void Create(char *name);
+int Create(char *name);
 
 /* Open the Nachos file "name", and return an "OpenFileId" that can
  * be used to read and write to the file.
@@ -119,7 +120,7 @@ void Create(char *name);
 OpenFileId Open(char *name);
 
 /* Write "size" bytes from "buffer" to the open file. */
-void Write(char *buffer, int size, OpenFileId id);
+int Write(char *buffer, int size, OpenFileId id);
 
 /* Read "size" bytes from the open file into "buffer".
  * Return the number of bytes actually read -- if the open file isn't
@@ -130,7 +131,7 @@ void Write(char *buffer, int size, OpenFileId id);
 int Read(char *buffer, int size, OpenFileId id);
 
 /* Close the file, we're done reading and writing to it. */
-void Close(OpenFileId id);
+int Close(OpenFileId id);
 
 /* User-level thread operations: Fork and Yield.  To allow multiple
  * threads to run within a user program.
@@ -191,6 +192,8 @@ void cd(char *path);
 void ls();
 
 void mkdir(char *name);
+
+void rm(char *name);
 
 #endif // IN_USER_MODE
 

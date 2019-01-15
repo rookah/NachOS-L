@@ -195,7 +195,7 @@ void ExceptionHandler(ExceptionType which)
 #ifdef FILESYS
 		case SC_Create:
 			copyStringFromMachine((machine->ReadRegister(4)), string, MAX_STRING_SIZE);
-			machine->WriteRegister(2, do_Create(string));
+			machine->WriteRegister(2, do_Create(string, false));
 			break;
 
 		case SC_Open:
@@ -203,15 +203,21 @@ void ExceptionHandler(ExceptionType which)
 			machine->WriteRegister(2, do_Open(string));
 			break;
 
-		case SC_Read:
+		case SC_Read: {
+			char *buff = new char[machine->ReadRegister(6)];
+			machine->WriteRegister(2, do_Read(machine->ReadRegister(4), buff, machine->ReadRegister(6)));
+			copyDataToMachine(buff, machine->ReadRegister(5), machine->ReadRegister(6));
+			delete[] buff;
 			break;
+		}
 
 		case SC_Write:
-			copyStringFromMachine((machine->ReadRegister(4)), string, MAX_STRING_SIZE);
+			copyStringFromMachine((machine->ReadRegister(5)), string, MAX_STRING_SIZE);
+			machine->WriteRegister(2, do_Write(machine->ReadRegister(4), string, machine->ReadRegister(6)));
 			break;
 
 		case SC_Close:
-			copyStringFromMachine((machine->ReadRegister(4)), string, MAX_STRING_SIZE);
+			machine->WriteRegister(2, do_Close(machine->ReadRegister(4)));
 			break;
 
 		case SC_cd:
@@ -235,10 +241,15 @@ void ExceptionHandler(ExceptionType which)
 
 		case SC_mkdir:
 			copyStringFromMachine((machine->ReadRegister(4)), string, MAX_STRING_SIZE);
-			fileSystem->Create(string, 0, true);
+			machine->WriteRegister(2, do_Create(string, true));
 			break;
 
-#endif
+		case SC_rm:	
+			copyStringFromMachine((machine->ReadRegister(4)), string, MAX_STRING_SIZE);
+			machine->WriteRegister(2, do_Rm(string));
+			break;
+
+		#endif
 
 		default: {
 			printf("Unexpected user mode exception %d %d\n", which, type);

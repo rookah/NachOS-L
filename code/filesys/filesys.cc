@@ -250,7 +250,7 @@ OpenFile *FileSystem::Open(const char *name)
 
 	DEBUG('f', "Opening file %s\n", name);
 
-	// FIXME Parse name as a path
+	// TODO Parse name as a path
 
 	sector = directory->Find(name);
 	if (sector >= 0)

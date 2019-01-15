@@ -319,15 +319,6 @@ cd:
 
 	.end cd
 
-	.globl mkdir
-	.ent mkdir
-mkdir:
-	addiu $2,$0,SC_mkdir
-	syscall
-	j	$31
-
-	.end mkdir
-
 	.globl pwd
 	.ent pwd
 pwd:
@@ -337,6 +328,25 @@ pwd:
 
 	.end pwd
 	
+	.globl mkdir
+	.ent mkdir
+mkdir:
+	addiu $2,$0,SC_mkdir
+	syscall
+	j	$31
+
+	.end mkdir
+
+	.globl rm
+	.ent rm
+rm:
+	addiu $2,$0,SC_rm
+	syscall
+	j	$31
+
+	.end rm
+	
+
 /* dummy function to keep gcc happy */
         .globl  __main
         .ent    __main
