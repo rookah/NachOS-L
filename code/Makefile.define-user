@@ -47,7 +47,7 @@ USERPROG_LIBS=start.S libstdio.c libstdlib.c libpthread.c libsemaphore.c libmema
 # sources and will always be linked only with start.S (USERPROG_LIBS
 # and ..._EXTRA_SOURCES are ignored for them)
 
-EXTRA_SOURCES=synchconsole.cc userthread.cc usersemaphore.cc frameprovider.cc forkexec.cc fs.cc
+EXTRA_SOURCES=synchconsole.cc userthread.cc usersemaphore.cc frameprovider.cc forkexec.cc fs.cc rconn.cc rconnpool.cc
 
 ###########################################################################
 #                        NACHOS KERNELS                                   #
@@ -75,7 +75,7 @@ $(eval $(call define-flavor,userprog,userprog filesys-stub,$(EXTRA_SOURCES)))
 ######### filesys
 $(eval $(call define-flavor,filesys,userprog filesys,$(EXTRA_SOURCES)))
 ######### network
-$(eval $(call define-flavor,network,thread-test userprog filesys network,$(EXTRA_SOURCES) rconn.cc rconnpool.cc))
+$(eval $(call define-flavor,network,thread-test userprog filesys network,$(EXTRA_SOURCES) ))
 ######### vm
 $(eval $(call define-flavor,vm,userprog filesys-stub,$(EXTRA_SOURCES) vm))
 ###########################################################################
@@ -87,15 +87,18 @@ $(eval $(call define-flavor,vm,userprog filesys-stub,$(EXTRA_SOURCES) vm))
 # nachos-"flavor" in the 'build/' directory
 
 # By default, the same flavors as the original ones are compiled
-USER_FLAVORS=filesys network userprog threads step5 step2
+USER_FLAVORS=final test
 # Once some personnal flavor are defined, this list can be limited
 # to the personal flavors
 # USER_FLAVORS=step2 step5 mynetwork final
 
-$(eval $(call define-flavor,step2,userprog filesys-stub network,$(EXTRA_SOURCES) rconn.cc rconnpool.cc))
-$(eval $(call define-flavor,step5,userprog filesys, $(EXTRA_SOURCES)))
+# $(eval $(call define-flavor,step2,userprog filesys-stub network,$(EXTRA_SOURCES)))
+# $(eval $(call define-flavor,step5,userprog filesys, $(EXTRA_SOURCES)))
 # $(eval $(call define-flavor,mynetwork,userprog filesys-stub network, \
 #     $(EXTRA_SOURCES)))
-# $(eval $(call define-flavor,final,userprog filesys network,\
-#     $(EXTRA_SOURCES)))
+$(eval $(call define-flavor,final,userprog filesys network,\
+    $(EXTRA_SOURCES)))
+
+$(eval $(call define-flavor,test,userprog filesys-stub network,\
+    $(EXTRA_SOURCES)))
 

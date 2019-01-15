@@ -1,67 +1,67 @@
 #!/usr/bin/env bats
 
 @test "semaphore" {
-  result="$(./nachos-step2 -rs 1 -x semaphore | head -n 1)"
+  result="$(./nachos-test -rs 1 -x semaphore | head -n 1)"
   [[ "$result" == "----------------------------------------------------------------------------------------------------" ]]
 }
 
 @test "mutex" {
-  result="$(./nachos-step2 -rs 1 -x mutex | head -n 1)"
+  result="$(./nachos-test -rs 1 -x mutex | head -n 1)"
   [[ "$result" == "1400" ]]
 }
 
 @test "condition1" {
-  result="$(./nachos-step2 -rs 1 -x condition1 | head -n 1)"
+  result="$(./nachos-test -rs 1 -x condition1 | head -n 1)"
   [[ "$result" == "132" ]]
 }
 
 @test "condition2" {
-  result="$(./nachos-step2 -rs 1 -x condition2 | head -n 1)"
+  result="$(./nachos-test -rs 1 -x condition2 | head -n 1)"
   [[ "$result" == "123" ]]
 }
 
 @test "nohalt" {
-  result="$(./nachos-step2 -rs 1 -x nohalt | head -n 1)"
+  result="$(./nachos-test -rs 1 -x nohalt | head -n 1)"
   [[ "$result" == "This main function does not halt!" ]]
 }
 
 @test "nothreadexit" {
-  result="$(./nachos-step2 -rs 1 -x nothreadexit | head -n 1)"
+  result="$(./nachos-test -rs 1 -x nothreadexit | head -n 1)"
   [[ "$result" == "0-1-2-3-4-5-6-7-8-9-10-11-12-13-14-15-16-17-18-19-20-21-22-23-24-25-26-27-28-29-30-31-32-33-34-35-36-37-38-39-40-41-42-43-44-45-46-47-48-49-50-51-52-53-54-55-56-57-58-59-60-61-62-63-64-65-66-67-68-69-70-71-72-73-74-75-76-77-78-79-80-81-82-83-84-85-86-87-88-89-90-91-92-93-94-95-96-97-98-99-" ]]
 }
 
 @test "prodcons" {
-  result="$(./nachos-step2 -rs 1 -x prodcons | head -n 1)"
+  result="$(./nachos-test -rs 1 -x prodcons | head -n 1)"
   [[ "$result" == "0-1-2-3-4-5-6-7-8-9-10-11-12-13-14-15-16-17-18-19-20-21-22-23-24-25-26-27-28-29-30-31-32-33-34-35-36-37-38-39-40-41-42-43-44-45-46-47-48-49-50-51-52-53-54-55-56-57-58-59-60-61-62-63-64-65-66-67-68-69-70-71-72-73-74-75-76-77-78-79-80-81-82-83-84-85-86-87-88-89-90-91-92-93-94-95-96-97-98-99-" ]]
 }
 
 @test "join" {
-  result="$(./nachos-step2 -rs 1 -x join | head -n 1)"
-  [[ "$result" == "122222333111313" ]]
+  result="$(./nachos-test -rs 1 -x join | head -n 1)"
+  [[ "$result" == "222223331111133" ]]
 }
 
 @test "getputchar" {
-  result="$(echo 'a' | ./nachos-step2 -rs 1 -x getputchar | head -n 1)"
+  result="$(echo 'a' | ./nachos-test -rs 1 -x getputchar | head -n 1)"
   [[ "$result" == "a" ]]
 }
 
 
 @test "getputstring" {
-  result="$(echo "foobar2000" | ./nachos-step2 -rs 1 -x getputstring | head -n 1)"
+  result="$(echo "foobar2000" | ./nachos-test -rs 1 -x getputstring | head -n 1)"
   [[ "$result" == "foobar2000" ]]
 }
 
 @test "halt" {
-  result="$(./nachos-step2 -rs 1 -x halt | head -n 1)"
+  result="$(./nachos-test -rs 1 -x halt | head -n 1)"
   [[ "$result" == "Machine halting!" ]]
 }
 
 @test "multithread" {
-  result="$(./nachos-step2 -rs 1 -x multithread | head -n 1)"
-  [[ "$result" == "0022222111103222220000312000330222222220000000322222222222200222000002000000002222022200022200200000002222000000000000000000000000000000000000000000000000000000" ]]
+  result="$(./nachos-test -rs 1 -x multithread | head -n 1)"
+  [[ "$result" == "0000233000021333112222102100220002222222000000000002222022200000022222220020000220002200022200200000002222220000022000222000000000000000000000000000000000000000" ]]
 }
 
 @test "putchar" {
-  result="$(./nachos-step2 -rs 1 -x putchar | head -n 1)"
+  result="$(./nachos-test -rs 1 -x putchar | head -n 1)"
   [[ "$result" == "abcd" ]]
 }
