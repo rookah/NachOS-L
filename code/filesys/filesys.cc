@@ -289,6 +289,23 @@ bool FileSystem::Remove(const char *name)
 	fileHdr = new FileHeader;
 	fileHdr->FetchFrom(sector);
 
+	if (fileHdr->IsDirectory()) {
+		if (!strcmp(name, ".") || !strcmp(name, "..")) {
+			delete directory;
+			return FALSE; // Cannot delete special directory
+		}
+
+		auto dirFile = OpenFile(sector);
+
+		auto dir = Directory(NumDirEntries);
+		dir.FetchFrom(&dirFile);
+
+		if (!dir.IsEmpty()) {
+			delete directory;
+			return FALSE; // Cannot delete non-empty dir
+		}
+	}
+
 	freeMap = new BitMap(NumSectors);
 	freeMap->FetchFrom(freeMapFile);
 

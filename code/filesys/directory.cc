@@ -223,3 +223,13 @@ void Directory::Print()
 	printf("\n");
 	delete hdr;
 }
+
+bool Directory::IsEmpty() {
+	// 0 and 1 are "." and ".."
+	for (int i=2; i < tableSize; i++) {
+		if (table[i].inUse)
+			return FALSE;
+	}
+
+	return TRUE;
+}

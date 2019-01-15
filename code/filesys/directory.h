@@ -66,6 +66,7 @@ class Directory
 	bool Add(const char *name, int newSector); // Add a file name into the directory
 
 	bool Remove(const char *name); // Remove a file from the directory
+	bool IsEmpty();
 
 	void List();  // Print the names of all the files
 	              //  in the directory
