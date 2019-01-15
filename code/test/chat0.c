@@ -27,6 +27,8 @@ int main()
 	char *buffer = malloc(BUFFER_SIZE);
 	UserThreadCreate(receive_thread, (void *)socket);
 
+	puts("Press <return> to quit\n");
+
 	while (1) {
 		fgets(buffer, BUFFER_SIZE, stdin);
 
@@ -36,7 +38,7 @@ int main()
 		}
 		i++; // Takes \0 into account
 
-		if (i <= 1)
+		if (i <= 2)
 			break;
 
 		Send(socket, 4, (char *)&i);

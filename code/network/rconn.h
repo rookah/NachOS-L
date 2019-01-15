@@ -4,6 +4,8 @@
 #include <unordered_map>
 #include <vector>
 
+#include "synch.h"
+
 typedef int SeqId;
 
 #define MAX_REEMISSIONS 32
@@ -56,6 +58,8 @@ class RConn
 	int addr;
 	int mailbox;
 	bool closed;
+
+	Lock lock;
 
 	std::unordered_map<SeqId, ROutMessage *> mOutMessages;
 	std::unordered_map<SeqId, RInMessage *> mInMessages;
