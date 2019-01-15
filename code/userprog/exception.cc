@@ -249,7 +249,7 @@ void ExceptionHandler(ExceptionType which)
 			machine->WriteRegister(2, do_Rm(string));
 			break;
 
-		#endif
+#endif
 
 		default: {
 			printf("Unexpected user mode exception %d %d\n", which, type);

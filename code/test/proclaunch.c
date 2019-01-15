@@ -56,6 +56,9 @@ int main()
 		else if (streq(buffer, "rmdir")) {
 			rm(buffer + j);
 		}
+		else if (streq(buffer, "exit")) {
+			Halt();
+		}
 		else {
 			newProc = ForkExec(buffer);
 			ForkJoin(newProc);
