@@ -59,7 +59,8 @@ class RConn
 	int mailbox;
 	bool closed;
 
-	Lock lock;
+	Lock sendLock;
+	Lock recvLock;
 
 	std::unordered_map<SeqId, ROutMessage *> mOutMessages;
 	std::unordered_map<SeqId, RInMessage *> mInMessages;
