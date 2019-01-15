@@ -41,11 +41,11 @@
 class FileHeader
 {
   public:
-    bool Allocate(BitMap *bitMap, unsigned int fileSize, bool is_directory = false); // Initialize a file header,
-	                                             //  including allocating space
-	                                             //  on disk for the file data
-	void Deallocate(BitMap *bitMap);             // De-allocate this file's
-	                                             //  data blocks
+	bool Allocate(BitMap *bitMap, unsigned int fileSize, bool is_directory = false); // Initialize a file header,
+	                                                                                 //  including allocating space
+	                                                                                 //  on disk for the file data
+	void Deallocate(BitMap *bitMap);                                                 // De-allocate this file's
+	                                                                                 //  data blocks
 
 	void FetchFrom(int sectorNumber); // Initialize file header from disk
 	void WriteBack(int sectorNumber); // Write modifications to file header
@@ -59,16 +59,16 @@ class FileHeader
 	                  // in bytes
 
 	void Print(); // Print the contents of the file.
-    int IsDirectory();
+	int IsDirectory();
 
   private:
-	unsigned int numBytes;               // Number of bytes in the file
-	unsigned int numSectors;             // Number of data sectors in the file
+	unsigned int numBytes;   // Number of bytes in the file
+	unsigned int numSectors; // Number of data sectors in the file
 	int isDirectory;
 
-    // NOTE: Modify the constant NumDirect if you add / remove fields above!
+	// NOTE: Modify the constant NumDirect if you add / remove fields above!
 	int indirectDataSectors[NumIndirect]; // Disk sector numbers for each data
-	                            // block in the file
+	                                      // block in the file
 };
 
 #endif // FILEHDR_H

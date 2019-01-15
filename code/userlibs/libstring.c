@@ -1,7 +1,8 @@
 #include "syscall.h"
 #include <stddef.h>
 
-int streq(char* s1, char* s2) {
+int streq(char *s1, char *s2)
+{
 	if ((s1 == NULL && s2 != NULL) || (s1 != NULL && s2 == NULL))
 		return 0;
 

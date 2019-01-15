@@ -23,8 +23,8 @@
 #include "directory.h"
 #include "copyright.h"
 #include "filehdr.h"
-#include "utility.h"
 #include "filesys.h"
+#include "utility.h"
 
 //----------------------------------------------------------------------
 // Directory::Directory
@@ -45,16 +45,16 @@ Directory::Directory(int size, int sector, int parentSector)
 	for (int i = 0; i < tableSize; i++)
 		table[i].inUse = FALSE;
 
-    table[0].inUse = TRUE;
+	table[0].inUse = TRUE;
 	table[0].name[0] = '.';
 	table[0].name[1] = '\0';
 	table[0].sector = sector;
 
-    table[1].inUse = TRUE;
-    table[1].name[0] = '.';
-    table[1].name[1] = '.';
-    table[1].name[2] = '\0';
-    table[1].sector = parentSector;
+	table[1].inUse = TRUE;
+	table[1].name[0] = '.';
+	table[1].name[1] = '.';
+	table[1].name[2] = '\0';
+	table[1].sector = parentSector;
 }
 
 //----------------------------------------------------------------------
@@ -132,14 +132,13 @@ int Directory::Find(const char *name) const
 //  "sector" -- the sector of the file which name we want to retrieve
 //----------------------------------------------------------------------
 
-char* Directory::FindName(const int sector) const
+char *Directory::FindName(const int sector) const
 {
 	for (int i = 0; i < tableSize; i++)
 		if (table[i].sector == sector)
 			return table[i].name;
 	return nullptr;
 }
-
 
 //----------------------------------------------------------------------
 // Directory::Add
@@ -202,7 +201,6 @@ void Directory::List()
 			else
 				printf("%s*\n", table[i].name);
 		}
-
 }
 
 //----------------------------------------------------------------------

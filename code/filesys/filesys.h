@@ -36,8 +36,8 @@
 #define FS_H
 
 #include "copyright.h"
-#include "openfile.h"
 #include "directory.h"
+#include "openfile.h"
 
 #define MaxDepth 10
 #define NumDirEntries 10
@@ -83,12 +83,12 @@ class FileSystem
 class FileSystem
 {
   public:
-    explicit FileSystem(bool format); // Initialize the file system.
-	                         // Must be called *after* "synchDisk"
-	                         // has been initialized.
-	                         // If "format", there is nothing on
-	                         // the disk, so initialize the directory
-	                         // and the bitmap of free blocks.
+	explicit FileSystem(bool format); // Initialize the file system.
+	                                  // Must be called *after* "synchDisk"
+	                                  // has been initialized.
+	                                  // If "format", there is nothing on
+	                                  // the disk, so initialize the directory
+	                                  // and the bitmap of free blocks.
 
 	bool Create(const char *name, unsigned int initialSize, bool is_directory = false);
 	// Create a file (UNIX creat)
@@ -101,21 +101,21 @@ class FileSystem
 
 	void Print(); // List all the files and their contents
 
-    OpenFile* PathParser(OpenFile *startDir, char *path);
+	OpenFile *PathParser(OpenFile *startDir, char *path);
 
-    OpenFile *getRoot();
+	OpenFile *getRoot();
 	OpenFile *getDirectory();
-    const char *getCurrentDirectoryPath();
+	const char *getCurrentDirectoryPath();
 
-    void ChangeDirectory(OpenFile *dir);
-    bool ChangeDirectory(char *relative_path);
+	void ChangeDirectory(OpenFile *dir);
+	bool ChangeDirectory(char *relative_path);
 
   private:
 	OpenFile *freeMapFile;   // Bit map of free disk blocks,
 	                         // represented as a file
 	OpenFile *directoryFile; // "Root" directory -- list of
 	                         // file names, represented as a file
-    Directory *getCurrentDirectory();
+	Directory *getCurrentDirectory();
 };
 
 #endif // FILESYS

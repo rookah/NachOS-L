@@ -1,6 +1,7 @@
 #include "syscall.h"
 
-int main() {
+int main()
+{
 	mkdir("test_dir");
 	ls();
 	cd("./test_dir");

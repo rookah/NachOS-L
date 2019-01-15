@@ -23,9 +23,9 @@
 
 #include "copyright.h"
 
-#include "semaphore.h"
 #include "forkexec.h"
 #include "fs.h"
+#include "semaphore.h"
 #include "syscall.h"
 #include "system.h"
 #include "usersemaphore.h"
@@ -166,7 +166,7 @@ void ExceptionHandler(ExceptionType which)
 			do_ProcessJoin(machine->ReadRegister(4));
 			break;
 
-		#ifdef NETWORK
+#ifdef NETWORK
 		case SC_Connect:
 			machine->WriteRegister(2, connPool->connect(machine->ReadRegister(4), machine->ReadRegister(5)));
 			break;
@@ -190,9 +190,9 @@ void ExceptionHandler(ExceptionType which)
 		case SC_CloseConn:
 			connPool->close(machine->ReadRegister(4));
 			break;
-		#endif
+#endif
 
-		#ifdef FILESYS
+#ifdef FILESYS
 		case SC_Create:
 			copyStringFromMachine((machine->ReadRegister(4)), string, MAX_STRING_SIZE);
 			machine->WriteRegister(2, do_Create(string));
@@ -224,7 +224,7 @@ void ExceptionHandler(ExceptionType which)
 			break;
 
 		case SC_pwd: {
-			const char* pwd = fileSystem->getCurrentDirectoryPath();
+			const char *pwd = fileSystem->getCurrentDirectoryPath();
 			while (*pwd != '\0') {
 				synchconsole->SynchPutChar(*pwd);
 				++pwd;
@@ -237,8 +237,8 @@ void ExceptionHandler(ExceptionType which)
 			copyStringFromMachine((machine->ReadRegister(4)), string, MAX_STRING_SIZE);
 			fileSystem->Create(string, 0, true);
 			break;
-			
-		#endif
+
+#endif
 
 		default: {
 			printf("Unexpected user mode exception %d %d\n", which, type);

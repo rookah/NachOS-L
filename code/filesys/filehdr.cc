@@ -51,7 +51,7 @@ bool FileHeader::Allocate(BitMap *freeMap, unsigned int fileSize, bool is_direct
 	// Number of entries in the indirect table
 	unsigned int numIndir = divRoundUp(numSectors, NumDirect);
 
-	for (unsigned int i=0; i < numIndir; i++) {
+	for (unsigned int i = 0; i < numIndir; i++) {
 		// New entry in indirect table, allocate a segment for it
 		indirectDataSectors[i] = freeMap->Find();
 		ASSERT(indirectDataSectors[i] != -1)
@@ -60,7 +60,7 @@ bool FileHeader::Allocate(BitMap *freeMap, unsigned int fileSize, bool is_direct
 		ASSERT(sizeof(directSectors) == SectorSize);
 
 		// A table has max NumDirect segments, and doesn't have more segments than what is needed
-		for (unsigned int j=0; (j < NumDirect && i*NumDirect + j < numSectors); j++) {
+		for (unsigned int j = 0; (j < NumDirect && i * NumDirect + j < numSectors); j++) {
 			// New entry in direct table, allocate segment for it
 			directSectors[j] = freeMap->Find();
 			ASSERT(directSectors[j] != -1)
@@ -83,15 +83,15 @@ void FileHeader::Deallocate(BitMap *freeMap)
 {
 	unsigned int numIndir = divRoundUp(numSectors, NumDirect);
 
-	for (unsigned int i=0; i < numIndir; i++) {
+	for (unsigned int i = 0; i < numIndir; i++) {
 
 		int directSectors[NumDirect] = {0};
 		ASSERT(sizeof(directSectors) == SectorSize);
 
-		synchDisk->ReadSector(indirectDataSectors[i], (char *) directSectors);
+		synchDisk->ReadSector(indirectDataSectors[i], (char *)directSectors);
 
 		// A table has max NumDirect segments, and doesn't have more segments than what is needed
-		for (unsigned int j=0; (j < NumDirect && i*NumDirect + j < numSectors); j++) {
+		for (unsigned int j = 0; (j < NumDirect && i * NumDirect + j < numSectors); j++) {
 			ASSERT(freeMap->Test(directSectors[j]));
 			// Remove data sector
 			freeMap->Clear(directSectors[j]);
@@ -147,7 +147,7 @@ int FileHeader::ByteToSector(int offset)
 	ASSERT(sizeof(sectors) == SectorSize);
 
 	// Fetch the direct segments table
-	synchDisk->ReadSector(indirectDataSectors[sectorIndirectIndex], (char *) sectors);
+	synchDisk->ReadSector(indirectDataSectors[sectorIndirectIndex], (char *)sectors);
 
 	int sectorDirectIndex = sectorDirectNumber % NumDirect;
 
@@ -192,6 +192,7 @@ void FileHeader::Print()
 	delete[] data;
 }
 
-int FileHeader::IsDirectory() {
-    return isDirectory;
+int FileHeader::IsDirectory()
+{
+	return isDirectory;
 }

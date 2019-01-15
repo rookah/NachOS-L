@@ -1,6 +1,7 @@
 #include "syscall.h"
 
-int main() {
-    ls();
+int main()
+{
+	ls();
 	return 0;
 }

@@ -190,7 +190,7 @@ void cd(char *path);
 
 void ls();
 
-void mkdir(char* name);
+void mkdir(char *name);
 
 #endif // IN_USER_MODE
 

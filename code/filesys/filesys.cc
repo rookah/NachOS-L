@@ -101,8 +101,8 @@ FileSystem::FileSystem(bool format)
 		// Second, allocate space for the data blocks containing the contents
 		// of the directory and bitmap files.  There better be enough space!
 
-		ASSERT(mapHdr->Allocate(freeMap, (unsigned int) FreeMapFileSize));
-		ASSERT(dirHdr->Allocate(freeMap, (unsigned int) DirectoryFileSize, true));
+		ASSERT(mapHdr->Allocate(freeMap, (unsigned int)FreeMapFileSize));
+		ASSERT(dirHdr->Allocate(freeMap, (unsigned int)DirectoryFileSize, true));
 
 		// Flush the bitmap and directory FileHeaders back to disk
 		// We need to do this before we can "Open" the file, since open
@@ -194,7 +194,7 @@ bool FileSystem::Create(const char *name, unsigned int initialSize, bool is_dire
 	DEBUG('f', "Creating file %s, size %d\n", name, initialSize);
 
 	directory = new Directory(NumDirEntries);
-		directory->FetchFrom(getDirectory());
+	directory->FetchFrom(getDirectory());
 
 	if (directory->Find(name) != -1)
 		success = FALSE; // file is already in directory
@@ -210,13 +210,12 @@ bool FileSystem::Create(const char *name, unsigned int initialSize, bool is_dire
 			hdr = new FileHeader;
 			if (!hdr->Allocate(freeMap, initialSize, is_directory)) {
 				success = FALSE; // no space on disk for data
-			}
-			else {
-                hdr->WriteBack(sector);
+			} else {
+				hdr->WriteBack(sector);
 				if (is_directory) {
 					auto newDir = Directory(NumDirEntries, sector, directory->Find("."));
 
-                    auto dirFile = OpenFile(sector);
+					auto dirFile = OpenFile(sector);
 					newDir.WriteBack(&dirFile);
 				}
 
@@ -297,7 +296,7 @@ bool FileSystem::Remove(const char *name)
 	freeMap->Clear(sector);       // remove header block
 	directory->Remove(name);
 
-	freeMap->WriteBack(freeMapFile);     // flush to disk
+	freeMap->WriteBack(freeMapFile);      // flush to disk
 	directory->WriteBack(getDirectory()); // flush to disk
 	delete fileHdr;
 	delete directory;
@@ -354,13 +353,15 @@ void FileSystem::Print()
 	delete directory;
 }
 
-Directory *FileSystem::getCurrentDirectory() {
+Directory *FileSystem::getCurrentDirectory()
+{
 	auto directory = new Directory(NumDirEntries);
 	directory->FetchFrom(getDirectory());
 	return directory;
 }
 
-const char *FileSystem::getCurrentDirectoryPath() {
+const char *FileSystem::getCurrentDirectoryPath()
+{
 	auto directory = getCurrentDirectory();
 	std::string ret;
 	char *tmp;
@@ -381,7 +382,8 @@ const char *FileSystem::getCurrentDirectoryPath() {
 	return ret_char;
 }
 
-OpenFile* FileSystem::PathParser(OpenFile *startDir, char *path) {
+OpenFile *FileSystem::PathParser(OpenFile *startDir, char *path)
+{
 	ASSERT(startDir != nullptr);
 	ASSERT(path != nullptr);
 
@@ -394,8 +396,7 @@ OpenFile* FileSystem::PathParser(OpenFile *startDir, char *path) {
 	auto tmp = startDir;
 	auto directory = new Directory(NumDirEntries);
 
-	while (pch != nullptr)
-	{
+	while (pch != nullptr) {
 		directory->FetchFrom(tmp);
 
 		int hdrSector = directory->Find(pch);
@@ -420,27 +421,31 @@ OpenFile* FileSystem::PathParser(OpenFile *startDir, char *path) {
 	return tmp;
 }
 
-OpenFile * FileSystem::getRoot() {
+OpenFile *FileSystem::getRoot()
+{
 	return directoryFile;
 }
 
-OpenFile * FileSystem::getDirectory() {
-	if (currentThread->space == NULL) //in the main
+OpenFile *FileSystem::getDirectory()
+{
+	if (currentThread->space == NULL) // in the main
 		return getRoot();
 	else
 		return currentThread->space->getCurDirFile();
 }
 
-void FileSystem::ChangeDirectory(OpenFile *dir) {
+void FileSystem::ChangeDirectory(OpenFile *dir)
+{
 	ASSERT(dir != nullptr);
 	ASSERT(currentThread->space != nullptr);
 	currentThread->space->setCurDirFile(dir);
 }
 
-bool FileSystem::ChangeDirectory(char *relative_path) {
+bool FileSystem::ChangeDirectory(char *relative_path)
+{
 	ASSERT(relative_path != nullptr);
 
-	OpenFile* file = PathParser(getDirectory(), relative_path);
+	OpenFile *file = PathParser(getDirectory(), relative_path);
 	if (file != nullptr) {
 		ChangeDirectory(file);
 		return true;
