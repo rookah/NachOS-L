@@ -22,6 +22,10 @@
 #include "copyright.h"
 #include "system.h"
 
+#ifdef USER_PROGRAM
+#include "addrspace.h"
+#endif
+
 //----------------------------------------------------------------------
 // Scheduler::Scheduler
 //      Initialize the list of ready but not running threads to empty.

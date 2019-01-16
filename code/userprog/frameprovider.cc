@@ -12,7 +12,14 @@ FrameProvider::~FrameProvider()
 
 int FrameProvider::GetEmptyFrame()
 {
-	return this->frame_bitmap->Find();
+	int rv = this->frame_bitmap->FindRandom();
+
+	if (rv == -1) {
+		DEBUG('n', "Out of memory\n");
+		ASSERT(FALSE);
+	}
+
+	return rv;
 }
 
 void FrameProvider::ReleaseFrame(int frame)

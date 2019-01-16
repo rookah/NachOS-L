@@ -224,9 +224,10 @@ void Directory::Print()
 	delete hdr;
 }
 
-bool Directory::IsEmpty() {
+bool Directory::IsEmpty()
+{
 	// 0 and 1 are "." and ".."
-	for (int i=2; i < tableSize; i++) {
+	for (int i = 2; i < tableSize; i++) {
 		if (table[i].inUse)
 			return FALSE;
 	}

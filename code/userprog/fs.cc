@@ -9,7 +9,7 @@ std::unordered_map<int, OpenFile *> openFileList;
 
 int do_Create(char *filename, bool isDir)
 {
-	 return fileSystem->Create(filename, 0, isDir) ? 1 : 0;
+	return fileSystem->Create(filename, 0, isDir) ? 1 : 0;
 }
 
 int do_Open(char *filename)
@@ -62,7 +62,7 @@ int do_Close(int fd)
 
 int do_Rm(char *filename)
 {
-		return fileSystem->Remove(filename);
+	return fileSystem->Remove(filename);
 }
 
 #endif

@@ -54,6 +54,10 @@
 
 #include <string>
 
+#ifdef USER_PROGRAM
+#include "addrspace.h"
+#endif
+
 // Sectors containing the file headers for the bitmap of free sectors,
 // and the directory of files.  These file headers are placed in well-known
 // sectors, so that they can be located on boot-up.
@@ -420,8 +424,8 @@ OpenFile *FileSystem::PathParser(OpenFile *startDir, char *path)
 		if (hdrSector == -1) {
 			delete directory;
 			DEBUG('f', "Wrong path! %s does not exist\n", pch);
-            if (tmp != startDir)
-                delete tmp;
+			if (tmp != startDir)
+				delete tmp;
 			return nullptr;
 		}
 
@@ -432,8 +436,8 @@ OpenFile *FileSystem::PathParser(OpenFile *startDir, char *path)
 			DEBUG('f', "Wrong path! %s is a file, not a directory\n", pch);
 			delete fh;
 			delete directory;
-            if (tmp != startDir)
-                delete tmp;
+			if (tmp != startDir)
+				delete tmp;
 			return nullptr;
 		}
 

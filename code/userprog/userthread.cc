@@ -1,6 +1,10 @@
 #include "machine.h"
 #include "system.h"
 
+#ifdef USER_PROGRAM
+#include "addrspace.h"
+#endif
+
 typedef struct bundle {
 	int f;
 	int arg;
@@ -15,9 +19,10 @@ int do_UserThreadCreate(int f, int arg, int userThreadExitAddr)
 	b->f = f;
 	b->arg = arg;
 	b->userThreadExitAddr = userThreadExitAddr;
+
 	Thread *t = new Thread("newThread");
 	t->pid = currentThread->pid;
-	currentThread->space->AddThread(t->id); // add new thread to the list of threads to run
+	currentThread->space->RegisterThread(t->id);
 	t->Fork(StartUserThread, (int)b);
 	return t->id;
 }
@@ -29,7 +34,7 @@ void do_UserThreadJoin(int tid)
 
 void do_UserThreadExit()
 {
-	currentThread->space->SignalThread(currentThread->id);
+	currentThread->space->UnregisterThread(currentThread->id);
 	currentThread->Finish();
 }
 
@@ -48,6 +53,8 @@ static void StartUserThread(int f)
 	machine->WriteRegister(31, b->userThreadExitAddr);
 
 	machine->WriteRegister(4, b->arg);
+
+	delete b;
 
 	machine->Run();
 	ASSERT(FALSE);

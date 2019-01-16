@@ -2,5 +2,5 @@
 
 int main()
 {
-	ForkExec("../build/putchar");
+	ForkExec("putchar");
 }

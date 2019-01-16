@@ -30,6 +30,11 @@
 #include "system.h"
 #include "usersemaphore.h"
 #include "userthread.h"
+
+#ifdef USER_PROGRAM
+#include "addrspace.h"
+#endif
+
 //----------------------------------------------------------------------
 // UpdatePC : Increments the Program Counter register in order to resume
 // the user program immediately after the "syscall" instruction.
@@ -79,8 +84,10 @@ void ExceptionHandler(ExceptionType which)
 	if (which == SyscallException) {
 		switch (type) {
 		case SC_Exit:
-			SignalProcess(currentThread->pid);
+			currentThread->space->UnregisterThread(currentThread->id);
 			currentThread->space->Exit();
+			SignalProcess(currentThread->pid);
+			delete currentThread->space;
 			currentThread->Finish();
 			break;
 
@@ -155,7 +162,7 @@ void ExceptionHandler(ExceptionType which)
 
 		case SC_ForkExec:
 			copyStringFromMachine((machine->ReadRegister(4)), string, MAX_STRING_SIZE);
-			machine->WriteRegister(2, do_ForkExec(string));
+			machine->WriteRegister(2, do_ForkExec(string, machine->ReadRegister(6)));
 			break;
 
 		case SC_Sbrk:
@@ -244,7 +251,7 @@ void ExceptionHandler(ExceptionType which)
 			machine->WriteRegister(2, do_Create(string, true));
 			break;
 
-		case SC_rm:	
+		case SC_rm:
 			copyStringFromMachine((machine->ReadRegister(4)), string, MAX_STRING_SIZE);
 			machine->WriteRegister(2, do_Rm(string));
 			break;

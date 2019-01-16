@@ -4,8 +4,6 @@
 #include "system.h"
 #include "utility.h"
 
-void copyStringFromMachine(int from, char *to, unsigned size);
-
 static Semaphore *readAvail;
 static Semaphore *writeDone;
 

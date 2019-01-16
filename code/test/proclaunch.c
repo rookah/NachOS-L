@@ -1,5 +1,5 @@
-#include "syscall.h"
 #include "../userlibs/libstring.h"
+#include "syscall.h"
 #include <stdio.h>
 
 int main()
@@ -37,29 +37,21 @@ int main()
 			break;
 		if (streq(buffer, "ls")) {
 			ls();
-		}
-		else if (streq(buffer, "pwd")) {
+		} else if (streq(buffer, "pwd")) {
 			pwd();
-		}
-		else if (streq(buffer, "touch")) {
+		} else if (streq(buffer, "touch")) {
 			Create(buffer + j);
-		}
-		else if (streq(buffer, "mkdir")) {
+		} else if (streq(buffer, "mkdir")) {
 			mkdir(buffer + j);
-		}
-		else if (streq(buffer, "cd")) {
+		} else if (streq(buffer, "cd")) {
 			cd(buffer + j);
-		}
-		else if (streq(buffer, "rm")) {
+		} else if (streq(buffer, "rm")) {
 			rm(buffer + j);
-		}
-		else if (streq(buffer, "rmdir")) {
+		} else if (streq(buffer, "rmdir")) {
 			rm(buffer + j);
-		}
-		else if (streq(buffer, "exit")) {
+		} else if (streq(buffer, "exit")) {
 			Halt();
-		}
-		else {
+		} else {
 			newProc = ForkExec(buffer);
 			ForkJoin(newProc);
 		}

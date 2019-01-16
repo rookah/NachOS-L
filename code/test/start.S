@@ -242,6 +242,7 @@ SemPost:
 	.ent ForkExec
 ForkExec:
 	addiu $2,$0,SC_ForkExec
+	addiu $6,$0,UserThreadExit
 	syscall
 	j	$31
 

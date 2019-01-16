@@ -8,7 +8,8 @@ void ReceiveAck(int conn);
 
 static const int MaxRMailSize = MaxMailSize - sizeof(RHeader);
 
-RConn::RConn(PostOffice *post, int to_addr, int mailboxId) : mPost(post), addr(to_addr), mailbox(mailboxId), sendLock("conn send lock"), recvLock("conn recv lock")
+RConn::RConn(PostOffice *post, int to_addr, int mailboxId)
+    : mPost(post), addr(to_addr), mailbox(mailboxId), sendLock("conn send lock"), recvLock("conn recv lock")
 {
 	seqId = 1;
 	friendSeqId = 1;
@@ -89,7 +90,7 @@ int RConn::sendOne(int size, const char *data)
 int RConn::recv(int size, char *data)
 {
 	recvLock.Acquire();
-	
+
 	for (int i = 0; i < size; i += MaxRMailSize) {
 		int r = recvOne(std::min(MaxRMailSize, size - i), data + i);
 

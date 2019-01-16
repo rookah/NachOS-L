@@ -41,8 +41,9 @@
 #include "utility.h"
 
 #ifdef USER_PROGRAM
-#include "addrspace.h"
 #include "machine.h"
+
+class AddrSpace;
 #endif
 
 // CPU register state to be saved on context switch.
@@ -110,8 +111,7 @@ class Thread
 		printf("%s, ", name);
 	}
 	int id;
-	int userStack; // Top of user stack
-	int pid;       // pid associated to the thread
+	int pid; // pid associated to the thread
 
   private:
 	// some of the private data for this class is listed above

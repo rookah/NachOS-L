@@ -24,7 +24,9 @@
 #include <set>
 #include <strings.h> /* for bzero */
 
-static int process_count = 0;
+static int processCount = 0;
+static Lock processCountLock("proc count lock");
+
 static void ReadAtVirtual(OpenFile *executable, int virtualaddr, int numBytes, int position);
 static FrameProvider fp(NumPhysPages);
 
@@ -64,7 +66,7 @@ static void SwapHeader(NoffHeader *noffH)
 //      "executable" is the file containing the object code to load into memory
 //----------------------------------------------------------------------
 
-AddrSpace::AddrSpace(OpenFile *executable) : mtx(new Lock("thread countlock"))
+AddrSpace::AddrSpace(OpenFile *executable) : noThreadCondition("cond proc"), threadListLock("lock proc")
 {
 	NoffHeader noffH;
 	unsigned int size;
@@ -115,11 +117,10 @@ AddrSpace::AddrSpace(OpenFile *executable) : mtx(new Lock("thread countlock"))
 		DEBUG('a', "Initializing data segment, at 0x%x, size %d\n", noffH.initData.virtualAddr, noffH.initData.size);
 		ReadAtVirtual(executable, noffH.initData.virtualAddr, noffH.initData.size, noffH.initData.inFileAddr);
 	}
-	numThreads = 0;
 
-	mtx->Acquire();
-	process_count++;
-	mtx->Release();
+	processCountLock.Acquire();
+	processCount++;
+	processCountLock.Release();
 
 #ifdef FILESYS
 	setCurDirFile(fileSystem->getRoot());
@@ -135,22 +136,19 @@ static void ReadAtVirtual(OpenFile *executable, int virtualaddr, int numBytes, i
 	}
 }
 
-//----------------------------------------------------------------------
-// AddrSpace::~AddrSpace
-//      Deallocate an address space.  Nothing for now!
-//----------------------------------------------------------------------
-
 AddrSpace::~AddrSpace()
 {
-	// LB: Missing [] for delete
-	// delete pageTable;
+}
+
+void AddrSpace::Cleanup()
+{
+	DEBUG('n', "Cleanup");
 	for (unsigned i = 0; i < MaxVirtPage; i++) {
 		if (pageTable[i].valid) {
 			fp.ReleaseFrame(pageTable[i].physicalPage);
 			pageTable[i].valid = false;
 		}
 	}
-	// End of modification
 }
 
 //----------------------------------------------------------------------
@@ -165,9 +163,9 @@ AddrSpace::~AddrSpace()
 
 void AddrSpace::InitThreadRegisters()
 {
-	int i;
+	DEBUG('n', "New thread %d\n", currentThread->id);
 
-	for (i = 0; i < NumTotalRegs; i++)
+	for (int i = 0; i < NumTotalRegs; i++)
 		machine->WriteRegister(i, 0);
 
 	// Initial program counter -- must be location of "Start"
@@ -180,10 +178,12 @@ void AddrSpace::InitThreadRegisters()
 	// Set the stack register to the end of the address space, where we
 	// allocated the stack; but subtract off a bit, to make sure we don't
 	// accidentally reference off the end!
-	currentThread->userStack = AllocatePages(UserStackSize / PageSize, true);
-	int stackAddr = currentThread->userStack * PageSize + UserStackSize - 16;
 
+	// Set the stack pointer to the previously allocated memory block
+	ASSERT(threadList.count(currentThread->id)); // See RegisterThread
+	int stackAddr = threadList[currentThread->id].topOfStack * PageSize + UserStackSize - 16;
 	machine->WriteRegister(StackReg, stackAddr);
+
 	DEBUG('a', "Initializing stack register to %d\n", stackAddr);
 }
 
@@ -213,52 +213,97 @@ void AddrSpace::RestoreState()
 	machine->pageTableSize = MaxVirtPage;
 }
 
-int AddrSpace::ThreadCount()
+void AddrSpace::RegisterThread(int tid)
 {
-	mtx->Acquire();
-	int a = ++numThreads;
-	mtx->Release();
-	return a;
+	DEBUG('n', "Registering thread %d\n", tid);
+	threadListLock.Acquire();
+
+	ASSERT(threadList.count(tid) == 0);
+
+	// Allocate memory for the new thread's stack
+	ThreadData newThread{new Semaphore("thread", 0), AllocatePages(UserStackSize / PageSize, true)};
+	threadList.insert(std::make_pair(tid, newThread));
+
+	threadListLock.Release();
 }
 
-void AddrSpace::AddThread(int tid)
+void AddrSpace::UnregisterThread(int tid)
 {
-	Semaphore *sem = new Semaphore("thread", 0);
-	threadList.insert(std::make_pair(tid, sem));
-}
+	DEBUG('n', "Enregistering thread %d\n", tid);
+	threadListLock.Acquire();
 
-void AddrSpace::SignalThread(int tid)
-{
-	threadList.at(tid)->Post();
+	ASSERT(threadList.count(tid) == 1);
+	FreePages(threadList[tid].topOfStack, UserStackSize / PageSize); // See AddrSpace::RegisterThread
+
+	for (unsigned int i = 0; i < threadList.size(); i++) { // At most numThreads are waiting on this thread to finish
+		threadList.at(tid).endSemaphore->Post();
+	}
+
+	threadList.erase(tid);
+	DEBUG('n', "Erased thread %d\n", tid);
+
+	ASSERT(threadList.count(tid) == 0);
+
+	DEBUG('n', "Erased stack %d, space %p\n", tid, this);
+
+	if (threadList.size() == 0)
+		noThreadCondition.Broadcast(&threadListLock);
+
+	threadListLock.Release();
 }
 
 void AddrSpace::JoinThread(int tid)
 {
-	// return if tid isn't running
-	std::unordered_map<int, Semaphore *>::iterator it = threadList.find(tid);
-	if (it == threadList.end())
-		return;
+	threadListLock.Acquire();
 
-	// wait on tid and erase entry from the map
-	threadList.at(tid)->Wait();
-	delete threadList.at(tid);
-	threadList.erase(tid);
+	DEBUG('n', "Joining thread %d, space %p\n", tid, this);
+
+	if (threadList.count(tid) == 0) {
+		threadListLock.Release();
+		DEBUG('n', "Already joined thread %d\n", tid);
+		return;
+	}
+
+	DEBUG('n', "Waiting thread %d\n", tid);
+
+	threadListLock.Release();
+
+	threadList.at(tid).endSemaphore->Wait();
+
+	DEBUG('n', "Erased thrsead %d\n", tid);
 }
 
 void AddrSpace::Exit()
 {
-	mtx->Acquire();
+	DEBUG('n', "Exit process\n");
 
-	process_count--;
-	if (process_count == 0) {
+	threadListLock.Acquire();
+
+	while (threadList.size() > 0)
+		noThreadCondition.Wait(&threadListLock);
+
+	threadListLock.Release();
+
+	Cleanup();
+
+	// Here we could delete all semaphores
+	// delete threadList.at(tid).endSemaphore;
+
+	processCountLock.Acquire();
+
+	processCount--;
+	if (processCount == 0) {
 		interrupt->Halt();
 	}
 
-	mtx->Release();
+	processCountLock.Release();
 }
 
 int AddrSpace::AllocatePages(int numPages, bool fromEnd)
 {
+	// Tries to allocate contiguous pages
+	// if fromEnd is set, begin from the end of the address space
+
 	std::set<int> usedVPN;
 
 	for (unsigned int i = 0; i < MaxVirtPage; ++i) {

@@ -31,10 +31,12 @@ void StartProcess(char *filename)
 		return;
 	}
 	space = new AddrSpace(executable);
-	currentThread->space = space;
 	delete executable; // close file
+	currentThread->space = space;
 
+	space->RegisterThread(currentThread->id);
 	currentThread->pid = currentThread->id; // pid = main thread's id
+
 	Semaphore *sem = new Semaphore("main_process", 0);
 	processList.insert(std::make_pair(currentThread->pid, sem));
 	space->InitThreadRegisters(); // set the initial register values

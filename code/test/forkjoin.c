@@ -4,18 +4,18 @@ int main()
 {
 	PutString("With Join: \n\n");
 
-	int id = ForkExec("../build/prodcons");
+	int id = ForkExec("prodcons");
 	ForkJoin(id);
 	PutChar('\n');
 
-	id = ForkExec("../build/prodcons");
+	id = ForkExec("prodcons");
 	ForkJoin(id);
 	PutChar('\n');
 
 	PutString("Without Join: \n");
 
-	ForkExec("../build/prodcons");
-	ForkExec("../build/prodcons");
+	ForkExec("prodcons");
+	ForkExec("prodcons");
 
 	PutString("\n\n");
 

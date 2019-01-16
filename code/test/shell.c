@@ -18,7 +18,7 @@ int main()
 
 		do {
 
-			Read( input,&buffer[i], 1);
+			Read(input, &buffer[i], 1);
 
 		} while (buffer[i++] != '\n');
 

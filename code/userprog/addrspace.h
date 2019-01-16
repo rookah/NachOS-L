@@ -18,8 +18,7 @@
 #include "translate.h"
 #include <unordered_map>
 
-class Lock;
-class Semaphore;
+#include "synch.h"
 
 #define UserStackSize 2048            // increase this as necessary!
 #define MaxVirtPage (unsigned int)512 // VM Size
@@ -37,9 +36,9 @@ class AddrSpace
 
 	void SaveState();    // Save/restore address space-specific
 	void RestoreState(); // info on a context switch
-	int ThreadCount();
-	void AddThread(int tid);
-	void SignalThread(int tid);
+
+	void RegisterThread(int tid);
+	void UnregisterThread(int tid);
 	void JoinThread(int tid);
 
 	void Exit();
@@ -53,11 +52,20 @@ class AddrSpace
 #endif
 
   private:
+	void Cleanup();
+
 	TranslationEntry pageTable[MaxVirtPage];
 
-	int numThreads;
-	Lock *mtx;
-	std::unordered_map<int, Semaphore *> threadList;
+	Condition noThreadCondition;
+	Lock threadListLock;
+
+	struct ThreadData {
+		Semaphore *endSemaphore;
+		int topOfStack;
+	};
+
+	std::unordered_map<int, ThreadData> threadList;
+
 	unsigned int brk;
 
 #ifdef FILESYS

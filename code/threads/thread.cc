@@ -25,6 +25,10 @@ static Lock thread_mutex("thread mutex");
                                    // execution stack, for detecting
                                    // stack overflows
 
+#ifdef USER_PROGRAM
+#include "addrspace.h"
+#endif
+
 //----------------------------------------------------------------------
 // Thread::Thread
 //      Initialize a thread control block, so that we can then call
@@ -45,7 +49,6 @@ Thread::Thread(const char *threadName)
 
 #ifdef USER_PROGRAM
 	space = NULL;
-	userStack = -1;
 	// FBT: Need to initialize special registers of simulator to 0
 	// in particular LoadReg or it could crash when switching
 	// user threads.
@@ -172,11 +175,6 @@ void Thread::Finish()
 	// End of addition
 
 	threadToBeDestroyed = currentThread;
-
-#ifdef USER_PROGRAM
-	if (userStack != -1)
-		currentThread->space->FreePages(userStack, UserStackSize / PageSize); // See AddrSpace::InitThreadRegisters
-#endif
 
 	Sleep(); // invokes SWITCH
 	         // not reached

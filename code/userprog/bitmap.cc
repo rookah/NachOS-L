@@ -95,29 +95,34 @@ bool BitMap::Test(int which)
 
 int BitMap::Find()
 {
-	for (int i = 0; i < numBits; i++)
+	for (int i = 0; i < numBits; i++) {
 		if (!Test(i)) {
 			Mark(i);
 			return i;
 		}
+	}
+
 	return -1;
 }
 
 int BitMap::FindRandom()
 {
 	std::set<int> s;
-	for (int i = 0; i < numBits; i++)
-		s.insert(i);
-	std::set<int>::const_iterator it(s.begin());
-
 	for (int i = 0; i < numBits; i++) {
-		advance(it, 1);
-		if (!Test(*it)) {
-			Mark(*it);
-			return (*it);
+		if (!Test(i)) {
+			s.insert(i);
 		}
 	}
-	return -1;
+
+	if (s.empty()) {
+		return -1;
+	}
+
+	std::set<int>::const_iterator it(s.begin());
+
+	advance(it, rand() % 5);
+	Mark(*it);
+	return (*it);
 }
 
 //----------------------------------------------------------------------
