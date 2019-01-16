@@ -6,7 +6,7 @@
 #include <stddef.h>
 
 // FIXME Redefined in several locations
-#define MaxThreadNum 8
+#define MaxThreadNum 16
 
 int pthread_create(pthread_t *thread, const pthread_attr_t *attr, void *(*start_routine)(void *), void *arg)
 {

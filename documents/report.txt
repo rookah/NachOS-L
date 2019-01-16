@@ -9,7 +9,7 @@ Your project *must* compile with the "make" command on mandelbrot.
         a (short) part quickly describing the interresting/main features of your kernel (ie what makes you unique, what can be done with your software, ...)
         a "specifications" part that lists all what is available for user programs. You must put here what kind of information you would find in man pages. We must then find all implemented system calls with their prototype, the description of their arguments, the description of their behavior (user behavior, not the implementation), the description of the return value (if any), of the error managment, ... If you have a user-level library, you must describe its functions as your system calls.
         a "user tests" that describe the test programs you wrote, what they check, ...
-        an "implémentation" part that explain the main points of your implementation. So, it is the only part that talks in details about the code you wrote. You must explain/justify your choices.
+        an "implementation" part that explain the main points of your implementation. So, it is the only part that talks in details about the code you wrote. You must explain/justify your choices.
         a more "scolar" part where you describe the organization of your work (planning, ...), you do useful comments about the project organisation, ...
 
 The 3 first parts should target a user of your system. The 4th part target a developer that would like to continue to improve your system. If you correctly worked on specifications as requested, theses technical parts will be easy to write.
