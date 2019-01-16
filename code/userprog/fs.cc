@@ -30,7 +30,7 @@ int do_Open(char *filename)
 		return -1;
 	}
 	for (auto it : openFileList) {
-		if (it.second->getHeaderSector() == f->getHeaderSector()) { // file found in the open files list
+		if (it.second->getFirstFileDataSector() == f->getFirstFileDataSector()) { // file found in the open files list
 			printf("Unable to open file %s: file already opened\n", filename);
 			open_files_mutex.Release();
 			return -1;
@@ -90,7 +90,7 @@ int do_Rm(char *filename)
 	OpenFile *f = fileSystem->Open(filename);
 	if (f != nullptr) {
 		for (auto it : openFileList) {
-			if (it.second->getHeaderSector() == f->getHeaderSector()) { // file found in the open files list
+			if (it.second->getFirstFileDataSector() == f->getFirstFileDataSector()) { // file found in the open files list
 				printf("Unable to delete file %s: file already opened\n", filename);
 				open_files_mutex.Release();
 				return -1;

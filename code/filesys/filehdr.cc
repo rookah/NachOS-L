@@ -197,7 +197,7 @@ int FileHeader::IsDirectory()
 	return isDirectory;
 }
 
-bool FileHeader::Reallocate(BitMap *freeMap, unsigned int newFileSize) {
+bool FileHeader::Extend(BitMap *freeMap, unsigned int newFileSize) {
 	ASSERT(isDirectory == FALSE); // Folders are supposed to have a fixed size
 
 	ASSERT(newFileSize > numBytes); // Can only increase file size
@@ -248,7 +248,16 @@ bool FileHeader::Reallocate(BitMap *freeMap, unsigned int newFileSize) {
 
 	// Now the last allocated indirect sector is full, need to create new indirect entries
 
-	for (unsigned int i = 1 + numSectors / NumDirect; i < newNumIndir; i++) {
+	unsigned int i = 0;
+
+	// File was completely empty
+	if (numSectors == 0) {
+		i = 0;
+	} else {
+		i = 1 + numSectors / NumDirect;
+	}
+
+	for (; i < newNumIndir; i++) {
 		// New entry in indirect table, allocate a segment for it
 		indirectDataSectors[i] = freeMap->Find();
 		ASSERT(indirectDataSectors[i] != -1)

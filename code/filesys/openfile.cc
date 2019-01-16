@@ -26,10 +26,11 @@
 //	"sector" -- the location on disk of the file header for this file
 //----------------------------------------------------------------------
 
-OpenFile::OpenFile(int sector)
+OpenFile::OpenFile(unsigned int sector)
 {
 	hdr = new FileHeader;
 	hdr->FetchFrom(sector);
+	hdrSector = sector;
 	seekPosition = 0;
 }
 
@@ -143,9 +144,6 @@ int OpenFile::WriteAt(const char *from, unsigned int numBytes, unsigned int posi
 	bool firstAligned, lastAligned;
 	char *buf;
 
-	if ((numBytes <= 0) || (position >= fileLength))
-		return 0; // check request
-
 	// Need to allocate more segments
 	if ((position + numBytes) > fileLength) {
 
@@ -154,7 +152,8 @@ int OpenFile::WriteAt(const char *from, unsigned int numBytes, unsigned int posi
 		auto *freeMapFile = new OpenFile(FreeMapSector);
 		freeMap->FetchFrom(freeMapFile);
 
-		hdr->Reallocate(freeMap, position + numBytes);
+        hdr->Extend(freeMap, position + numBytes);
+		hdr->WriteBack(hdrSector);
 
 		delete freeMapFile;
 		delete freeMap;
@@ -196,7 +195,7 @@ int OpenFile::Length()
 	return hdr->FileLength();
 }
 
-int OpenFile::getHeaderSector()
+int OpenFile::getFirstFileDataSector()
 {
 	return hdr->ByteToSector(0);
 }

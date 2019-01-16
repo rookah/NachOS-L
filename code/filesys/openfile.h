@@ -81,12 +81,12 @@ class FileHeader;
 class OpenFile
 {
   public:
-	OpenFile(int sector); // Open a file whose header is located
+	OpenFile(unsigned int sector); // Open a file whose header is located
 	                      // at "sector" on the disk
 	~OpenFile();          // Close the file
 
-	int getHeaderSector();	// Returns the sector of the header of the file
-							// Allows to authenticate a an OpenFile. 
+	int getFirstFileDataSector();
+							// Allows to authenticate an OpenFile.
 
 	void Seek(int position); // Set the position from which to
 	                         // start reading/writing -- UNIX lseek
@@ -109,6 +109,7 @@ class OpenFile
 
   private:
 	FileHeader *hdr;  // Header for this file
+	unsigned hdrSector;
 	int seekPosition; // Current position within the file
 };
 
