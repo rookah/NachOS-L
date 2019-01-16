@@ -12,13 +12,13 @@ int main()
 	prompt[1] = '-';
 
 	while (1) {
-		Write(prompt, 2, output);
+		Write(output, prompt, 2);
 
 		i = 0;
 
 		do {
 
-			Read(&buffer[i], 1, input);
+			Read( input,&buffer[i], 1);
 
 		} while (buffer[i++] != '\n');
 
