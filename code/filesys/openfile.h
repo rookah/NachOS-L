@@ -85,6 +85,9 @@ class OpenFile
 	                      // at "sector" on the disk
 	~OpenFile();          // Close the file
 
+	int getHeaderSector();	// Returns the sector of the header of the file
+							// Allows to authenticate a an OpenFile. 
+
 	void Seek(int position); // Set the position from which to
 	                         // start reading/writing -- UNIX lseek
 
