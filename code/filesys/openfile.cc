@@ -136,17 +136,29 @@ int OpenFile::ReadAt(char *into, int numBytes, int position)
 	return numBytes;
 }
 
-int OpenFile::WriteAt(const char *from, int numBytes, int position)
+int OpenFile::WriteAt(const char *from, unsigned int numBytes, unsigned int position)
 {
-	int fileLength = hdr->FileLength();
-	int i, firstSector, lastSector, numSectors;
+	unsigned int fileLength = hdr->FileLength();
+	unsigned int i, firstSector, lastSector, numSectors;
 	bool firstAligned, lastAligned;
 	char *buf;
 
 	if ((numBytes <= 0) || (position >= fileLength))
 		return 0; // check request
-	if ((position + numBytes) > fileLength)
-		numBytes = fileLength - position;
+
+	// Need to allocate more segments
+	if ((position + numBytes) > fileLength) {
+
+		// FIXME Abstraction leak, OpenFile is not supposed to be aware of this
+		auto *freeMap = new BitMap(NumSectors);
+		auto *freeMapFile = new OpenFile(FreeMapSector);
+		freeMap->FetchFrom(freeMapFile);
+
+		hdr->Reallocate(freeMap, position + numBytes);
+
+		delete freeMapFile;
+		delete freeMap;
+	}
 	DEBUG('f', "Writing %d bytes at %d, from file of length %d.\n", numBytes, position, fileLength);
 
 	firstSector = divRoundDown(position, SectorSize);

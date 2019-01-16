@@ -39,6 +39,7 @@
 #include "directory.h"
 #include "openfile.h"
 
+#define FreeMapSector 0
 #define MaxDepth 10
 #define NumDirEntries 10
 

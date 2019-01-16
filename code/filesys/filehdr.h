@@ -46,6 +46,7 @@ class FileHeader
 	                                                                                 //  on disk for the file data
 	void Deallocate(BitMap *bitMap);                                                 // De-allocate this file's
 	                                                                                 //  data blocks
+	bool Reallocate(BitMap *freeMap, unsigned int newFileSize);
 
 	void FetchFrom(int sectorNumber); // Initialize file header from disk
 	void WriteBack(int sectorNumber); // Write modifications to file header
@@ -55,7 +56,7 @@ class FileHeader
 	                              // to the disk sector containing
 	                              // the byte
 
-	int FileLength(); // Return the length of the file
+	unsigned int FileLength(); // Return the length of the file
 	                  // in bytes
 
 	void Print(); // Print the contents of the file.

@@ -100,7 +100,7 @@ class OpenFile
 	int ReadAt(char *into, int numBytes, int position);
 	// Read/write bytes from the file,
 	// bypassing the implicit position.
-	int WriteAt(const char *from, int numBytes, int position);
+	int WriteAt(const char *from, unsigned int numBytes, unsigned int position);
 
 	int Length(); // Return the number of bytes in the
 	              // file (this interface is simpler

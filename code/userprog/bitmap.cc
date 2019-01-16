@@ -176,5 +176,5 @@ void BitMap::FetchFrom(OpenFile *file)
 
 void BitMap::WriteBack(OpenFile *file)
 {
-	file->WriteAt((char *)map, numWords * sizeof(unsigned), 0);
+	file->WriteAt((char *)map, (unsigned int)numWords * sizeof(unsigned), 0);
 }

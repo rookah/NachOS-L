@@ -159,7 +159,7 @@ int FileHeader::ByteToSector(int offset)
 // 	Return the number of bytes in the file.
 //----------------------------------------------------------------------
 
-int FileHeader::FileLength()
+unsigned int FileHeader::FileLength()
 {
 	return numBytes;
 }
@@ -195,4 +195,79 @@ void FileHeader::Print()
 int FileHeader::IsDirectory()
 {
 	return isDirectory;
+}
+
+bool FileHeader::Reallocate(BitMap *freeMap, unsigned int newFileSize) {
+	ASSERT(isDirectory == FALSE); // Folders are supposed to have a fixed size
+
+	ASSERT(newFileSize > numBytes); // Can only increase file size
+	ASSERT(NumIndirect >= divRoundUp(newFileSize, NumDirect)); // Enough room in the indirect table
+
+	unsigned int newNumSectors = divRoundUp(newFileSize, SectorSize);
+	unsigned int numExtraSectors = newNumSectors - numSectors;
+
+	unsigned int numExtraIndirectSectors = divRoundUp(newNumSectors, NumDirect) - divRoundUp(numSectors, NumDirect);
+
+	// Nothing to do here
+	if (numExtraSectors == 0) {
+		numBytes = newFileSize;
+		return TRUE;
+	}
+
+	// FIXME Not thread-safe (cannot assume the number of clear sectors won't change)
+	if (freeMap->NumClear() < numExtraSectors + numExtraIndirectSectors)
+		return FALSE; // Not enough space for new sectors + indirect tables
+
+	// Number of entries in the indirect table
+	unsigned int newNumIndir = divRoundUp(newNumSectors, NumDirect);
+
+	// There is an indirect sector that is not entirely full
+	if (numSectors % NumDirect != 0) {
+		unsigned incompleteIndirect = numSectors / NumDirect;
+
+		int directSectors[NumDirect] = {0};
+		ASSERT(sizeof(directSectors) == SectorSize);
+
+		synchDisk->ReadSector(indirectDataSectors[incompleteIndirect], (char *)directSectors);
+
+		for (unsigned int j = numSectors % NumDirect; (j < NumDirect && incompleteIndirect * NumDirect + j < numSectors); j++) {
+
+			directSectors[j] = freeMap->Find();
+			ASSERT(directSectors[j] != -1)
+		}
+
+		synchDisk->WriteSector(indirectDataSectors[incompleteIndirect], (char *)directSectors);
+	}
+
+	// All new segments already fit in the remaining place in the last indirect sector
+	if (numExtraIndirectSectors == 0) {
+		numBytes = newFileSize;
+		numSectors = newNumSectors;
+		return TRUE;
+	}
+
+	// Now the last allocated indirect sector is full, need to create new indirect entries
+
+	for (unsigned int i = 1 + numSectors / NumDirect; i < newNumIndir; i++) {
+		// New entry in indirect table, allocate a segment for it
+		indirectDataSectors[i] = freeMap->Find();
+		ASSERT(indirectDataSectors[i] != -1)
+
+		int directSectors[NumDirect] = {0};
+		ASSERT(sizeof(directSectors) == SectorSize);
+
+		// A table has max NumDirect segments, and doesn't have more segments than what is needed
+		for (unsigned int j = 0; (j < NumDirect && i * NumDirect + j < newNumSectors); j++) {
+			// New entry in direct table, allocate segment for it
+			directSectors[j] = freeMap->Find();
+			ASSERT(directSectors[j] != -1)
+		}
+
+		synchDisk->WriteSector(indirectDataSectors[i], (char *)directSectors);
+	}
+
+	numBytes = newFileSize;
+	numSectors = newNumSectors;
+
+	return TRUE;
 }

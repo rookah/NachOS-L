@@ -86,10 +86,10 @@ FileSystem::FileSystem(bool format)
 {
 	DEBUG('f', "Initializing the file system.\n");
 	if (format) {
-		BitMap *freeMap = new BitMap(NumSectors);
-		Directory *directory = new Directory(NumDirEntries);
-		FileHeader *mapHdr = new FileHeader;
-		FileHeader *dirHdr = new FileHeader;
+		auto *freeMap = new BitMap(NumSectors);
+		auto *directory = new Directory(NumDirEntries);
+		auto *mapHdr = new FileHeader;
+		auto *dirHdr = new FileHeader;
 
 		DEBUG('f', "Formatting the file system.\n");
 
@@ -345,10 +345,10 @@ void FileSystem::List()
 
 void FileSystem::Print()
 {
-	FileHeader *bitHdr = new FileHeader;
-	FileHeader *dirHdr = new FileHeader;
-	BitMap *freeMap = new BitMap(NumSectors);
-	Directory *directory = new Directory(NumDirEntries);
+	auto *bitHdr = new FileHeader;
+	auto *dirHdr = new FileHeader;
+	auto *freeMap = new BitMap(NumSectors);
+	auto *directory = new Directory(NumDirEntries);
 
 	printf("Bit map file header:\n");
 	bitHdr->FetchFrom(FreeMapSector);
