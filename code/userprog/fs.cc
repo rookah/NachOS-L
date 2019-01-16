@@ -19,13 +19,22 @@ int do_Open(char *filename)
 	open_files_mutex.Acquire();
 	if (openFileList.size() >= 10) {
 		printf("Unable to open file %s: too many files currently open\n", (char *)filename);
+		open_files_mutex.Release();
 		return -1;
 	}
 
 	OpenFile *f = fileSystem->Open(filename);
 	if (f == nullptr) {
 		printf("Unable to open file %s: file not found\n", filename);
+		open_files_mutex.Release();
 		return -1;
+	}
+	for (auto it : openFileList) {
+		if (it.second->getHeaderSector() == f->getHeaderSector()) { // file found in the open files list
+			printf("Unable to open file %s: file already opened\n", filename);
+			open_files_mutex.Release();
+			return -1;
+		}
 	}
 
 	openFileList.insert(std::make_pair(++fd_index, f));
@@ -78,12 +87,14 @@ int do_Close(int fd)
 int do_Rm(char *filename)
 {
 	open_files_mutex.Acquire();
-	for (auto it : openFileList) {
-		if (it.first == fd) { // fd found in the open files list
-			printf("Unable to delete file %s: file is currently opened\n", (char *)filename);
-			openFileList.erase(fd);
-			open_files_mutex.Release();
-			return -1;
+	OpenFile *f = fileSystem->Open(filename);
+	if (f != nullptr) {
+		for (auto it : openFileList) {
+			if (it.second->getHeaderSector() == f->getHeaderSector()) { // file found in the open files list
+				printf("Unable to delete file %s: file already opened\n", filename);
+				open_files_mutex.Release();
+				return -1;
+			}
 		}
 	}
 	int ret = fileSystem->Remove(filename);
