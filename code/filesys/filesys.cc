@@ -404,9 +404,9 @@ OpenFile *FileSystem::PathParser(OpenFile *startDir, char *path)
 	ASSERT(startDir != nullptr);
 	ASSERT(path != nullptr);
 
-	auto pch = new char[MaxPwdSize];
-	strcpy(pch, path);
-	strtok(pch, "/");
+	auto pathcopy = new char[MaxPwdSize];
+	strcpy(pathcopy, path);
+	auto pch = strtok(pathcopy, "/");
 	if (pch == nullptr)
 		return startDir;
 
@@ -418,7 +418,10 @@ OpenFile *FileSystem::PathParser(OpenFile *startDir, char *path)
 
 		int hdrSector = directory->Find(pch);
 		if (hdrSector == -1) {
+			delete directory;
 			DEBUG('f', "Wrong path! %s does not exist\n", pch);
+            if (tmp != startDir)
+                delete tmp;
 			return nullptr;
 		}
 
@@ -427,14 +430,23 @@ OpenFile *FileSystem::PathParser(OpenFile *startDir, char *path)
 
 		if (!fh->IsDirectory()) {
 			DEBUG('f', "Wrong path! %s is a file, not a directory\n", pch);
+			delete fh;
+			delete directory;
+            if (tmp != startDir)
+                delete tmp;
 			return nullptr;
 		}
 
-		// FIXME Stop leak
+		delete fh;
+
+		if (tmp != startDir)
+			delete tmp;
+
 		tmp = new OpenFile(hdrSector);
 		pch = strtok(nullptr, "/");
 	}
 
+	delete directory;
 	return tmp;
 }
 
@@ -445,7 +457,7 @@ OpenFile *FileSystem::getRoot()
 
 OpenFile *FileSystem::getDirectory()
 {
-	if (currentThread->space == NULL) // in the main
+	if (currentThread->space == nullptr) // in the main
 		return getRoot();
 	else
 		return currentThread->space->getCurDirFile();
