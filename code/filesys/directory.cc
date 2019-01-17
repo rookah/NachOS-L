@@ -88,7 +88,7 @@ void Directory::FetchFrom(OpenFile *file)
 
 void Directory::WriteBack(OpenFile *file)
 {
-	(void)file->WriteAt((char *)table, tableSize * sizeof(DirectoryEntry), 0);
+	(void)file->WriteAt((char *)table, (unsigned int)tableSize * sizeof(DirectoryEntry), 0);
 }
 
 //----------------------------------------------------------------------
