@@ -163,6 +163,7 @@ void AddrSpace::Cleanup()
 
 void AddrSpace::InitThreadRegisters()
 {
+	// I know that these debug messages are not network related but the vm debugging channel is full of crap...
 	DEBUG('n', "New thread %d\n", currentThread->id);
 
 	for (int i = 0; i < NumTotalRegs; i++)
@@ -229,7 +230,7 @@ void AddrSpace::RegisterThread(int tid)
 
 void AddrSpace::UnregisterThread(int tid)
 {
-	DEBUG('n', "Enregistering thread %d\n", tid);
+	DEBUG('n', "Unregistering thread %d\n", tid);
 	threadListLock.Acquire();
 
 	ASSERT(threadList.count(tid) == 1);
